@@ -30,7 +30,7 @@ export const links: LinksFunction = () => {
 }
 
 export const meta: MetaFunction = () => {
-  return { title: 'New Remix App' }
+  return { title: 'Sizes | mooth.tech' }
 }
 
 type LoaderData = {
@@ -53,6 +53,13 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <script
+          async
+          defer
+          data-domain="sizes.mooth.tech"
+          data-api="https://mooth.tech/proxy/api/event"
+          src="https://mooth.tech/js/potato.js"
+        />
         <Meta />
         <Links />
       </head>
@@ -65,23 +72,20 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
           </header>
           <div className="flex-1">{children}</div>
         </div>
-        <footer className="py-8">
-          <div className="group text-center">
+        <footer className="py-8 text-center">
+          <a
+            href="https://mooth.tech/?ref=Sizes"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group link link-hover"
+          >
             Made with{' '}
             <span className="relative inline-block h-5 w-5 align-middle">
               <HeartIcon className="absolute inset-0 fill-current text-pink" />
               <HeartIcon className="absolute inset-0 fill-current text-purple group-hover:animate-ping" />
             </span>{' '}
-            by{' '}
-            <a
-              href="https://mooth.tech/?ref=Sizes"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="link"
-            >
-              Soorria
-            </a>
-          </div>
+            by <span className="underline">Soorria</span>
+          </a>
         </footer>
         <ScrollRestoration />
         {js ? <Scripts /> : null}
