@@ -1,11 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
 import {
   ActionFunction,
   Form,
   json,
   LoaderFunction,
   useLoaderData,
-  useTransition,
 } from 'remix'
 import { setPrefsToSession, themeNames } from '~/lib/prefs.server'
 import { commitSession, destroySession, getSession } from '~/lib/session.server'
@@ -18,13 +16,13 @@ export const action: ActionFunction = async ({ request }) => {
   const action = formData.get('_action')
 
   if (action === 'destroy') {
-    await destroySession(session)
-
-    return json({}, { headers: { 'Set-Cookie': await commitSession(session) } })
+    return json(
+      {},
+      { headers: { 'Set-Cookie': await destroySession(session) } }
+    )
   }
 
   const data = {
-    js: formData.get('js') === 'on',
     theme: formData.get('theme') as string,
   }
 
@@ -41,52 +39,14 @@ export const loader: LoaderFunction = () => {
   return { themes: themeNames }
 }
 
-const ids = { js: 'js', theme: 'theme' }
-
 const OptionsPage: React.FC = () => {
   const { themes } = useLoaderData<LoaderData>()
   const rootData = useRootLoaderData()
-  const [key, setKey] = useState(0)
-  const transition = useTransition()
-  const prevSubmissionDataRef = useRef<Record<string, any>>()
-
-  useEffect(() => {
-    const prevdata = { ...prevSubmissionDataRef.current }
-
-    if (prevSubmissionDataRef.current && !transition.submission) {
-      setKey(p => p + 1)
-      const prevSubmittedJsPreference = prevdata.js
-      console.log('key updated', { prevSubmittedJsPreference, prevdata })
-      if (prevSubmittedJsPreference !== 'on') {
-        window.location.reload()
-      }
-    }
-
-    prevSubmissionDataRef.current = prevSubmissionDataRef.current
-      ? prevSubmissionDataRef.current
-      : {}
-  }, [transition.submission])
 
   return (
-    <main className="space-y-8" key={key}>
+    <main className="space-y-8">
       <h2 className="text-5xl mt-8 text-primary">options</h2>
       <Form method="post" className="space-y-8">
-        <div className="form-control flex-row justify-between items-center">
-          <label
-            className="label cursor-pointer flex-1 text-xl"
-            htmlFor={ids.js}
-          >
-            enable javascript
-          </label>
-          <input
-            id={ids.js}
-            name="js"
-            type="checkbox"
-            className="toggle toggle-primary"
-            defaultChecked={rootData.js}
-          />
-        </div>
-
         <fieldset role="radiogroup" className="form-control space-y-4">
           <legend className="label text-xl">theme</legend>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
