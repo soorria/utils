@@ -38,3 +38,39 @@ h1 {
 .btn.loading::before {
   @apply animate-spin;
 }
+
+.bg-rainbow {
+  background-image: linear-gradient(
+    -75deg,
+    theme('colors.pink'),
+    theme('colors.red'),
+    theme('colors.orange'),
+    theme('colors.yellow'),
+    theme('colors.green'),
+    theme('colors.cyan'),
+    theme('colors.purple'),
+    theme('colors.pink'),
+    theme('colors.red'),
+    theme('colors.orange'),
+    theme('colors.yellow'),
+    theme('colors.green'),
+    theme('colors.cyan'),
+    theme('colors.purple'),
+    theme('colors.pink'),
+    theme('colors.red')
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes bgslide {
+  from {
+    background-position: left;
+  }
+  to {
+    background-position: right;
+  }
+}
+
+.bg-rainbow-animate {
+  animation: bgslide linear infinite 3s;
+}

@@ -1,10 +1,12 @@
 // @ts-expect-error doesn't have types
 import themes from 'daisyui/src/colors/themes'
 import type { Session } from 'remix'
+import { randomItem } from './utils'
 
 export type Prefs = {
   js: boolean
   theme: string
+  realTheme?: string
 }
 
 export const defaultPrefs: Prefs = {
@@ -23,14 +25,17 @@ const sessionKeys = {
 } as const
 
 export const getPrefsFromSession = (session: Session): Prefs => {
-  const prefs = { js: true, theme: 'dracula' }
+  const prefs = { js: true, theme: 'dracula' } as Prefs
 
   if (session.get(sessionKeys.js) === 'false') {
     prefs.js = false
   }
 
   const themeFromSession = session.get(sessionKeys.theme)
-  if (themeNames.includes(themeFromSession)) {
+  if (themeFromSession === '$$random') {
+    prefs.theme = randomItem(themeNames)
+    prefs.realTheme = '$$random'
+  } else if (themeNames.includes(themeFromSession)) {
     prefs.theme = themeFromSession
   }
 

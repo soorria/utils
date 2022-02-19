@@ -7,7 +7,6 @@ import {
 } from 'remix'
 import { setPrefsToSession, themeNames } from '~/lib/prefs.server'
 import { commitSession, destroySession, getSession } from '~/lib/session.server'
-import { capitalise } from '~/lib/utils'
 import { useRootLoaderData } from '~/root'
 
 export const action: ActionFunction = async ({ request }) => {
@@ -67,12 +66,33 @@ const OptionsPage: React.FC = () => {
                 <div className="p-2 peer-checked:ring ring-primary transition-shadow rounded-xl">
                   <label htmlFor={theme}>
                     <span className="btn btn-xl btn-block btn-primary rounded-lg">
-                      {capitalise(theme)}
+                      {theme}
                     </span>
                   </label>
                 </div>
               </div>
             ))}
+            <div
+              className={`p-2 -m-2 bg-rainbow rounded-[1.25rem] ${
+                rootData.realTheme === '$$random' ? 'bg-rainbow-animate' : ''
+              }`}
+            >
+              <input
+                type="radio"
+                value="$$random"
+                name="theme"
+                className="sr-only peer"
+                id="$$random"
+                defaultChecked={rootData.theme === '$$random'}
+              />
+              <div className="p-2 peer-checked:ring ring-black transition-shadow rounded-xl">
+                <label htmlFor="$$random">
+                  <span className="btn btn-xl btn-block btn-primary rounded-lg">
+                    Random
+                  </span>
+                </label>
+              </div>
+            </div>
           </div>
         </fieldset>
 
