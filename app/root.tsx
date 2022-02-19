@@ -8,10 +8,14 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useMatches,
 } from 'remix'
 import type { MetaFunction } from 'remix'
 import appStyles from './app.css'
 import { HeartIcon } from './components/icons'
+import { Link } from 'react-router-dom'
+import { getPrefsFromSession, Prefs } from './lib/prefs.server'
+import { getSession } from './lib/session.server'
 
 export const links: LinksFunction = () => {
   return [
@@ -33,18 +37,23 @@ export const meta: MetaFunction = () => {
   return { title: 'Sizes | mooth.tech' }
 }
 
-type LoaderData = {
-  js: boolean
-  theme: string
-}
+type LoaderData = Prefs
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const data = {
-    js: true,
-    theme: 'dracula',
-  } as LoaderData
+  const session = await getSession(request.headers.get('Cookie'))
+  const prefs = getPrefsFromSession(session)
+  return prefs
+}
 
-  return data
+export const useRootLoaderData = (): LoaderData => {
+  const matches = useMatches()
+  const rootMatch = matches.find(match => match.id === 'root')
+
+  if (!rootMatch) {
+    throw new Error("Can't get root loader data")
+  }
+
+  return rootMatch.data as LoaderData
 }
 
 const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
@@ -65,10 +74,25 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
       </head>
       <body className="min-h-screen flex flex-col">
         <div className="max-w-screen-lg w-full mx-auto py-8 px-4 space-y-8 flex flex-col h-full flex-1">
-          <header className="">
-            <h1 className="font-display text-5xl font-bold text-primary">
-              Sizes
-            </h1>
+          <header>
+            <nav className="flex items-center space-x-4">
+              <Link
+                to="/"
+                className="text-4xl text-primary font-bold font-display"
+              >
+                sizes
+              </Link>
+              <div className="flex-1" />
+              <Link to="/" className="link link-hover link-primary text-xl">
+                home
+              </Link>
+              <Link
+                to="/options"
+                className="link link-hover link-primary text-xl"
+              >
+                options
+              </Link>
+            </nav>
           </header>
           <div className="flex-1">{children}</div>
         </div>
@@ -106,3 +130,7 @@ const App: React.FC = () => {
 }
 
 export default App
+
+export const ErrorBoundary: React.FC = () => {
+  return <div>Error !</div>
+}

@@ -1,6 +1,14 @@
-import { ActionFunction, Form, useActionData, Link } from 'remix'
+import {
+  ActionFunction,
+  Form,
+  useActionData,
+  Link,
+  LoaderFunction,
+  useLoaderData,
+  useTransition,
+} from 'remix'
 import { getSizes, Sizes } from '~/lib/sizes.server'
-import { capitalise } from '~/lib/utils'
+import { capitalise, randomItem } from '~/lib/utils'
 
 type ActionData =
   | {
@@ -17,6 +25,7 @@ export const action: ActionFunction = async ({
   request,
 }): Promise<ActionData> => {
   const formData = await request.formData()
+  await new Promise(resolve => setTimeout(resolve, 1000))
   const text = formData.get('text')
 
   if (typeof text !== 'string') {
@@ -28,25 +37,41 @@ export const action: ActionFunction = async ({
   return { status: 'success', text, sizes }
 }
 
+type LoaderData = { title: string }
+
+export const loader: LoaderFunction = () => {
+  const titles = [
+    'character counter',
+    'measuring machine',
+    'byte counter',
+    'measuring tape',
+  ]
+  return { title: randomItem(titles) }
+}
+
 const formatOrder = ['initial', 'gzip', 'brotli'] as const
 
 const ids = {
   formError: 'form-error',
+  textarea: 'text',
 }
 
 export default function Index() {
+  const { title } = useLoaderData<LoaderData>()
   const actionData = useActionData<ActionData>()
+  const transition = useTransition()
 
   const isSuccess = actionData?.status === 'success'
   const isError = actionData?.status === 'error'
+  const isLoading = Boolean(transition.submission)
 
   return (
     <main className="space-y-8">
+      <h1 className="text-5xl mt-8">{title}</h1>
+
       {isError ? (
         <div className="space-y-6 p-4 border-red border-2 rounded-btn">
-          <h2 className="text-3xl text-red font-bold font-display">
-            Something went wrong :(
-          </h2>
+          <h2 className="text-3xl text-red">something went wrong :(</h2>
           <p aria-live="assertive" id={ids.formError}>
             {actionData.error}
           </p>
@@ -55,14 +80,12 @@ export default function Index() {
 
       {isSuccess ? (
         <div className="space-y-6 p-4 border-green border-2 rounded-btn">
-          <h2 className="text-3xl text-green font-bold font-display">
-            Your Results
-          </h2>
+          <h2 className="text-3xl text-green">your results</h2>
           <table className="table w-full">
             <thead>
               <tr>
-                <th>Format</th>
-                <th>Size (bytes)</th>
+                <th>format</th>
+                <th>size (bytes)</th>
               </tr>
             </thead>
             <tbody>
@@ -82,20 +105,26 @@ export default function Index() {
         className="space-y-8"
         aria-errormessage={isError ? ids.formError : undefined}
       >
-        <div className="space-y-4">
-          <label className="label text-xl" htmlFor="text">
-            Your Text
+        <div className="space-y-4 form-control">
+          <label className="label text-xl" htmlFor={ids.textarea}>
+            your text
           </label>
           <textarea
-            id="text"
+            id={ids.textarea}
             name="text"
             className="form-control textarea textarea-primary w-full min-h-[16rem]"
             placeholder="your text here"
+            defaultValue={
+              actionData?.status === 'success' ? actionData.text : ''
+            }
             required
           />
         </div>
-        <button type="submit" className="btn btn-primary btn-block">
-          See sizes!
+        <button
+          type="submit"
+          className={`btn btn-primary btn-block ${isLoading ? 'loading' : ''}`}
+        >
+          see sizes!
         </button>
       </Form>
       <Link to="." className="btn btn-ghost btn-block btn-outline">
