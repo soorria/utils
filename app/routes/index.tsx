@@ -6,6 +6,8 @@ import {
   LoaderFunction,
   useLoaderData,
   useTransition,
+  json,
+  HeadersFunction,
 } from 'remix'
 import { getSizes, Sizes } from '~/lib/sizes.server'
 import { capitalise, randomItem } from '~/lib/utils'
@@ -45,7 +47,16 @@ export const loader: LoaderFunction = () => {
     'byte counter',
     'measuring tape',
   ]
-  return { title: randomItem(titles) }
+  return json(
+    { title: randomItem(titles) },
+    { headers: { 'Cache-Control': 'max-age=10, s-max-age=10, public' } }
+  )
+}
+
+export const headers: HeadersFunction = ({ loaderHeaders }) => {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control')!,
+  }
 }
 
 const formatOrder = ['initial', 'gzip', 'brotli'] as const
