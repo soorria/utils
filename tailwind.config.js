@@ -18,6 +18,9 @@ module.exports = {
         display: ["'Poppins'", ...fontFamily.sans],
       },
       colors: { ...drac },
+      animation: {
+        spin: 'spin 0.5s linear infinite',
+      },
     },
   },
   plugins: [require('daisyui')],

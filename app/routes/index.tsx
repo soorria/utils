@@ -25,7 +25,6 @@ export const action: ActionFunction = async ({
   request,
 }): Promise<ActionData> => {
   const formData = await request.formData()
-  await new Promise(resolve => setTimeout(resolve, 1000))
   const text = formData.get('text')
 
   if (typeof text !== 'string') {

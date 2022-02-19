@@ -34,3 +34,7 @@ h4 {
 h1 {
   @apply text-primary;
 }
+
+.btn.loading::before {
+  @apply animate-spin;
+}
