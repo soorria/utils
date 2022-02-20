@@ -43,6 +43,8 @@ export const action: ActionFunction = async ({
 }): Promise<ActionData> => {
   const formData = await parseMultipartFormData(request)
 
+  await new Promise(r => setTimeout(r, 500))
+
   if (!formData) {
     return {
       status: 'error',
@@ -160,6 +162,7 @@ const FileInput: React.FC<
       noKeyboard: false,
       noClick: true,
       onDrop,
+      disabled: props.disabled,
     })
 
   const isDragging = isDragActive
@@ -169,9 +172,10 @@ const FileInput: React.FC<
     <label
       {...getRootProps({
         className: cx(
-          'relative border-2 border-primary rounded-btn outline-none min-h-[8rem] p-4 text-xl font-bold overflow-hidden group',
+          'relative border-2 rounded-btn outline-none min-h-[8rem] p-4 text-lg font-semibold overflow-hidden group',
           'focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary',
-          isDragging && 'bg-base-200'
+          isDragging && 'bg-base-200',
+          props.disabled ? 'bg-base-200 border-base-200' : 'border-primary'
         ),
       })}
     >
@@ -236,7 +240,10 @@ const Divider: React.FC = ({ children }) => {
   )
 
   return (
-    <div className="grid gap-4" style={{ gridTemplateColumns: '1fr auto 1fr' }}>
+    <div
+      className="grid gap-4 px-4"
+      style={{ gridTemplateColumns: '1fr auto 1fr' }}
+    >
       {line}
       <div className="italic text-sm">{children}</div>
       {line}
@@ -379,7 +386,13 @@ export default function Index() {
           see sizes!
         </button>
       </Form>
-      <Link to="." className="btn btn-ghost btn-block btn-outline">
+      <Link
+        to="."
+        className={cx(
+          'btn btn-ghost btn-block btn-outline',
+          isLoading && 'btn-disabled'
+        )}
+      >
         Reset
       </Link>
     </main>
