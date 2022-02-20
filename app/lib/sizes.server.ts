@@ -30,3 +30,54 @@ const gzipSize = async (text: string): Promise<number> => {
   const compressed = await gzip(text, { level: 9 })
   return compressed.length
 }
+
+export type GetAllSizesInput = {
+  text?: string | null
+  files?: Record<string, File>
+}
+
+export type GetAllSizesResult = {
+  text?: Sizes
+  files?: Record<string, Sizes>
+}
+
+export const getAllSizes = async ({
+  text,
+  files = {},
+}: GetAllSizesInput): Promise<GetAllSizesResult> => {
+  const filesEntries = Object.entries(files)
+
+  console.log({ text, files })
+
+  if (typeof text !== 'string' && filesEntries.length === 0) {
+    return {}
+  }
+
+  const promises: Promise<void>[] = []
+  const result: GetAllSizesResult = {}
+
+  if (typeof text === 'string') {
+    promises.push(
+      getSizes(text).then(sizes => {
+        result.text = sizes
+      })
+    )
+  }
+
+  if (filesEntries.length) {
+    result.files = {}
+    filesEntries.forEach(([name, file]) => {
+      promises.push(
+        getSizes(file).then(sizes => {
+          result.files![name] = sizes
+        })
+      )
+    })
+  }
+
+  await Promise.all(promises)
+
+  console.log('result', result)
+
+  return result
+}

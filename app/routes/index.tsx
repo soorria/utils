@@ -1,7 +1,4 @@
-import { mapToSourceFile } from '@remix-run/node/errors'
 import {
-  DragEventHandler,
-  FormEvent,
   FormEventHandler,
   InputHTMLAttributes,
   ReactNode,
@@ -22,9 +19,9 @@ import {
   json,
   useSubmit,
 } from 'remix'
-import { getSizes, Sizes } from '~/lib/sizes.server'
+import { getAllSizes, Sizes } from '~/lib/sizes.server'
 import { parseMultipartFormData } from '~/lib/uploads.server'
-import { capitalise, cx, randomItem } from '~/lib/utils'
+import { capitalise, cx, filterOnlyFiles, randomItem } from '~/lib/utils'
 
 type ActionData =
   | {
@@ -35,60 +32,58 @@ type ActionData =
     }
   | {
       status: 'error'
-      error: string
+      message: string
     }
 
-export const action: ActionFunction = async ({
-  request,
-}): Promise<ActionData> => {
+export const action: ActionFunction = async ({ request }) => {
   const formData = await parseMultipartFormData(request)
 
   await new Promise(r => setTimeout(r, 500))
 
   if (!formData) {
-    return {
-      status: 'error',
-      error:
-        "I couldn't read your submission. Maybe the files your uploaded are too large?",
-    }
+    return json(
+      {
+        status: 'error',
+        message:
+          "I couldn't read your submission. Maybe the files your uploaded are too large?",
+      },
+      413
+    )
   }
 
   const inputText = formData.get('text')
-  const inputFiles = formData
-    .getAll('files')
-    .filter(file => Boolean((file as File).name))
+  const inputFiles = filterOnlyFiles(formData.getAll('files')).filter(file =>
+    Boolean(file.name)
+  )
 
   if (!inputText && inputFiles.length === 0) {
-    return {
+    return json(
+      {
+        status: 'error',
+        message: 'At least one of Text and File must be provided',
+      },
+      400
+    )
+  }
+
+  if (inputText !== null && typeof inputText !== 'string') {
+    return json({
       status: 'error',
-      error: 'At least one of Text and File must be provided',
-    }
+      message: 'text must be text (a string)',
+    })
   }
 
-  let text: string | null = null
-  let textSizePromise: Promise<Sizes | undefined>
+  const sizes = await getAllSizes({
+    text: inputText,
+    files: Object.fromEntries(inputFiles.map(file => [file.name, file])),
+  })
 
-  if (typeof inputText === 'string' && inputText !== '') {
-    textSizePromise = getSizes(inputText)
-    text = inputText
-  } else {
-    textSizePromise = Promise.resolve(undefined)
+  return {
+    status: 'success',
+    text: inputText,
+    textSizes: sizes.text,
+    files: sizes.files,
   }
-
-  const fileSizePromises: Promise<[string, Sizes]>[] = inputFiles.map(
-    inputFile =>
-      getSizes(inputFile).then(result => [(inputFile as File).name, result])
-  )
-
-  const allFileSizesPromise = Promise.all(fileSizePromises).then(entries =>
-    Object.fromEntries(entries)
-  )
-  const [textSizes, files] = await Promise.all([
-    textSizePromise,
-    allFileSizesPromise,
-  ])
-
-  return { status: 'success', text, textSizes, files }
 }
 
 type LoaderData = { title: string }
@@ -305,7 +300,7 @@ export default function Index() {
         <div className="space-y-6 p-4 border-error border-2 rounded-btn">
           <h2 className="text-3xl text-error">something went wrong :(</h2>
           <p aria-live="assertive" id={ids.formError}>
-            {actionData.error}
+            {actionData.message}
           </p>
         </div>
       ) : null}

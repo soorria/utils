@@ -6,3 +6,10 @@ export const randomItem = <T>(arr: T[]): T =>
 
 export const cx = (...classes: (string | boolean | null | undefined)[]) =>
   classes.filter(cls => typeof cls === 'string').join(' ')
+
+type FormDataEntryValue = string | File
+export const areFormValuesOnlyFiles = (arr: FormDataEntryValue[]): boolean =>
+  arr.every(entry => entry instanceof File)
+
+export const filterOnlyFiles = (arr: unknown[]): File[] =>
+  arr.filter(el => el instanceof File) as File[]
