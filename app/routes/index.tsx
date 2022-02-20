@@ -61,7 +61,6 @@ export const action: ActionFunction = async ({
   let textSizePromise: Promise<Sizes | undefined>
 
   if (typeof inputText === 'string' && inputText !== '') {
-    console.log('got some text', JSON.stringify(inputText))
     textSizePromise = getSizes(inputText)
     text = inputText
   } else {
