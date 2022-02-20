@@ -26,5 +26,16 @@ module.exports = {
   plugins: [require('daisyui')],
   daisyui: {
     logs: false,
+    themes: [
+      {
+        dracula: {
+          ...require('daisyui/src/colors/themes')['[data-theme=dracula]'],
+          success: drac.green,
+          error: drac.red,
+          warning: drac.yellow,
+          info: drac.cyan,
+        },
+      },
+    ],
   },
 }

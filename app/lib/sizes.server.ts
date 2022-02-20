@@ -6,7 +6,10 @@ import brotliSize from 'brotli-size'
 export type SizeFormats = 'initial' | 'gzip' | 'brotli'
 export type Sizes = Record<SizeFormats, number>
 
-export const getSizes = async (text: string): Promise<Sizes> => {
+export const getSizes = async (stringOrFile: string | File): Promise<Sizes> => {
+  const text =
+    typeof stringOrFile === 'string' ? stringOrFile : await stringOrFile.text()
+
   const [gzip, brotli] = (
     await Promise.allSettled([gzipSize(text), brotliSize(text)])
   ).map(result => (result.status === 'fulfilled' ? result.value : -1))

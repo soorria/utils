@@ -112,7 +112,7 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
           </a>
         </footer>
         <ScrollRestoration />
-        {js ? <Scripts /> : null}
+        <Scripts />
         <LiveReload />
       </body>
     </html>

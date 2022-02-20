@@ -39,6 +39,12 @@ h1 {
   @apply animate-spin;
 }
 
+.textarea,
+.input,
+.btn {
+  @apply border-2;
+}
+
 .bg-rainbow {
   background-image: linear-gradient(
     -75deg,
@@ -73,4 +79,9 @@ h1 {
 
 .bg-rainbow-animate {
   animation: bgslide linear infinite 3s;
+}
+
+.label {
+  user-select: text;
+  @apply px-0;
 }

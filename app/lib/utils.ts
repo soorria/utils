@@ -3,3 +3,6 @@ export const capitalise = (text: string): string =>
 
 export const randomItem = <T>(arr: T[]): T =>
   arr[Math.floor(Math.random() * arr.length)]
+
+export const cx = (...classes: (string | boolean | null | undefined)[]) =>
+  classes.filter(cls => typeof cls === 'string').join(' ')
