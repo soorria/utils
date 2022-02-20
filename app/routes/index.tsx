@@ -95,7 +95,7 @@ export const loader: LoaderFunction = () => {
     'measuring tape',
   ]
 
-  const maxSize = (MAX_FILE_SIZE / 1e6).toFixed(1)
+  const maxSize = (MAX_FILE_SIZE / 1e6).toFixed(1) + 'MB'
 
   return json(
     { title: randomItem(titles), maxSize },
@@ -401,6 +401,7 @@ export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
   return (
     <main className="space-y-8">
       <h1 className="text-5xl mt-8">something broke somewhere :(</h1>
+      <p>Maybe you uploaded files that were too big?</p>
 
       <Link to="." className="btn btn-ghost btn-block btn-outline">
         Try again ?
