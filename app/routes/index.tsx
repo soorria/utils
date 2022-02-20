@@ -18,6 +18,7 @@ import {
   useTransition,
   json,
   useSubmit,
+  ErrorBoundaryComponent,
 } from 'remix'
 import { getAllSizes, Sizes } from '~/lib/sizes.server'
 import { parseMultipartFormData } from '~/lib/uploads.server'
@@ -37,8 +38,6 @@ type ActionData =
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await parseMultipartFormData(request)
-
-  await new Promise(r => setTimeout(r, 500))
 
   if (!formData) {
     return json(
@@ -287,6 +286,7 @@ export default function Index() {
       method: 'post',
       encType: 'multipart/form-data',
       action: '/?index',
+      replace: true,
     })
   }
 
@@ -331,6 +331,7 @@ export default function Index() {
       ) : null}
 
       <Form
+        replace
         method="post"
         className="space-y-8"
         aria-errormessage={isError ? ids.formError : undefined}
@@ -394,10 +395,10 @@ export default function Index() {
   )
 }
 
-export const ErrorBoundary = () => {
+export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
   return (
     <main className="space-y-8">
-      <h1 className="text-5xl mt-8">something broke somewhere</h1>
+      <h1 className="text-5xl mt-8">something broke somewhere :(</h1>
 
       <Link to="." className="btn btn-ghost btn-block btn-outline">
         Try again ?

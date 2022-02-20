@@ -38,7 +38,7 @@ export type GetAllSizesInput = {
 
 export type GetAllSizesResult = {
   text?: Sizes
-  files?: Record<string, Sizes>
+  files: Record<string, Sizes>
 }
 
 export const getAllSizes = async ({
@@ -48,11 +48,11 @@ export const getAllSizes = async ({
   const filesEntries = Object.entries(files)
 
   if (typeof text !== 'string' && filesEntries.length === 0) {
-    return {}
+    return { files: {} }
   }
 
   const promises: Promise<void>[] = []
-  const result: GetAllSizesResult = {}
+  const result: GetAllSizesResult = { files: {} }
 
   if (typeof text === 'string') {
     promises.push(
@@ -63,7 +63,6 @@ export const getAllSizes = async ({
   }
 
   if (filesEntries.length) {
-    result.files = {}
     filesEntries.forEach(([name, file]) => {
       promises.push(
         getSizes(file).then(sizes => {
