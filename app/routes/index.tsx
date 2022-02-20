@@ -44,11 +44,17 @@ export const action: ActionFunction = async ({
   const formData = await parseMultipartFormData(request)
 
   if (!formData) {
-    return { status: 'error', error: "I couldn't read your submission" }
+    return {
+      status: 'error',
+      error:
+        "I couldn't read your submission. Maybe the files your uploaded are too large?",
+    }
   }
 
   const inputText = formData.get('text')
-  const inputFiles = formData.getAll('files')
+  const inputFiles = formData
+    .getAll('files')
+    .filter(file => Boolean((file as File).name))
 
   if (!inputText && inputFiles.length === 0) {
     return {
@@ -245,9 +251,22 @@ export default function Index() {
   const actionData = useActionData<ActionData>()
   const [files, setFiles] = useState<File[]>([])
 
-  const isSuccess = actionData?.status === 'success'
-  const isError = actionData?.status === 'error'
+  const titleRef = useRef<HTMLHeadingElement | null>(null)
+
+  const isSuccess = !transition.submission && actionData?.status === 'success'
+  const isError = !transition.submission && actionData?.status === 'error'
   const isLoading = Boolean(transition.submission)
+
+  const prevSubmissionRef = useRef<typeof transition.submission>()
+  useEffect(() => {
+    const submission = transition.submission
+
+    if (prevSubmissionRef.current && !submission) {
+      titleRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+
+    prevSubmissionRef.current = submission
+  }, [transition.submission])
 
   // need this since we can't set the value of file inputs with js
   const handleSubmit: FormEventHandler<HTMLFormElement> = event => {
@@ -261,6 +280,7 @@ export default function Index() {
         data.append('files', file)
       }
     })
+
     submit(data, {
       method: 'post',
       encType: 'multipart/form-data',
@@ -270,7 +290,9 @@ export default function Index() {
 
   return (
     <main className="space-y-8">
-      <h1 className="text-5xl mt-8">{title}</h1>
+      <h1 ref={titleRef} className="text-5xl mt-8 scroll-mt-8">
+        {title}
+      </h1>
 
       {isError ? (
         <div className="space-y-6 p-4 border-error border-2 rounded-btn">

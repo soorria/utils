@@ -1,4 +1,5 @@
 const { fontFamily } = require('tailwindcss/defaultTheme')
+const themes = require('daisyui/src/colors/themes')
 
 const drac = {
   cyan: '#8be9fd',
@@ -29,13 +30,16 @@ module.exports = {
     themes: [
       {
         dracula: {
-          ...require('daisyui/src/colors/themes')['[data-theme=dracula]'],
+          ...themes['[data-theme=dracula]'],
           success: drac.green,
           error: drac.red,
           warning: drac.yellow,
           info: drac.cyan,
         },
       },
+      ...Object.keys(themes).map(selector =>
+        selector.replace('[data-theme=', '').replace(']', '')
+      ),
     ],
   },
 }

@@ -75,7 +75,7 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
       <body className="min-h-screen flex flex-col">
         <div className="max-w-screen-lg w-full mx-auto py-8 px-4 space-y-8 flex flex-col h-full flex-1">
           <header>
-            <nav className="flex items-center space-x-4">
+            <nav className="flex items-center space-x-2">
               <Link
                 to="/"
                 className="text-4xl text-primary font-bold font-display"
@@ -83,12 +83,15 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
                 sizes
               </Link>
               <div className="flex-1" />
-              <Link to="/" className="link link-hover link-primary text-xl">
+              <Link
+                to="/"
+                className="link link-hover link-primary text-xl rounded-btn px-1"
+              >
                 home
               </Link>
               <Link
                 to="/options"
-                className="link link-hover link-primary text-xl"
+                className="link link-hover link-primary text-xl rounded-btn px-1"
               >
                 options
               </Link>
