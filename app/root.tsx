@@ -30,11 +30,36 @@ export const links: LinksFunction = () => {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;700;900&display=swap',
     },
+    {
+      rel: 'canonical',
+      href: 'https://sizes.mooth.tech',
+    },
   ]
 }
 
 export const meta: MetaFunction = () => {
-  return { title: 'Sizes | mooth.tech' }
+  const image = 'https://og-gen-mooth.vercel.app/api/og?category=sizes'
+  const description =
+    'See the size of files or text in a few formats. Has a bunch of color schemes because why not.'
+  const title = 'Sizes | mooth.tech'
+
+  return {
+    title,
+    description,
+    image,
+    'og:url': 'https://sizes.mooth.tech',
+    'og:type': 'website',
+    'og:image': image,
+    'og:image:width': '1200',
+    'og:image:height': '630',
+    'og:description': description,
+    'og:locale': 'en_AU',
+    'twitter:card': 'summary_large_image',
+    'twitter:creator': '@soorriously',
+    'twitter:site': '@soorriously',
+    'twitter:title': title,
+    'twitter:alt': 'Sizes | mooth.tech',
+  }
 }
 
 type LoaderData = Prefs
@@ -135,5 +160,15 @@ const App: React.FC = () => {
 export default App
 
 export const ErrorBoundary: React.FC = () => {
-  return <div>Error !</div>
+  return (
+    <Layout js theme="dracula">
+      <main className="space-y-8">
+        <h1 className="text-5xl mt-8">something broke somewhere :(</h1>
+
+        <Link to="." className="btn btn-ghost btn-block btn-outline">
+          Try again ?
+        </Link>
+      </main>
+    </Layout>
+  )
 }

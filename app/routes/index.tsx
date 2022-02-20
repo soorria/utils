@@ -21,7 +21,7 @@ import {
   ErrorBoundaryComponent,
 } from 'remix'
 import { getAllSizes, Sizes } from '~/lib/sizes.server'
-import { parseMultipartFormData } from '~/lib/uploads.server'
+import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
 import { capitalise, cx, filterOnlyFiles, randomItem } from '~/lib/utils'
 
 type ActionData =
@@ -73,7 +73,7 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   const sizes = await getAllSizes({
-    text: inputText,
+    text: inputText || null,
     files: Object.fromEntries(inputFiles.map(file => [file.name, file])),
   })
 
@@ -85,7 +85,7 @@ export const action: ActionFunction = async ({ request }) => {
   }
 }
 
-type LoaderData = { title: string }
+type LoaderData = { title: string; maxSize: string }
 
 export const loader: LoaderFunction = () => {
   const titles = [
@@ -95,8 +95,10 @@ export const loader: LoaderFunction = () => {
     'measuring tape',
   ]
 
+  const maxSize = (MAX_FILE_SIZE / 1e6).toFixed(1)
+
   return json(
-    { title: randomItem(titles) },
+    { title: randomItem(titles), maxSize },
     { headers: { 'Cache-Control': 's-max-age=10, public' } }
   )
 }
@@ -182,7 +184,7 @@ const FileInput: React.FC<
       {hasFiles ? (
         <span className="block space-y-4">
           <span>selected files</span>
-          <table className="table w-full">
+          <table className="table w-full table-compact md:table-normal">
             <thead>
               <tr>
                 <th>filename</th>
@@ -246,7 +248,7 @@ const Divider: React.FC = ({ children }) => {
 }
 
 export default function Index() {
-  const { title } = useLoaderData<LoaderData>()
+  const { title, maxSize } = useLoaderData<LoaderData>()
   const submit = useSubmit()
   const transition = useTransition()
   const actionData = useActionData<ActionData>()
@@ -340,7 +342,7 @@ export default function Index() {
       >
         <div className="form-control">
           <label className="label text-xl mb-4" htmlFor={ids.fileInput}>
-            your file
+            your files
           </label>
           <FileInput
             id={ids.fileInput}
@@ -351,8 +353,8 @@ export default function Index() {
           />
           <p id={ids.fileInputHelpText} className="label mt-2">
             <span className="label-text-alt">
-              Any file <em>should</em> work. File size limited to about 5mb
-              total.
+              Any file <em>should</em> work. File size limited to about{' '}
+              {maxSize}. App will explode if payload is too large.
             </span>
           </p>
         </div>
