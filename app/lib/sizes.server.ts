@@ -47,8 +47,6 @@ export const getAllSizes = async ({
 }: GetAllSizesInput): Promise<GetAllSizesResult> => {
   const filesEntries = Object.entries(files)
 
-  console.log({ text, files })
-
   if (typeof text !== 'string' && filesEntries.length === 0) {
     return {}
   }
@@ -76,8 +74,6 @@ export const getAllSizes = async ({
   }
 
   await Promise.all(promises)
-
-  console.log('result', result)
 
   return result
 }
