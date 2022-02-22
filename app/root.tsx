@@ -124,12 +124,12 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
           </header>
           <div className="flex-1">{children}</div>
         </div>
-        <footer className="py-8 text-center">
+        <footer className="py-8 text-center flex flex-col justify-center space-y-4">
           <a
             href="https://mooth.tech/?ref=Sizes"
             target="_blank"
             rel="noopener noreferrer"
-            className="group link link-hover"
+            className="group link link-hover block"
           >
             Made with{' '}
             <span className="relative inline-block h-5 w-5 align-middle">
@@ -138,6 +138,15 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
             </span>{' '}
             by{' '}
             <span className="underline group-hover:no-underline">Soorria</span>
+          </a>
+          <a
+            href="https://github.com/mo0th/sizes"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group link link-hover"
+          >
+            <span className="underline group-hover:no-underline">Source</span>{' '}
+            on GitHub
           </a>
         </footer>
         <ScrollRestoration />
