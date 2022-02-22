@@ -136,7 +136,8 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
               <HeartIcon className="absolute inset-0 fill-current text-pink" />
               <HeartIcon className="absolute inset-0 fill-current text-purple group-hover:animate-ping" />
             </span>{' '}
-            by <span className="underline">Soorria</span>
+            by{' '}
+            <span className="underline group-hover:no-underline">Soorria</span>
           </a>
         </footer>
         <ScrollRestoration />

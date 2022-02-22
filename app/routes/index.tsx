@@ -103,7 +103,7 @@ export const loader: LoaderFunction = () => {
   )
 }
 
-const formatOrder = ['initial', 'gzip', 'brotli'] as const
+const formatOrder = ['initial', 'deflate', 'gzip', 'brotli'] as const
 
 const ids = {
   formError: 'form-error',
@@ -111,6 +111,9 @@ const ids = {
   fileInput: 'file',
   fileInputHelpText: 'file-help-text',
 }
+
+const renderSize = (size: number): ReactNode =>
+  size >= 0 ? size : <span className="text-error">ERROR</span>
 
 const ResultSection: React.FC<{ title: ReactNode; sizes: Sizes }> = ({
   title,
@@ -131,7 +134,7 @@ const ResultSection: React.FC<{ title: ReactNode; sizes: Sizes }> = ({
           {formatOrder.map(format => (
             <tr key={format} className="hover">
               <td>{capitalise(format)}</td>
-              <td>{sizes[format]}</td>
+              <td>{renderSize(sizes[format])}</td>
             </tr>
           ))}
         </tbody>
@@ -302,7 +305,18 @@ export default function Index() {
         <div className="space-y-6 p-4 border-error border-2 rounded-btn">
           <h2 className="text-3xl text-error">something went wrong :(</h2>
           <p aria-live="assertive" id={ids.formError}>
-            {actionData.message}
+            {actionData.message}{' '}
+            <a
+              href="https://mooth.tech/?ref=Sizes&utm_content=ErrorLink#contact"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline group"
+            >
+              <span className="underline group-hover:no-underline">
+                Let me know
+              </span>{' '}
+              what happened.
+            </a>
           </p>
         </div>
       ) : null}
@@ -329,6 +343,20 @@ export default function Index() {
               sizes={actionData.textSizes}
             />
           ) : null}
+
+          <p className="text-center">
+            <a
+              href="https://mooth.tech/?ref=Sizes&utm_content=ErrorLink#contact"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline group"
+            >
+              <span className="underline group-hover:no-underline">
+                Let me know
+              </span>{' '}
+              if something looks off
+            </a>
+          </p>
         </div>
       ) : null}
 
