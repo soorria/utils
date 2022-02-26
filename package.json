@@ -1,17 +1,17 @@
 {
   "private": true,
-  "name": "remix-app-template",
-  "description": "",
+  "name": "sizes",
+  "description": "see the size of text and files in deflate, gzip and brotli formats",
   "license": "MIT",
   "dependencies": {
     "@remix-run/react": "^1.2.1",
     "@remix-run/vercel": "^1.2.1",
-    "brotli-size": "^4.0.0",
     "content-type": "^1.0.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-dropzone": "^12.0.4",
-    "remix": "^1.2.1"
+    "remix": "^1.2.1",
+    "zod": "^3.12.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.2.1",

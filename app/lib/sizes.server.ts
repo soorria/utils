@@ -2,32 +2,82 @@ import zlib from 'zlib'
 import { promisify } from 'util'
 import { Readable, PassThrough } from 'stream'
 
-import brotliSize, { stream as brotliStream } from 'brotli-size'
+import { getResolvedPromiseValueOrDefault } from './utils'
+import type { SizesRequest } from './sizes'
 
 export type SizeFormats = 'initial' | 'gzip' | 'brotli' | 'deflate'
-export type Sizes = Record<SizeFormats, number>
+export type Sizes = Partial<Record<SizeFormats, number>>
+export type SizesOptions = Omit<SizesRequest, 'text' | 'files'>
 
-export const getSizes = async (stringOrFile: string | File): Promise<Sizes> => {
+type SizeFunction = (text: string, level: number) => Promise<number>
+
+type StreamToMeasure = Readable | NodeJS.ReadableStream
+type SizeFromStream = (stream: StreamToMeasure) => Promise<number>
+
+const getSizeWithKeyAndOptions = <Format extends string>(
+  format: Format,
+  promise: Promise<number | null>
+): Promise<[Format, number | null]> =>
+  promise
+    .then(
+      value => ({ status: 'fulfilled' as const, value }),
+      reason => ({ status: 'rejected' as const, reason })
+    )
+    .then(result => getResolvedPromiseValueOrDefault(result, -1))
+    .then(value => [format, value])
+
+const getSizeIfEnabled = (
+  fn: SizeFunction,
+  text: string,
+  enabled: boolean,
+  level: number
+): Promise<number | null> => (enabled ? fn(text, level) : Promise.resolve(null))
+
+export const getSizes = async (
+  stringOrFile: string | File,
+  options: SizesOptions
+): Promise<Sizes> => {
   const text =
     typeof stringOrFile === 'string' ? stringOrFile : await stringOrFile.text()
 
-  const [gzip, brotli, deflate] = (
-    await Promise.allSettled([
-      gzipSize(text),
-      brotliSize(text),
-      deflateSize(text),
+  const resultEntries = (
+    await Promise.all([
+      getSizeWithKeyAndOptions(
+        'initial',
+        getSizeIfEnabled(bytesSize, text, options.initialEnabled, -1)
+      ),
+      getSizeWithKeyAndOptions(
+        'deflate',
+        getSizeIfEnabled(
+          deflateSize,
+          text,
+          options.deflateEnabled,
+          options.deflateLevel
+        )
+      ),
+      getSizeWithKeyAndOptions(
+        'gzip',
+        getSizeIfEnabled(
+          bytesSize,
+          text,
+          options.gzipEnabled,
+          options.gzipLevel
+        )
+      ),
+      getSizeWithKeyAndOptions(
+        'brotli',
+        getSizeIfEnabled(
+          bytesSize,
+          text,
+          options.brotliEnabled,
+          options.brotliLevel
+        )
+      ),
     ])
-  ).map(result => (result.status === 'fulfilled' ? result.value : -1))
+  ).filter(([_, val]) => val !== null)
 
-  return {
-    initial: bytesSize(text),
-    gzip,
-    brotli,
-    deflate,
-  }
+  return Object.fromEntries(resultEntries) as Sizes
 }
-
-const hasErrors = (sizes: Sizes) => Object.values(sizes).some(s => s < 0)
 
 const createStringStream = (string: string): Readable => {
   const stream = new Readable()
@@ -35,9 +85,6 @@ const createStringStream = (string: string): Readable => {
   stream.push(null)
   return stream
 }
-
-type StreamToMeasure = Readable | NodeJS.ReadableStream
-type SizeFromStream = (stream: StreamToMeasure) => Promise<number>
 
 export const getSizesUsingStream = async (
   stringOrFile: string | File
@@ -54,7 +101,7 @@ export const getSizesUsingStream = async (
       brotliSizeFromStream(stream),
       deflateSizeFromStream(stream),
     ])
-  ).map(result => (result.status === 'fulfilled' ? result.value : -1))
+  ).map(result => getResolvedPromiseValueOrDefault(result, -1))
 
   return {
     initial,
@@ -64,7 +111,7 @@ export const getSizesUsingStream = async (
   }
 }
 
-const bytesSize = (text: string): number => {
+const bytesSize: SizeFunction = async text => {
   return new TextEncoder().encode(text).length
 }
 
@@ -84,8 +131,8 @@ const bytesSizeFromStream: SizeFromStream = async stream => {
 }
 
 const deflate = promisify(zlib.deflate)
-const deflateSize = async (text: string): Promise<number> => {
-  const compressed = await deflate(text)
+const deflateSize: SizeFunction = async (text, level) => {
+  const compressed = await deflate(text, { level })
   return compressed.length
 }
 
@@ -105,8 +152,8 @@ const deflateSizeFromStream: SizeFromStream = stream => {
 }
 
 const gzip = promisify(zlib.gzip)
-const gzipSize = async (text: string): Promise<number> => {
-  const compressed = await gzip(text, { level: 9 })
+const gzipSize: SizeFunction = async (text, level) => {
+  const compressed = await gzip(text, { level })
   return compressed.length
 }
 
@@ -125,21 +172,23 @@ const gzipSizeFromStream: SizeFromStream = stream => {
   })
 }
 
-const brotliSizeFromStream: SizeFromStream = stream => {
-  const brotli = brotliStream()
-
-  return new Promise(resolve => {
-    brotli.on('brotli-size' as any, resolve).on('error', err => {
-      console.log({ err })
-      resolve(-1)
-    })
-    stream.pipe(brotli)
+const brotli = promisify(zlib.brotliCompress)
+const brotliSize: SizeFunction = async (text, level) => {
+  const compressed = await brotli(text, {
+    params: {
+      [zlib.constants.BROTLI_PARAM_QUALITY]: level,
+    },
   })
+  return compressed.length
+}
+
+const brotliSizeFromStream: SizeFromStream = async stream => {
+  throw new Error('TODO')
 }
 
 export type GetAllSizesInput = {
   text?: string | null
-  files?: Record<string, File>
+  files?: File[]
 }
 
 export type GetAllSizesResult = {
@@ -147,13 +196,11 @@ export type GetAllSizesResult = {
   files: Record<string, Sizes>
 }
 
-export const getAllSizes = async ({
-  text,
-  files = {},
-}: GetAllSizesInput): Promise<GetAllSizesResult> => {
-  const filesEntries = Object.entries(files)
-
-  if (typeof text !== 'string' && filesEntries.length === 0) {
+export const getAllSizes = async (
+  { text, files = [] }: GetAllSizesInput,
+  options: SizesOptions
+): Promise<GetAllSizesResult> => {
+  if (typeof text !== 'string' && files.length === 0) {
     return { files: {} }
   }
 
@@ -162,17 +209,17 @@ export const getAllSizes = async ({
 
   if (typeof text === 'string') {
     promises.push(
-      getSizes(text).then(sizes => {
+      getSizes(text, options).then(sizes => {
         result.text = sizes
       })
     )
   }
 
-  if (filesEntries.length) {
-    filesEntries.forEach(([name, file]) => {
+  if (files.length) {
+    files.forEach(file => {
       promises.push(
-        getSizes(file).then(sizes => {
-          result.files![name] = sizes
+        getSizes(file, options).then(sizes => {
+          result.files[file.name] = sizes
         })
       )
     })

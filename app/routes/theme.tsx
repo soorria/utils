@@ -44,11 +44,11 @@ const OptionsPage: React.FC = () => {
 
   return (
     <main className="space-y-8">
-      <h2 className="text-5xl mt-8 text-primary">options</h2>
+      <h2 className="text-5xl mt-8 text-primary">theme</h2>
       <Form replace method="post" className="space-y-8">
         <fieldset role="radiogroup" className="form-control space-y-4">
           <legend className="label text-xl">theme</legend>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-2 focus-within-outline rounded-2xl">
             {themes.map(theme => (
               <div
                 key={theme}

@@ -1,6 +1,5 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
 
 @font-face {
   font-family: 'Poppins';
@@ -90,7 +89,17 @@ h1 {
   @apply outline-primary;
 }
 
+.focus-outline {
+  @apply outline-none focus:outline-2 focus:outline-primary focus:outline-offset-2 rounded-btn;
+}
+
+.focus-within-outline {
+  @apply outline-none focus-within:outline-2 focus-within:outline-primary focus-within:outline-offset-2 rounded-btn;
+}
+
 html,
 body {
   scroll-behavior: smooth;
 }
+
+@tailwind utilities;

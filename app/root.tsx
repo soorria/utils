@@ -103,7 +103,7 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
             <nav className="flex items-center space-x-2">
               <Link
                 to="/"
-                className="text-4xl text-primary font-bold font-display"
+                className="text-4xl text-primary font-bold font-display focus-outline"
               >
                 sizes
               </Link>
@@ -115,21 +115,21 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
                 home
               </Link>
               <Link
-                to="/options"
+                to="/theme"
                 className="link link-hover link-primary text-xl rounded-btn px-1"
               >
-                options
+                theme
               </Link>
             </nav>
           </header>
           <div className="flex-1">{children}</div>
         </div>
-        <footer className="py-8 text-center flex flex-col justify-center space-y-4">
+        <footer className="py-8 text-center flex flex-col items-center space-y-4">
           <a
             href="https://mooth.tech/?ref=Sizes"
             target="_blank"
             rel="noopener noreferrer"
-            className="group link link-hover block"
+            className="group link link-hover inline-block focus-outline px-2"
           >
             Made with{' '}
             <span className="relative inline-block h-5 w-5 align-middle">
@@ -143,7 +143,7 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
             href="https://github.com/mo0th/sizes"
             target="_blank"
             rel="noopener noreferrer"
-            className="group link link-hover"
+            className="group link link-hover inline-block focus-outline px-2"
           >
             <span className="underline group-hover:no-underline">Source</span>{' '}
             on GitHub

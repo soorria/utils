@@ -20,9 +20,22 @@ import {
   useSubmit,
   ErrorBoundaryComponent,
 } from 'remix'
-import { getAllSizes, Sizes } from '~/lib/sizes.server'
+import CompressionFormatOptions, {
+  CompressionFormatToggle,
+} from '~/components/CompressionFormatOptions'
+import Divider from '~/components/Divider'
+import FileInput from '~/components/FileInput'
+import ResultSection from '~/components/ResultSection'
+import {
+  BROTLI_LEVEL_RANGE,
+  DEFLATE_LEVEL_RANGE,
+  GZIP_LEVEL_RANGE,
+  SizesRequestErrors,
+  sizesRequestSchema,
+} from '~/lib/sizes'
+import { getAllSizes, SizeFormats, Sizes } from '~/lib/sizes.server'
 import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
-import { capitalise, cx, filterOnlyFiles, randomItem } from '~/lib/utils'
+import { capitalise, cx, randomItem, range } from '~/lib/utils'
 
 type ActionData =
   | {
@@ -31,55 +44,58 @@ type ActionData =
       textSizes?: Sizes
       files: Record<string, Sizes>
     }
-  | {
-      status: 'error'
-      message: string
-    }
+  | ({ status: 'error' } & SizesRequestErrors)
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await parseMultipartFormData(request)
 
   if (!formData) {
-    return json(
+    return json<ActionData>(
       {
         status: 'error',
-        message:
+        formErrors: [
           "I couldn't read your submission. Maybe the files your uploaded are too large?",
+        ],
+        fieldErrors: {},
       },
       413
     )
   }
 
-  const inputText = formData.get('text')
-  const inputFiles = filterOnlyFiles(formData.getAll('files')).filter(file =>
-    Boolean(file.name)
-  )
+  const payload: unknown = (() => {
+    const inputFiles = formData.getAll('files')
+    formData.delete('files')
+    const _payload: any = Object.fromEntries(formData)
+    _payload.files = inputFiles
+    return _payload
+  })()
+  const parseResult = await sizesRequestSchema.spa(payload)
 
-  if (!inputText && inputFiles.length === 0) {
-    return json(
+  if (!parseResult.success) {
+    const parseErrors = parseResult.error.flatten()
+
+    return json<ActionData>(
       {
         status: 'error',
-        message: 'At least one of Text and File must be provided',
+        ...parseErrors,
       },
       400
     )
   }
 
-  if (inputText !== null && typeof inputText !== 'string') {
-    return json({
-      status: 'error',
-      message: 'text must be text (a string)',
-    })
-  }
+  const { text, files = [], ...options } = parseResult.data
 
-  const sizes = await getAllSizes({
-    text: inputText || null,
-    files: Object.fromEntries(inputFiles.map(file => [file.name, file])),
-  })
+  const sizes = await getAllSizes(
+    {
+      text,
+      files,
+    },
+    options
+  )
 
   return {
     status: 'success',
-    text: inputText,
+    text,
     textSizes: sizes.text,
     files: sizes.files,
   }
@@ -103,151 +119,14 @@ export const loader: LoaderFunction = () => {
   )
 }
 
-const formatOrder = ['initial', 'deflate', 'gzip', 'brotli'] as const
-
 const ids = {
   formError: 'form-error',
   textarea: 'text',
   fileInput: 'file',
   fileInputHelpText: 'file-help-text',
-}
-
-const renderSize = (size: number): ReactNode =>
-  size >= 0 ? size : <span className="text-error">ERROR</span>
-
-const ResultSection: React.FC<{ title: ReactNode; sizes: Sizes }> = ({
-  title,
-  sizes,
-}) => {
-  return (
-    <section>
-      <h3 className="text-xl mb-4">{title}</h3>
-
-      <table className="table w-full">
-        <thead>
-          <tr>
-            <th>format</th>
-            <th>size (bytes)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {formatOrder.map(format => (
-            <tr key={format} className="hover">
-              <td>{capitalise(format)}</td>
-              <td>{renderSize(sizes[format])}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </section>
-  )
-}
-
-const FileInput: React.FC<
-  InputHTMLAttributes<HTMLInputElement> & { onFiles?: (files: File[]) => any }
-> = ({ onFiles, ...props }) => {
-  const onFilesRef = useRef<typeof onFiles>()
-
-  useEffect(() => {
-    onFilesRef.current = onFiles
-  }, [onFiles])
-
-  const onDrop = useCallback(files => {
-    onFilesRef.current?.(files)
-  }, [])
-
-  const { getInputProps, getRootProps, isDragActive, acceptedFiles } =
-    useDropzone({
-      noKeyboard: false,
-      noClick: true,
-      onDrop,
-      disabled: props.disabled,
-    })
-
-  const isDragging = isDragActive
-  const hasFiles = acceptedFiles.length > 0
-
-  return (
-    <label
-      {...getRootProps({
-        className: cx(
-          'relative border-2 rounded-btn outline-none min-h-[8rem] p-4 text-lg font-semibold overflow-hidden group',
-          'focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary',
-          isDragging && 'bg-base-200',
-          props.disabled ? 'bg-base-200 border-base-200' : 'border-primary'
-        ),
-      })}
-    >
-      {!hasFiles ? (
-        <span className="col-span-full place-items-center h-full grid absolute inset-0">
-          upload files to measure
-        </span>
-      ) : null}
-
-      {hasFiles ? (
-        <span className="block space-y-4">
-          <span>selected files</span>
-          <table className="table w-full table-compact md:table-normal">
-            <thead>
-              <tr>
-                <th>filename</th>
-                <th>type</th>
-              </tr>
-            </thead>
-            <tbody className="text-base">
-              {acceptedFiles.map((file, i) => (
-                <tr key={i}>
-                  <td>{file.name}</td>
-                  <td>{file.type}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <span className="text-sm text-center block group-hover:underline">
-            click to change files to measure
-          </span>
-        </span>
-      ) : null}
-
-      <input
-        {...getInputProps({
-          name: 'file',
-          type: 'file',
-          className:
-            'sr-only form-control input input-primary border-none focus:outline-none block',
-          ...props,
-        })}
-      />
-
-      <span
-        className={cx(
-          'place-items-center bg-base-200 absolute inset-0 transition-opacity pointer-events-none grid col-span-full z-50',
-          isDragging ? 'opacity-100' : 'opacity-0'
-        )}
-      >
-        drop files to measure
-      </span>
-    </label>
-  )
-}
-
-const Divider: React.FC = ({ children }) => {
-  const line = (
-    <div role="presentation" className="flex items-center">
-      <div className="h-px bg-neutral-content flex-1" />
-    </div>
-  )
-
-  return (
-    <div
-      className="grid gap-4 px-4"
-      style={{ gridTemplateColumns: '1fr auto 1fr' }}
-    >
-      {line}
-      <div className="italic text-sm">{children}</div>
-      {line}
-    </div>
-  )
+  brotliLevel: 'brotli-level',
+  gzipLevel: 'gzip-level',
+  deflateLevel: 'deflate-level',
 }
 
 export default function Index() {
@@ -302,27 +181,35 @@ export default function Index() {
       </h1>
 
       {isError ? (
-        <div className="space-y-6 p-4 border-error border-2 rounded-btn">
+        <div className="space-y-6 p-4 md:p-8 border-error border-2 rounded-btn">
           <h2 className="text-3xl text-error">something went wrong :(</h2>
-          <p aria-live="assertive" id={ids.formError}>
-            {actionData.message}{' '}
-            <a
-              href="https://mooth.tech/?ref=Sizes&utm_content=ErrorLink#contact"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline group"
-            >
-              <span className="underline group-hover:no-underline">
-                Let me know
-              </span>{' '}
-              what happened.
-            </a>
-          </p>
+          <div aria-live="assertive" className="space-y-6" id={ids.formError}>
+            <ul className="list-disc pl-8 space-y-3">
+              {actionData.formErrors?.map((message, i) => (
+                <li key={i}>{message}</li>
+              ))}
+            </ul>
+
+            <p className="text-center text-sm">
+              <a
+                href="https://mooth.tech/?ref=Sizes&utm_content=ErrorLink#contact"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline group"
+              >
+                If this is unexpected,{' '}
+                <span className="underline group-hover:no-underline">
+                  let me know
+                </span>{' '}
+                what happened.
+              </a>
+            </p>
+          </div>
         </div>
       ) : null}
 
       {isSuccess ? (
-        <div className="space-y-6 p-4 border-success border-2 rounded-btn">
+        <div className="space-y-6 p-4 md:p-4 border-success border-2 rounded-btn">
           <h2 className="text-3xl text-success">your results</h2>
 
           {Object.entries(actionData.files).map(([name, sizes]) => (
@@ -344,7 +231,7 @@ export default function Index() {
             />
           ) : null}
 
-          <p className="text-center">
+          <p className="text-center text-sm">
             <a
               href="https://mooth.tech/?ref=Sizes&utm_content=ErrorLink#contact"
               target="_blank"
@@ -405,6 +292,48 @@ export default function Index() {
           />
         </div>
 
+        <details className="space-y-8 bg-base-200 p-4 rounded-btn focus-within:outline-primary outline-offset-2">
+          <summary className="cursor-pointer -m-4 p-4 focus-outline">
+            <h2 className="inline-block ml-1">compression options</h2>
+          </summary>
+
+          <CompressionFormatOptions
+            formatName="deflate"
+            idBase="deflate-options"
+            levelName="deflateLevel"
+            toggleName="deflateEnabled"
+            levelRange={DEFLATE_LEVEL_RANGE}
+          />
+
+          <hr className="border-base-100" />
+
+          <CompressionFormatOptions
+            formatName="gzip"
+            idBase="gzip-options"
+            levelName="gzipLevel"
+            toggleName="gzipEnabled"
+            levelRange={GZIP_LEVEL_RANGE}
+          />
+
+          <hr className="border-base-100" />
+
+          <CompressionFormatOptions
+            formatName="brotli"
+            idBase="brotli-options"
+            levelName="brotliLevel"
+            toggleName="brotliEnabled"
+            levelRange={BROTLI_LEVEL_RANGE}
+          />
+
+          <hr className="border-base-100" />
+
+          <CompressionFormatToggle
+            formatName="initial size"
+            id="initial-enabled"
+            name="initialEnabled"
+          />
+        </details>
+
         <button
           type="submit"
           className={`btn btn-primary btn-block ${isLoading ? 'loading' : ''}`}
@@ -419,13 +348,15 @@ export default function Index() {
           isLoading && 'btn-disabled'
         )}
       >
-        Reset
+        start over
       </Link>
     </main>
   )
 }
 
 export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
+  console.error(error)
+
   return (
     <main className="space-y-8">
       <h1 className="text-5xl mt-8">something broke somewhere :(</h1>

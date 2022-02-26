@@ -13,3 +13,22 @@ export const areFormValuesOnlyFiles = (arr: FormDataEntryValue[]): boolean =>
 
 export const filterOnlyFiles = (arr: unknown[]): File[] =>
   arr.filter(el => el instanceof File) as File[]
+
+export const getResolvedPromiseValueOrDefault = <T>(
+  promiseResult: PromiseSettledResult<T>,
+  defaultValue: T
+): T => {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    promiseResult.status === 'rejected'
+  ) {
+    console.error(promiseResult.reason)
+  }
+
+  return promiseResult.status === 'fulfilled'
+    ? promiseResult.value
+    : defaultValue
+}
+
+export const range = (min: number, max: number): number[] =>
+  Array.from({ length: max - min }, (_, i) => i + min)
