@@ -1,13 +1,4 @@
-import {
-  FormEventHandler,
-  InputHTMLAttributes,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
-import { useDropzone } from 'react-dropzone'
+import { FormEventHandler, useEffect, useRef, useState } from 'react'
 import {
   ActionFunction,
   Form,
@@ -31,18 +22,12 @@ import {
   DEFLATE_LEVEL_RANGE,
   GZIP_LEVEL_RANGE,
   SizesRequestErrors,
-  sizesRequestSchema,
 } from '~/lib/sizes'
-import { getAllSizes, SizeFormats, Sizes } from '~/lib/sizes.server'
+import { sizesRequestSchema } from '~/lib/sizes.server'
+import { getAllSizes, Sizes } from '~/lib/sizes.server'
+import { getRandomTitle } from '~/lib/title.server'
 import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
-import {
-  capitalise,
-  cx,
-  randomItem,
-  range,
-  WeightedRandomArray,
-  weightedRandomItem,
-} from '~/lib/utils'
+import { cx } from '~/lib/utils'
 
 type ActionData =
   | {
@@ -110,21 +95,11 @@ export const action: ActionFunction = async ({ request }) => {
 
 type LoaderData = { title: string; maxSize: string }
 
-export const loader: LoaderFunction = () => {
-  const titles: WeightedRandomArray<string> = [
-    ['character counter', 1],
-    ['measuring machine', 1],
-    ['byte counter', 1],
-    ['measuring tape', 1],
-    ['ruler', 1],
-    ['measurement measurer', 0.01],
-    ['crappy counter', 0.01],
-  ]
-
+export const loader: LoaderFunction = async () => {
   const maxSize = `~${(MAX_FILE_SIZE / 1e6).toFixed(1)}MB`
 
   return json(
-    { title: weightedRandomItem(titles), maxSize },
+    { title: await getRandomTitle(), maxSize },
     { headers: { 'Cache-Control': 's-max-age=10, public' } }
   )
 }

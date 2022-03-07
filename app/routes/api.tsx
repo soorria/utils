@@ -1,8 +1,7 @@
 import { ActionFunction, json } from 'remix'
 import { parse as parseContentType, ParsedMediaType } from 'content-type'
 import { parseMultipartFormData } from '~/lib/uploads.server'
-import { getAllSizes } from '~/lib/sizes.server'
-import { sizesRequestSchema } from '~/lib/sizes'
+import { getAllSizes, sizesRequestSchema } from '~/lib/sizes.server'
 
 export const action: ActionFunction = async ({ request }) => {
   if (request.method.toLowerCase() !== 'post') {
