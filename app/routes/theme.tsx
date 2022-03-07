@@ -48,7 +48,7 @@ const OptionsPage: React.FC = () => {
       <Form replace method="post" className="space-y-8">
         <fieldset role="radiogroup" className="form-control space-y-4">
           <legend className="label text-xl">theme</legend>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-2 focus-within-outline rounded-2xl">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-2 focus-within-outline rounded-[1.25rem]">
             {themes.map(theme => (
               <div
                 key={theme}
@@ -65,7 +65,7 @@ const OptionsPage: React.FC = () => {
                 />
                 <div className="p-2 peer-checked:ring ring-primary transition-shadow rounded-xl">
                   <label htmlFor={theme}>
-                    <span className="btn btn-xl btn-block btn-primary rounded-lg">
+                    <span className="btn no-ring btn-xl btn-block btn-primary rounded-lg">
                       {theme}
                     </span>
                   </label>
@@ -87,7 +87,7 @@ const OptionsPage: React.FC = () => {
               />
               <div className="p-2 peer-checked:ring ring-black transition-shadow rounded-xl">
                 <label htmlFor="$$random">
-                  <span className="btn btn-xl btn-block btn-primary rounded-lg">
+                  <span className="btn no-ring btn-xl btn-block btn-primary rounded-lg">
                     Random
                   </span>
                 </label>

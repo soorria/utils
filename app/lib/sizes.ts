@@ -85,6 +85,22 @@ export const sizesRequestSchema = z
 
     return val as SizesRequest
   })
+  .superRefine((val, ctx) => {
+    const optionValues = [
+      val.deflateEnabled,
+      val.gzipEnabled,
+      val.brotliEnabled,
+      val.initialEnabled,
+    ]
+    if (optionValues.every(b => !b)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        fatal: true,
+        message:
+          'all measuring options were disabled - at least one must be enabled',
+      })
+    }
+  })
 
 export type SizesRequest = {
   text?: string

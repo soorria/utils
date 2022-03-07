@@ -98,12 +98,12 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
         <Links />
       </head>
       <body className="min-h-screen flex flex-col">
-        <div className="max-w-screen-lg w-full mx-auto py-8 px-4 space-y-8 flex flex-col h-full flex-1">
+        <div className="max-w-screen-lg w-full mx-auto py-8 px-4 md:px-8 md:py-12 space-y-8 flex flex-col h-full flex-1">
           <header>
             <nav className="flex items-center space-x-2">
               <Link
                 to="/"
-                className="text-4xl text-primary font-bold font-display focus-outline"
+                className="text-4xl text-primary font-bold font-display focus-outline rounded-btn px-2 -mx-2"
               >
                 sizes
               </Link>
@@ -129,7 +129,7 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
             href="https://mooth.tech/?ref=Sizes"
             target="_blank"
             rel="noopener noreferrer"
-            className="group link link-hover inline-block focus-outline px-2"
+            className="group link link-hover inline-block focus-outline px-2 rounded-btn"
           >
             Made with{' '}
             <span className="relative inline-block h-5 w-5 align-middle">
@@ -143,7 +143,7 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
             href="https://github.com/mo0th/sizes"
             target="_blank"
             rel="noopener noreferrer"
-            className="group link link-hover inline-block focus-outline px-2"
+            className="group link link-hover inline-block focus-outline px-2 rounded-btn"
           >
             <span className="underline group-hover:no-underline">Source</span>{' '}
             on GitHub

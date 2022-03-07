@@ -195,7 +195,7 @@ export default function Index() {
                 href="https://mooth.tech/?ref=Sizes&utm_content=ErrorLink#contact"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline group"
+                className="hover:underline group focus-outline px-2"
               >
                 If this is unexpected,{' '}
                 <span className="underline group-hover:no-underline">
@@ -236,7 +236,7 @@ export default function Index() {
               href="https://mooth.tech/?ref=Sizes&utm_content=ErrorLink#contact"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline group"
+              className="hover:underline group focus-outline px-2"
             >
               <span className="underline group-hover:no-underline">
                 Let me know
@@ -293,7 +293,7 @@ export default function Index() {
         </div>
 
         <details className="space-y-8 bg-base-200 p-4 rounded-btn focus-within:outline-primary outline-offset-2">
-          <summary className="cursor-pointer -m-4 p-4 focus-outline">
+          <summary className="cursor-pointer -m-4 p-4 focus-outline rounded-btn">
             <h2 className="inline-block ml-1">compression options</h2>
           </summary>
 

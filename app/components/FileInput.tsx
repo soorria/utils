@@ -30,8 +30,8 @@ const FileInput: React.FC<
     <label
       {...getRootProps({
         className: cx(
-          'relative border-2 rounded-btn outline-none min-h-[8rem] p-4 text-lg font-semibold overflow-hidden group',
-          'focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary',
+          'relative border-2 rounded-btn min-h-[8rem] p-4 text-lg font-semibold overflow-hidden group',
+          'focus-within-outline',
           isDragging && 'bg-base-200',
           props.disabled ? 'bg-base-200 border-base-200' : 'border-primary'
         ),
