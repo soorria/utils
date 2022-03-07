@@ -6,7 +6,7 @@ import { randomItem } from './utils'
 export type Prefs = {
   js: boolean
   theme: string
-  realTheme?: string
+  realTheme?: '$$random' | string
 }
 
 export const defaultPrefs: Prefs = {

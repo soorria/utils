@@ -7,6 +7,7 @@ import {
 } from 'remix'
 import { setPrefsToSession, themeNames } from '~/lib/prefs.server'
 import { commitSession, destroySession, getSession } from '~/lib/session.server'
+import { cx } from '~/lib/utils'
 import { useRootLoaderData } from '~/root'
 
 export const action: ActionFunction = async ({ request }) => {
@@ -61,9 +62,19 @@ const OptionsPage: React.FC = () => {
                   name="theme"
                   className="sr-only peer"
                   id={theme}
-                  defaultChecked={rootData.theme === theme}
+                  defaultChecked={
+                    rootData.theme === theme &&
+                    rootData.realTheme !== '$$random'
+                  }
                 />
-                <div className="p-2 peer-checked:ring ring-primary transition-shadow rounded-xl">
+                <div
+                  className={cx(
+                    'p-2 peer-checked:ring transition-shadow rounded-xl',
+                    rootData.realTheme === '$$random' && rootData.theme == theme
+                      ? 'ring ring-secondary'
+                      : 'ring-primary'
+                  )}
+                >
                   <label htmlFor={theme}>
                     <span className="btn no-ring btn-xl btn-block btn-primary rounded-lg">
                       {theme}
@@ -83,7 +94,7 @@ const OptionsPage: React.FC = () => {
                 name="theme"
                 className="sr-only peer"
                 id="$$random"
-                defaultChecked={rootData.theme === '$$random'}
+                defaultChecked={rootData.realTheme === '$$random'}
               />
               <div className="p-2 peer-checked:ring ring-black transition-shadow rounded-xl">
                 <label htmlFor="$$random">
