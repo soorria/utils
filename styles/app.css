@@ -105,3 +105,25 @@ body {
 .focus-within-outline {
   @apply focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-base-100 transition-shadow focus-within:outline-none;
 }
+
+@screen sm {
+  /* Chrome */
+  ::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-base-200 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-primary hover:bg-primary-focus;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: 'thin';
+    scrollbar-color: theme('colors.primary') theme('colors.primary');
+  }
+}

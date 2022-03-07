@@ -35,7 +35,14 @@ import {
 } from '~/lib/sizes'
 import { getAllSizes, SizeFormats, Sizes } from '~/lib/sizes.server'
 import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
-import { capitalise, cx, randomItem, range } from '~/lib/utils'
+import {
+  capitalise,
+  cx,
+  randomItem,
+  range,
+  WeightedRandomArray,
+  weightedRandomItem,
+} from '~/lib/utils'
 
 type ActionData =
   | {
@@ -104,17 +111,19 @@ export const action: ActionFunction = async ({ request }) => {
 type LoaderData = { title: string; maxSize: string }
 
 export const loader: LoaderFunction = () => {
-  const titles = [
-    'character counter',
-    'measuring machine',
-    'byte counter',
-    'measuring tape',
+  const titles: WeightedRandomArray<string> = [
+    ['character counter', 1],
+    ['measuring machine', 1],
+    ['byte counter', 1],
+    ['measuring tape', 1],
+    ['measurement measurer', 0.01],
+    ['crappy counter', 1],
   ]
 
-  const maxSize = (MAX_FILE_SIZE / 1e6).toFixed(1) + 'MB'
+  const maxSize = `~${(MAX_FILE_SIZE / 1e6).toFixed(1)}MB`
 
   return json(
-    { title: randomItem(titles), maxSize },
+    { title: weightedRandomItem(titles), maxSize },
     { headers: { 'Cache-Control': 's-max-age=10, public' } }
   )
 }
@@ -269,7 +278,8 @@ export default function Index() {
           <p id={ids.fileInputHelpText} className="label mt-2">
             <span className="label-text-alt">
               Any file <em>should</em> work. File size limited to about{' '}
-              {maxSize}. App will explode if payload is too large.
+              {maxSize}. App may explode (idk why) or not work as expected
+              (vercel payload limits) if the payload is too large.
             </span>
           </p>
         </div>
@@ -283,7 +293,7 @@ export default function Index() {
           <textarea
             id={ids.textarea}
             name="text"
-            className="form-control textarea textarea-primary w-full min-h-[16rem]"
+            className="form-control textarea textarea-primary rounded-btn w-full min-h-[16rem]"
             placeholder="your text here"
             defaultValue={
               (actionData?.status === 'success' && actionData.text) || ''

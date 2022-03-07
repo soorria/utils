@@ -60,14 +60,14 @@ const CompressionFormatOptions: React.FC<CompressionFormatOptionsProps> = ({
           type="range"
           min={levelRange.min}
           max={levelRange.max}
-          defaultValue={levelRange.max}
+          defaultValue={levelRange.def}
           className="range range-primary focus-outline"
           id={levelId}
           name={levelName}
         />
         <div className="w-full flex justify-between text-xs px-2">
           {range(levelRange.min, levelRange.max + 1).map(i => (
-            <span>{i}</span>
+            <span key={i}>{i}</span>
           ))}
         </div>
       </div>

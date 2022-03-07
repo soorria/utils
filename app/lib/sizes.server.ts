@@ -57,17 +57,12 @@ export const getSizes = async (
       ),
       getSizeWithKeyAndOptions(
         'gzip',
-        getSizeIfEnabled(
-          bytesSize,
-          text,
-          options.gzipEnabled,
-          options.gzipLevel
-        )
+        getSizeIfEnabled(gzipSize, text, options.gzipEnabled, options.gzipLevel)
       ),
       getSizeWithKeyAndOptions(
         'brotli',
         getSizeIfEnabled(
-          bytesSize,
+          brotliSize,
           text,
           options.brotliEnabled,
           options.brotliLevel

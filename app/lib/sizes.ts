@@ -1,10 +1,22 @@
 import { z } from 'zod'
 
-export type CompressionLevelRange = { min: number; max: number }
+export type CompressionLevelRange = { min: number; max: number; def: number }
 
-export const BROTLI_LEVEL_RANGE: CompressionLevelRange = { min: 0, max: 11 }
-export const GZIP_LEVEL_RANGE: CompressionLevelRange = { min: 0, max: 9 }
-export const DEFLATE_LEVEL_RANGE: CompressionLevelRange = { min: 0, max: 9 }
+export const BROTLI_LEVEL_RANGE: CompressionLevelRange = {
+  min: 0,
+  max: 11,
+  def: 7,
+}
+export const GZIP_LEVEL_RANGE: CompressionLevelRange = {
+  min: 0,
+  max: 9,
+  def: 5,
+}
+export const DEFLATE_LEVEL_RANGE: CompressionLevelRange = {
+  min: 0,
+  max: 9,
+  def: 9,
+}
 
 const booleanOrCheckboxValue = () =>
   z.union([z.boolean(), z.enum(['on'])], {
@@ -59,21 +71,21 @@ export const sizesRequestSchema = z
     )
 
     if (typeof val.deflateLevel === 'undefined') {
-      val.deflateLevel = DEFLATE_LEVEL_RANGE.max
+      val.deflateLevel = DEFLATE_LEVEL_RANGE.def
     }
     val.deflateEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(
       val.deflateEnabled
     )
 
     if (typeof val.gzipLevel === 'undefined') {
-      val.gzipLevel = GZIP_LEVEL_RANGE.max
+      val.gzipLevel = GZIP_LEVEL_RANGE.def
     }
     val.gzipEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(
       val.gzipEnabled
     )
 
     if (typeof val.brotliLevel === 'undefined') {
-      val.brotliLevel = BROTLI_LEVEL_RANGE.max
+      val.brotliLevel = BROTLI_LEVEL_RANGE.def
     }
     val.brotliEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(
       val.brotliEnabled

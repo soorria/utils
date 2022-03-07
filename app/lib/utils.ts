@@ -4,6 +4,12 @@ export const capitalise = (text: string): string =>
 export const randomItem = <T>(arr: T[]): T =>
   arr[Math.floor(Math.random() * arr.length)]
 
+export type WeightedRandomArray<T> = ([T, number] | [T])[]
+export const weightedRandomItem = <T>(arr: WeightedRandomArray<T>): T =>
+  randomItem(
+    arr.flatMap(([val, n = 1]) => Array.from({ length: n * 100 }, _ => val))
+  )
+
 export const cx = (...classes: (string | boolean | null | undefined)[]) =>
   classes.filter(cls => typeof cls === 'string').join(' ')
 
