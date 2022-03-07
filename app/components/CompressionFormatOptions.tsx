@@ -1,4 +1,4 @@
-import type { CompressionLevelRange } from '~/lib/sizes'
+import { CompressionLevelRange, getCompressionRangeDefault } from '~/lib/sizes'
 import { range } from '~/lib/utils'
 
 interface CompressionFormatToggleProps {
@@ -60,7 +60,7 @@ const CompressionFormatOptions: React.FC<CompressionFormatOptionsProps> = ({
           type="range"
           min={levelRange.min}
           max={levelRange.max}
-          defaultValue={levelRange.def}
+          defaultValue={getCompressionRangeDefault(levelRange)}
           className="range range-primary focus-outline"
           id={levelId}
           name={levelName}

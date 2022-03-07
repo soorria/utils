@@ -1,22 +1,23 @@
 import { z } from 'zod'
 
-export type CompressionLevelRange = { min: number; max: number; def: number }
+export type CompressionLevelRange = { min: number; max: number; def?: number }
 
 export const BROTLI_LEVEL_RANGE: CompressionLevelRange = {
   min: 0,
   max: 11,
-  def: 7,
 }
 export const GZIP_LEVEL_RANGE: CompressionLevelRange = {
   min: 0,
   max: 9,
-  def: 5,
 }
 export const DEFLATE_LEVEL_RANGE: CompressionLevelRange = {
   min: 0,
   max: 9,
   def: 9,
 }
+
+export const getCompressionRangeDefault = (range: CompressionLevelRange) =>
+  range.def ?? range.max
 
 const booleanOrCheckboxValue = () =>
   z.union([z.boolean(), z.enum(['on'])], {

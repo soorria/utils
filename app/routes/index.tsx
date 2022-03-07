@@ -116,8 +116,9 @@ export const loader: LoaderFunction = () => {
     ['measuring machine', 1],
     ['byte counter', 1],
     ['measuring tape', 1],
+    ['ruler', 1],
     ['measurement measurer', 0.01],
-    ['crappy counter', 1],
+    ['crappy counter', 0.01],
   ]
 
   const maxSize = `~${(MAX_FILE_SIZE / 1e6).toFixed(1)}MB`
