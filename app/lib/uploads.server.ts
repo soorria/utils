@@ -3,7 +3,7 @@ import {
   unstable_parseMultipartFormData,
 } from 'remix'
 
-export const MAX_FILE_SIZE = 50_000_000
+export const MAX_FILE_SIZE = 5_000_000
 
 export const uploadHandler = unstable_createMemoryUploadHandler({
   maxFileSize: MAX_FILE_SIZE,
