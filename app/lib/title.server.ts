@@ -13,7 +13,9 @@ const parseContent = async (
   content: string
 ): Promise<z.infer<typeof titlesSingletonSchema>> => {
   const rows = content.split('\n').map(line => {
-    const [title, weightStr] = line.split(',')
+    const parts = line.split(',')
+    const title = parts.slice(0, parts.length - 1).join(',')
+    const weightStr = parts[parts.length - 1]
     const weight = parseFloat(weightStr)
     return Number.isFinite(weight) ? [title, weight] : [title]
   })
@@ -21,18 +23,22 @@ const parseContent = async (
   return titlesSingletonSchema.parseAsync(rows)
 }
 
+let titles: z.infer<typeof titlesSingletonSchema> = []
+
 export const getRandomTitle = async (): Promise<string> => {
-  if (client) {
+  if (!client) {
+    return DEFAULT_TITLE
+  }
+
+  if (titles.length <= 0) {
     const result = await client
       .from<{ id: number; slug: string; content: string }>('singletons')
       .select('*')
       .eq('slug', DB_SLUG)
       .maybeSingle()
-
     if (result.data) {
       try {
-        const titles = await parseContent(result.data.content)
-        return weightedRandomItem(titles)
+        titles = await parseContent(result.data.content)
       } catch (err) {
         if (process.env.NODE_ENV !== 'production') {
           console.log('singleton was bad', result)
@@ -41,5 +47,9 @@ export const getRandomTitle = async (): Promise<string> => {
     }
   }
 
-  return DEFAULT_TITLE
+  if (titles.length < 1) {
+    return DEFAULT_TITLE
+  }
+
+  return weightedRandomItem(titles)
 }

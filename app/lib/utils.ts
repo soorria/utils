@@ -5,10 +5,17 @@ export const randomItem = <T>(arr: T[]): T =>
   arr[Math.floor(Math.random() * arr.length)]
 
 export type WeightedRandomArray<T> = ([T, number] | [T])[]
-export const weightedRandomItem = <T>(arr: WeightedRandomArray<T>): T =>
-  randomItem(
-    arr.flatMap(([val, n = 1]) => Array.from({ length: n * 100 }, _ => val))
+export const weightedRandomItem = <T>(arr: WeightedRandomArray<T>): T => {
+  const smallestWeight = Math.min(
+    ...arr.map(([_, w]) => (typeof w === 'undefined' ? 1 : w))
   )
+  const multiplier = Math.ceil(1 / smallestWeight)
+  const choices = arr.flatMap(([val, n = 1]) =>
+    Array.from({ length: n * multiplier }, _ => val)
+  )
+
+  return randomItem(choices)
+}
 
 export const cx = (...classes: (string | boolean | null | undefined)[]) =>
   classes.filter(cls => typeof cls === 'string').join(' ')

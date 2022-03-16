@@ -1,7 +1,7 @@
 import { ActionFunction, json } from 'remix'
 import { parse as parseContentType, ParsedMediaType } from 'content-type'
 import { parseMultipartFormData } from '~/lib/uploads.server'
-import { getAllSizes, sizesRequestSchema } from '~/lib/sizes.server'
+import { getAllSizes, sizesRequestBodySchema } from '~/lib/sizes.server'
 
 export const action: ActionFunction = async ({ request }) => {
   if (request.method.toLowerCase() !== 'post') {
@@ -12,7 +12,7 @@ export const action: ActionFunction = async ({ request }) => {
   try {
     contentType = parseContentType(request.headers.get('Content-Type') ?? '')
   } catch (_) {
-    return json({ formErrors: 'Invalid Content-Type header' }, 400)
+    return json({ formErrors: ['Invalid Content-Type header'] }, 400)
   }
 
   let payload: unknown
@@ -26,7 +26,9 @@ export const action: ActionFunction = async ({ request }) => {
     if (!formData) {
       return json(
         {
-          formErrors: 'Could not read request body. Maybe files are too large?',
+          formErrors: [
+            'Could not read request body. Maybe files are too large?',
+          ],
         },
         400
       )
@@ -42,13 +44,13 @@ export const action: ActionFunction = async ({ request }) => {
   } else {
     return json(
       {
-        formErrors: 'Invalid content type',
+        formErrors: ['Invalid content type'],
       },
       400
     )
   }
 
-  const parseResult = await sizesRequestSchema.spa(payload)
+  const parseResult = await sizesRequestBodySchema.spa(payload)
 
   if (!parseResult.success) {
     return json(parseResult.error.flatten(), 400)

@@ -23,7 +23,7 @@ import {
   GZIP_LEVEL_RANGE,
   SizesRequestErrors,
 } from '~/lib/sizes'
-import { sizesRequestSchema } from '~/lib/sizes.server'
+import { sizesRequestBodySchema } from '~/lib/sizes.server'
 import { getAllSizes, Sizes } from '~/lib/sizes.server'
 import { getRandomTitle } from '~/lib/title.server'
 import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
@@ -61,7 +61,7 @@ export const action: ActionFunction = async ({ request }) => {
     _payload.files = inputFiles
     return _payload
   })()
-  const parseResult = await sizesRequestSchema.spa(payload)
+  const parseResult = await sizesRequestBodySchema.spa(payload)
 
   if (!parseResult.success) {
     const parseErrors = parseResult.error.flatten()

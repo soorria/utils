@@ -254,7 +254,7 @@ const stringToIntInRange = (range: CompressionLevelRange) =>
       message: `must be between ${range.min} and ${range.max}, inclusive`,
     })
 
-export const sizesRequestSchema = z
+export const sizesRequestBodySchema = z
   .object({
     text: z.string(),
     files: z
@@ -340,5 +340,5 @@ export type SizesRequest = {
 }
 
 export type SizesRequestErrors = z.inferFlattenedErrors<
-  typeof sizesRequestSchema
+  typeof sizesRequestBodySchema
 >
