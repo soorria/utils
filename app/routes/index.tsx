@@ -120,8 +120,9 @@ export default function Index() {
   const transition = useTransition()
   const actionData = useActionData<ActionData>()
   const [files, setFiles] = useState<File[]>([])
+  const formRef = useRef<HTMLFormElement>(null)
 
-  const titleRef = useRef<HTMLHeadingElement | null>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
 
   const isSuccess = !transition.submission && actionData?.status === 'success'
   const isError = !transition.submission && actionData?.status === 'error'
@@ -158,6 +159,8 @@ export default function Index() {
       replace: true,
     })
   }
+
+  const resetForm = () => formRef.current?.reset()
 
   return (
     <main className="space-y-8">
@@ -239,6 +242,7 @@ export default function Index() {
         aria-errormessage={isError ? ids.formError : undefined}
         onSubmit={handleSubmit}
         encType="multipart/form-data"
+        ref={formRef}
       >
         <div className="form-control">
           <label className="label text-xl mb-4" htmlFor={ids.fileInput}>
@@ -333,6 +337,7 @@ export default function Index() {
           'btn btn-ghost btn-block btn-outline',
           isLoading && 'btn-disabled'
         )}
+        onClick={resetForm}
       >
         start over
       </Link>
@@ -346,7 +351,10 @@ export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
   return (
     <main className="space-y-8">
       <h1 className="text-5xl mt-8">something broke somewhere :(</h1>
-      <p>Maybe you uploaded files that were too big?</p>
+      <p>
+        Maybe you uploaded files that were too big? Check the console for more
+        details
+      </p>
 
       <Link to="." className="btn btn-ghost btn-block btn-outline">
         Try again ?
