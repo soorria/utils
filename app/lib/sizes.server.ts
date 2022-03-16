@@ -274,7 +274,7 @@ export const sizesRequestBodySchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         fatal: true,
-        message: 'you must provide at least one or text and files',
+        message: 'you must provide at least one of text or files',
       })
     }
   })
