@@ -37,9 +37,7 @@ module.exports = {
           info: drac.cyan,
         },
       },
-      ...Object.keys(themes).map(selector =>
-        selector.replace('[data-theme=', '').replace(']', '')
-      ),
+      ...Object.keys(themes).map(selector => selector.replace('[data-theme=', '').replace(']', '')),
     ],
   },
 }

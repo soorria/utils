@@ -43,8 +43,7 @@ export const getSizes = async (
   stringOrFile: string | File,
   options: SizesOptions
 ): Promise<Sizes> => {
-  const text =
-    typeof stringOrFile === 'string' ? stringOrFile : await stringOrFile.text()
+  const text = typeof stringOrFile === 'string' ? stringOrFile : await stringOrFile.text()
 
   const resultEntries = (
     await Promise.all([
@@ -54,12 +53,7 @@ export const getSizes = async (
       ),
       getSizeWithKeyAndOptions(
         'deflate',
-        getSizeIfEnabled(
-          deflateSize,
-          text,
-          options.deflateEnabled,
-          options.deflateLevel
-        )
+        getSizeIfEnabled(deflateSize, text, options.deflateEnabled, options.deflateLevel)
       ),
       getSizeWithKeyAndOptions(
         'gzip',
@@ -67,12 +61,7 @@ export const getSizes = async (
       ),
       getSizeWithKeyAndOptions(
         'brotli',
-        getSizeIfEnabled(
-          brotliSize,
-          text,
-          options.brotliEnabled,
-          options.brotliLevel
-        )
+        getSizeIfEnabled(brotliSize, text, options.brotliEnabled, options.brotliLevel)
       ),
     ])
   ).filter(([_, val]) => val !== null)
@@ -87,13 +76,9 @@ const createStringStream = (string: string): Readable => {
   return stream
 }
 
-export const getSizesUsingStream = async (
-  stringOrFile: string | File
-): Promise<Sizes> => {
+export const getSizesUsingStream = async (stringOrFile: string | File): Promise<Sizes> => {
   const stream =
-    typeof stringOrFile === 'string'
-      ? createStringStream(stringOrFile)
-      : stringOrFile.stream()
+    typeof stringOrFile === 'string' ? createStringStream(stringOrFile) : stringOrFile.stream()
 
   const [initial, gzip, brotli, deflate] = (
     await Promise.allSettled([
@@ -194,6 +179,7 @@ export type GetAllSizesInput = {
 
 export type GetAllSizesResult = {
   text?: Sizes
+  total?: Sizes
   files: Record<string, Sizes>
 }
 
@@ -202,7 +188,7 @@ export const getAllSizes = async (
   options: SizesOptions
 ): Promise<GetAllSizesResult> => {
   if (typeof text !== 'string' && files.length === 0) {
-    return { files: {} }
+    return { files: {}, total: options.totalEnabled ? sumSizes([]) : undefined }
   }
 
   const promises: Promise<void>[] = []
@@ -228,6 +214,30 @@ export const getAllSizes = async (
 
   await Promise.all(promises)
 
+  if (options.totalEnabled) {
+    const allSizes = Object.values(result.files)
+    if (result.text) {
+      allSizes.push(result.text)
+    }
+    result.total = sumSizes(allSizes)
+  }
+
+  return result
+}
+
+const sumSizes = (sizes: Sizes[]): Sizes => {
+  if (sizes.length === 0) {
+    return { brotli: 0, deflate: 0, gzip: 0, initial: 0 }
+  }
+
+  const keys = Object.keys(sizes[0]) as (keyof Sizes)[]
+  const result = Object.fromEntries(keys.map(key => [key, 0])) as Sizes
+  for (const measurement of sizes) {
+    for (const key of keys) {
+      result[key]! += measurement[key] ?? 0
+    }
+  }
+
   return result
 }
 
@@ -240,9 +250,7 @@ const booleanOrCheckboxValue = () =>
       return z.defaultErrorMap(issue, ctx)
     },
   })
-const coerceOptionalBooleanOrCheckboxValueToBoolean = (
-  val: boolean | 'on' | undefined
-): boolean =>
+const coerceOptionalBooleanOrCheckboxValueToBoolean = (val: boolean | 'on' | undefined): boolean =>
   typeof val === 'boolean' ? val : typeof val === 'undefined' ? false : true
 
 const stringToIntInRange = (range: CompressionLevelRange) =>
@@ -261,6 +269,7 @@ export const sizesRequestBodySchema = z
       .array(z.instanceof(File, { message: 'files should only contain Files' }))
       .transform(files => files.filter(file => Boolean(file.name))),
     initialEnabled: booleanOrCheckboxValue(),
+    totalEnabled: booleanOrCheckboxValue(),
     brotliEnabled: booleanOrCheckboxValue(),
     brotliLevel: stringToIntInRange(BROTLI_LEVEL_RANGE),
     gzipEnabled: booleanOrCheckboxValue(),
@@ -279,30 +288,23 @@ export const sizesRequestBodySchema = z
     }
   })
   .transform(val => {
-    val.initialEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(
-      val.initialEnabled
-    )
+    val.initialEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(val.initialEnabled)
+    val.totalEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(val.totalEnabled)
 
     if (typeof val.deflateLevel === 'undefined') {
       val.deflateLevel = DEFLATE_LEVEL_RANGE.def
     }
-    val.deflateEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(
-      val.deflateEnabled
-    )
+    val.deflateEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(val.deflateEnabled)
 
     if (typeof val.gzipLevel === 'undefined') {
       val.gzipLevel = GZIP_LEVEL_RANGE.def
     }
-    val.gzipEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(
-      val.gzipEnabled
-    )
+    val.gzipEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(val.gzipEnabled)
 
     if (typeof val.brotliLevel === 'undefined') {
       val.brotliLevel = BROTLI_LEVEL_RANGE.def
     }
-    val.brotliEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(
-      val.brotliEnabled
-    )
+    val.brotliEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(val.brotliEnabled)
 
     if (!val.text) {
       val.text = undefined
@@ -321,8 +323,7 @@ export const sizesRequestBodySchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         fatal: true,
-        message:
-          'all measuring options were disabled - at least one must be enabled',
+        message: 'all measuring options were disabled - at least one must be enabled',
       })
     }
   })
@@ -331,6 +332,7 @@ export type SizesRequest = {
   text?: string
   files?: File[]
   initialEnabled: boolean
+  totalEnabled: boolean
   deflateEnabled: boolean
   deflateLevel: number
   gzipEnabled: boolean
@@ -339,6 +341,4 @@ export type SizesRequest = {
   brotliLevel: number
 }
 
-export type SizesRequestErrors = z.inferFlattenedErrors<
-  typeof sizesRequestBodySchema
->
+export type SizesRequestErrors = z.inferFlattenedErrors<typeof sizesRequestBodySchema>

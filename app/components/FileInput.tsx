@@ -15,13 +15,12 @@ const FileInput: React.FC<
     onFilesRef.current?.(files)
   }, [])
 
-  const { getInputProps, getRootProps, isDragActive, acceptedFiles } =
-    useDropzone({
-      noKeyboard: false,
-      noClick: true,
-      onDrop,
-      disabled: props.disabled,
-    })
+  const { getInputProps, getRootProps, isDragActive, acceptedFiles } = useDropzone({
+    noKeyboard: false,
+    noClick: true,
+    onDrop,
+    disabled: props.disabled,
+  })
 
   const isDragging = isDragActive
   const hasFiles = acceptedFiles.length > 0

@@ -17,6 +17,7 @@ import CompressionFormatOptions, {
 import Divider from '~/components/Divider'
 import FileInput from '~/components/FileInput'
 import ResultSection from '~/components/ResultSection'
+import { download } from '~/lib/download.client'
 import {
   BROTLI_LEVEL_RANGE,
   DEFLATE_LEVEL_RANGE,
@@ -35,6 +36,7 @@ type ActionData =
       text: string | null
       textSizes?: Sizes
       files: Record<string, Sizes>
+      total?: Sizes
     }
   | ({ status: 'error' } & SizesRequestErrors)
 
@@ -90,6 +92,7 @@ export const action: ActionFunction = async ({ request }) => {
     text,
     textSizes: sizes.text,
     files: sizes.files,
+    total: sizes.total,
   }
 }
 
@@ -121,6 +124,7 @@ export default function Index() {
   const actionData = useActionData<ActionData>()
   const [files, setFiles] = useState<File[]>([])
   const formRef = useRef<HTMLFormElement>(null)
+  const [resetFileInputKey, setResetFileInputKey] = useState(0)
 
   const titleRef = useRef<HTMLHeadingElement>(null)
 
@@ -160,7 +164,24 @@ export default function Index() {
     })
   }
 
-  const resetForm = () => formRef.current?.reset()
+  const resetForm = () => {
+    setResetFileInputKey(k => k + 1)
+    formRef.current?.reset()
+  }
+
+  const downloadResultsAsJson = () => {
+    if (actionData?.status !== 'success') return
+    const json = JSON.stringify(
+      {
+        text: actionData.text,
+        total: actionData.total,
+        files: actionData.files,
+      },
+      null,
+      2
+    )
+    download(json, 'sizes.json')
+  }
 
   return (
     <main className="space-y-8">
@@ -186,10 +207,8 @@ export default function Index() {
                 className="hover:underline group focus-outline px-2"
               >
                 If this is unexpected,{' '}
-                <span className="underline group-hover:no-underline">
-                  let me know
-                </span>{' '}
-                what happened.
+                <span className="underline group-hover:no-underline">let me know</span> what
+                happened.
               </a>
             </p>
           </div>
@@ -213,11 +232,16 @@ export default function Index() {
           ))}
 
           {actionData.textSizes ? (
-            <ResultSection
-              title="sizes for your text"
-              sizes={actionData.textSizes}
-            />
+            <ResultSection title="sizes for your text" sizes={actionData.textSizes} />
           ) : null}
+
+          {actionData.total ? <ResultSection title="total sizes" sizes={actionData.total} /> : null}
+
+          <div className="grid gap-6">
+            <button className="btn" onClick={downloadResultsAsJson}>
+              Download as JSON
+            </button>
+          </div>
 
           <p className="text-center text-sm">
             <a
@@ -226,10 +250,8 @@ export default function Index() {
               rel="noopener noreferrer"
               className="hover:underline group focus-outline px-2"
             >
-              <span className="underline group-hover:no-underline">
-                Let me know
-              </span>{' '}
-              if something looks off
+              <span className="underline group-hover:no-underline">Let me know</span> if something
+              looks off
             </a>
           </p>
         </div>
@@ -249,6 +271,7 @@ export default function Index() {
             your files
           </label>
           <FileInput
+            key={resetFileInputKey}
             id={ids.fileInput}
             name="files"
             aria-describedby={ids.fileInputHelpText}
@@ -257,9 +280,8 @@ export default function Index() {
           />
           <p id={ids.fileInputHelpText} className="label mt-2">
             <span className="label-text-alt">
-              Any file <em>should</em> work. File size limited to about{' '}
-              {maxSize}. App may explode (idk why) or not work as expected
-              (vercel payload limits) if the payload is too large.
+              Any file <em>should</em> work. File size limited to about {maxSize}. App may explode
+              (idk why) or not work as expected (vercel payload limits) if the payload is too large.
             </span>
           </p>
         </div>
@@ -275,14 +297,12 @@ export default function Index() {
             name="text"
             className="form-control textarea textarea-primary rounded-btn w-full min-h-[16rem]"
             placeholder="your text here"
-            defaultValue={
-              (actionData?.status === 'success' && actionData.text) || ''
-            }
+            defaultValue={(actionData?.status === 'success' && actionData.text) || ''}
             disabled={isLoading}
           />
         </div>
 
-        <details className="space-y-8 bg-base-200 p-4 rounded-btn focus-within:outline-primary outline-offset-2">
+        <details className="space-y-8 bg-neutral p-4 rounded-btn focus-within:outline-primary outline-offset-2">
           <summary className="cursor-pointer -m-4 p-4 focus-outline rounded-btn">
             <h2 className="inline-block ml-1">compression options</h2>
           </summary>
@@ -322,21 +342,19 @@ export default function Index() {
             id="initial-enabled"
             name="initialEnabled"
           />
+
+          <hr className="border-base-100" />
+
+          <CompressionFormatToggle formatName="total" id="total-enabled" name="totalEnabled" />
         </details>
 
-        <button
-          type="submit"
-          className={`btn btn-primary btn-block ${isLoading ? 'loading' : ''}`}
-        >
+        <button type="submit" className={`btn btn-primary btn-block ${isLoading ? 'loading' : ''}`}>
           see sizes!
         </button>
       </Form>
       <Link
         to="."
-        className={cx(
-          'btn btn-ghost btn-block btn-outline',
-          isLoading && 'btn-disabled'
-        )}
+        className={cx('btn btn-ghost btn-block btn-outline', isLoading && 'btn-disabled')}
         onClick={resetForm}
       >
         start over
@@ -351,10 +369,7 @@ export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
   return (
     <main className="space-y-8">
       <h1 className="text-5xl mt-8">something broke somewhere :(</h1>
-      <p>
-        Maybe you uploaded files that were too big? Check the console for more
-        details
-      </p>
+      <p>Maybe you uploaded files that were too big? Check the console for more details</p>
 
       <Link to="." className="btn btn-ghost btn-block btn-outline">
         Try again ?
