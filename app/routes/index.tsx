@@ -302,7 +302,7 @@ export default function Index() {
           />
         </div>
 
-        <details className="space-y-8 bg-neutral p-4 rounded-btn focus-within:outline-primary outline-offset-2">
+        <details className="space-y-8 bg-base-300 p-4 rounded-btn focus-within:outline-primary outline-offset-2">
           <summary className="cursor-pointer -m-4 p-4 focus-outline rounded-btn">
             <h2 className="inline-block ml-1">compression options</h2>
           </summary>
