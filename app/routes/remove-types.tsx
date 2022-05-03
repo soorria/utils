@@ -89,7 +89,9 @@ const RemoveTypes: React.FC = () => {
   }, [])
 
   const didSubmit = Boolean(params.get('ts'))
-  const isIdle = transition.state === 'idle' && !didSubmit
+  const isIdle =
+    transition.state === 'idle' ||
+    (transition.state === 'loading' && transition.location.pathname !== utilData.path)
   const isSubmitting = transition.state === 'submitting'
   const isSuccess = !isSubmitting && didSubmit && result.status === 'success'
   const isError = !isSubmitting && didSubmit && result.status === 'error'

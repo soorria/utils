@@ -10,14 +10,14 @@ import {
   ScrollRestoration,
   useLoaderData,
   useMatches,
+  Link,
 } from 'remix'
 import type { MetaFunction } from 'remix'
 import appStyles from './app.css'
 import { HeartIcon } from './components/icons'
-import { Link } from 'react-router-dom'
 import { getPrefsFromSession, Prefs } from './lib/prefs.server'
 import { getSession } from './lib/session.server'
-import { Toaster, ToastBar } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 
 export const links: LinksFunction = () => {
