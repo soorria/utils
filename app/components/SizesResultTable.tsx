@@ -24,10 +24,7 @@ const getFormatOrder = (a: string, b: string): number => {
 const renderSize = (size: number): ReactNode =>
   size >= 0 ? size : <span className="text-error">ERROR</span>
 
-const ResultSection: React.FC<{ title: ReactNode; sizes: Sizes }> = ({
-  title,
-  sizes,
-}) => {
+const SizesResultTable: React.FC<{ title: ReactNode; sizes: Sizes }> = ({ title, sizes }) => {
   return (
     <section>
       <h3 className="text-xl mb-4">{title}</h3>
@@ -54,4 +51,4 @@ const ResultSection: React.FC<{ title: ReactNode; sizes: Sizes }> = ({
   )
 }
 
-export default ResultSection
+export default SizesResultTable

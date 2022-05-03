@@ -1,4 +1,5 @@
 import {
+  ErrorBoundaryComponent,
   Links,
   LinksFunction,
   LiveReload,
@@ -16,6 +17,8 @@ import { HeartIcon } from './components/icons'
 import { Link } from 'react-router-dom'
 import { getPrefsFromSession, Prefs } from './lib/prefs.server'
 import { getSession } from './lib/session.server'
+import { Toaster, ToastBar } from 'react-hot-toast'
+import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 
 export const links: LinksFunction = () => {
   return [
@@ -38,16 +41,16 @@ export const links: LinksFunction = () => {
 }
 
 export const meta: MetaFunction = () => {
-  const image = 'https://og-gen-mooth.vercel.app/api/og?category=sizes'
+  const image = ogImage()
   const description =
-    'See the size of files or text in a few formats. Has a bunch of color schemes because why not.'
-  const title = 'Sizes | mooth.tech'
+    'Sometimes helpful utils that I use. Has a bunch of color schemes because why not.'
+  const title = DEFAULT_TITLE
 
   return {
     title,
     description,
     image,
-    'og:url': 'https://sizes.mooth.tech',
+    'og:url': BASE_URL,
     'og:type': 'website',
     'og:image': image,
     'og:image:width': '1200',
@@ -58,16 +61,18 @@ export const meta: MetaFunction = () => {
     'twitter:creator': '@soorriously',
     'twitter:site': '@soorriously',
     'twitter:title': title,
-    'twitter:alt': 'Sizes | mooth.tech',
+    'twitter:alt': title,
   }
 }
 
-type LoaderData = Prefs
+type LoaderData = {
+  prefs: Prefs
+}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request.headers.get('Cookie'))
   const prefs = getPrefsFromSession(session)
-  return prefs
+  return { prefs }
 }
 
 export const useRootLoaderData = (): LoaderData => {
@@ -81,7 +86,7 @@ export const useRootLoaderData = (): LoaderData => {
   return rootMatch.data as LoaderData
 }
 
-const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
+const Layout: React.FC<Prefs> = ({ children, js, theme }) => {
   return (
     <html lang="en" data-theme={theme}>
       <head>
@@ -105,19 +110,13 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
                 to="/"
                 className="text-4xl text-primary font-bold font-display focus-outline rounded-btn px-2 -mx-2"
               >
-                sizes
+                utils
               </Link>
               <div className="flex-1" />
-              <Link
-                to="/"
-                className="link link-hover link-primary text-xl rounded-btn px-1"
-              >
+              <Link to="/" className="link link-hover link-primary text-xl rounded-btn px-1">
                 home
               </Link>
-              <Link
-                to="/theme"
-                className="link link-hover link-primary text-xl rounded-btn px-1"
-              >
+              <Link to="/theme" className="link link-hover link-primary text-xl rounded-btn px-1">
                 theme
               </Link>
             </nav>
@@ -136,8 +135,7 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
               <HeartIcon className="absolute inset-0 fill-current text-pink" />
               <HeartIcon className="absolute inset-0 fill-current text-purple group-hover:animate-ping" />
             </span>{' '}
-            by{' '}
-            <span className="underline group-hover:no-underline">Soorria</span>
+            by <span className="underline group-hover:no-underline">Soorria</span>
           </a>
           <a
             href="https://github.com/mo0th/sizes"
@@ -145,10 +143,31 @@ const Layout: React.FC<LoaderData> = ({ children, js, theme }) => {
             rel="noopener noreferrer"
             className="group link link-hover inline-block focus-outline px-2 rounded-btn"
           >
-            <span className="underline group-hover:no-underline">Source</span>{' '}
-            on GitHub
+            <span className="underline group-hover:no-underline">Source</span> on GitHub
           </a>
         </footer>
+        <Toaster
+          position="bottom-center"
+          reverseOrder
+          toastOptions={{
+            style: {
+              backgroundColor: 'hsl(var(--n))',
+              color: 'hsl(var(--nc))',
+            },
+            success: {
+              iconTheme: {
+                primary: 'hsl(var(--su))',
+                secondary: 'hsl(var(--suc))',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: 'hsl(var(--er))',
+                secondary: 'hsl(var(--erc))',
+              },
+            },
+          }}
+        />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
@@ -161,7 +180,7 @@ const App: React.FC = () => {
   const data = useLoaderData<LoaderData>()
 
   return (
-    <Layout {...data}>
+    <Layout {...data.prefs}>
       <Outlet />
     </Layout>
   )
@@ -169,11 +188,14 @@ const App: React.FC = () => {
 
 export default App
 
-export const ErrorBoundary: React.FC = () => {
+export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
+  console.log(error)
   return (
     <Layout js theme="dracula">
       <main className="space-y-8">
         <h1 className="text-5xl mt-8">something broke somewhere :(</h1>
+
+        <pre>{error.stack || error.message}</pre>
 
         <Link to="." className="btn btn-ghost btn-block btn-outline">
           Try again ?

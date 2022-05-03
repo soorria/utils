@@ -10,6 +10,10 @@ import {
   GZIP_LEVEL_RANGE,
 } from './sizes'
 import { z } from 'zod'
+import {
+  coerceOptionalBooleanOrCheckboxValueToBoolean,
+  optionalBooleanOrCheckboxValue,
+} from './zod-utils'
 
 export type SizeFormats = 'initial' | 'gzip' | 'brotli' | 'deflate'
 export type Sizes = Partial<Record<SizeFormats, number>>
@@ -241,18 +245,6 @@ const sumSizes = (sizes: Sizes[]): Sizes => {
   return result
 }
 
-const booleanOrCheckboxValue = () =>
-  z.union([z.boolean(), z.enum(['on'])], {
-    errorMap(issue, ctx) {
-      if (issue.code === z.ZodIssueCode.invalid_union) {
-        return { message: "must be true, false or 'on'" }
-      }
-      return z.defaultErrorMap(issue, ctx)
-    },
-  })
-const coerceOptionalBooleanOrCheckboxValueToBoolean = (val: boolean | 'on' | undefined): boolean =>
-  typeof val === 'boolean' ? val : typeof val === 'undefined' ? false : true
-
 const stringToIntInRange = (range: CompressionLevelRange) =>
   z
     .string()
@@ -268,13 +260,13 @@ export const sizesRequestBodySchema = z
     files: z
       .array(z.instanceof(File, { message: 'files should only contain Files' }))
       .transform(files => files.filter(file => Boolean(file.name))),
-    initialEnabled: booleanOrCheckboxValue(),
-    totalEnabled: booleanOrCheckboxValue(),
-    brotliEnabled: booleanOrCheckboxValue(),
+    initialEnabled: optionalBooleanOrCheckboxValue(),
+    totalEnabled: optionalBooleanOrCheckboxValue(),
+    brotliEnabled: optionalBooleanOrCheckboxValue(),
     brotliLevel: stringToIntInRange(BROTLI_LEVEL_RANGE),
-    gzipEnabled: booleanOrCheckboxValue(),
+    gzipEnabled: optionalBooleanOrCheckboxValue(),
     gzipLevel: stringToIntInRange(GZIP_LEVEL_RANGE),
-    deflateEnabled: booleanOrCheckboxValue(),
+    deflateEnabled: optionalBooleanOrCheckboxValue(),
     deflateLevel: stringToIntInRange(DEFLATE_LEVEL_RANGE),
   })
   .partial()

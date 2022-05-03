@@ -25,7 +25,7 @@ const sessionKeys = {
 } as const
 
 export const getPrefsFromSession = (session: Session): Prefs => {
-  const prefs = { js: true, theme: '$$random' } as Prefs
+  const prefs = { ...defaultPrefs }
 
   if (session.get(sessionKeys.js) === 'false') {
     prefs.js = false

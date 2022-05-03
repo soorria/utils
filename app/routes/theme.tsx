@@ -1,14 +1,12 @@
-import {
-  ActionFunction,
-  Form,
-  json,
-  LoaderFunction,
-  useLoaderData,
-} from 'remix'
+import { ActionFunction, Form, json, LoaderFunction, useLoaderData } from 'remix'
+import { commonMetaFactory } from '~/lib/all-utils'
+import type { Util } from '~/lib/all-utils.server'
 import { setPrefsToSession, themeNames } from '~/lib/prefs.server'
 import { commitSession, destroySession, getSession } from '~/lib/session.server'
 import { cx } from '~/lib/utils'
 import { useRootLoaderData } from '~/root'
+
+export const meta = commonMetaFactory<LoaderData>()
 
 export const action: ActionFunction = async ({ request }) => {
   const session = await getSession(request.headers.get('Cookie'))
@@ -16,10 +14,7 @@ export const action: ActionFunction = async ({ request }) => {
   const action = formData.get('_action')
 
   if (action === 'destroy') {
-    return json(
-      {},
-      { headers: { 'Set-Cookie': await destroySession(session) } }
-    )
+    return json({}, { headers: { 'Set-Cookie': await destroySession(session) } })
   }
 
   const data = {
@@ -33,10 +28,19 @@ export const action: ActionFunction = async ({ request }) => {
 
 type LoaderData = {
   themes: typeof themeNames
+  utilData: Util
 }
 
 export const loader: LoaderFunction = () => {
-  return { themes: themeNames }
+  return json<LoaderData>({
+    themes: themeNames,
+    utilData: {
+      description: '29+ themes!',
+      path: '/theme',
+      slug: 'theme',
+      title: 'Theme',
+    },
+  })
 }
 
 const OptionsPage: React.FC = () => {
@@ -63,14 +67,13 @@ const OptionsPage: React.FC = () => {
                   className="sr-only peer"
                   id={theme}
                   defaultChecked={
-                    rootData.theme === theme &&
-                    rootData.realTheme !== '$$random'
+                    rootData.prefs.theme === theme && rootData.prefs.realTheme !== '$$random'
                   }
                 />
                 <div
                   className={cx(
                     'p-2 peer-checked:ring transition-shadow rounded-xl',
-                    rootData.realTheme === '$$random' && rootData.theme == theme
+                    rootData.prefs.realTheme === '$$random' && rootData.prefs.theme == theme
                       ? 'ring ring-secondary'
                       : 'ring-primary'
                   )}
@@ -85,7 +88,7 @@ const OptionsPage: React.FC = () => {
             ))}
             <div
               className={`p-2 -m-2 bg-rainbow rounded-[1.25rem] ${
-                rootData.realTheme === '$$random' ? 'bg-rainbow-animate' : ''
+                rootData.prefs.realTheme === '$$random' ? 'bg-rainbow-animate' : ''
               }`}
             >
               <input
@@ -94,7 +97,7 @@ const OptionsPage: React.FC = () => {
                 name="theme"
                 className="sr-only peer"
                 id="$$random"
-                defaultChecked={rootData.realTheme === '$$random'}
+                defaultChecked={rootData.prefs.realTheme === '$$random'}
               />
               <div className="p-2 peer-checked:ring ring-black transition-shadow rounded-xl">
                 <label htmlFor="$$random">
@@ -107,21 +110,11 @@ const OptionsPage: React.FC = () => {
           </div>
         </fieldset>
 
-        <button
-          className="btn btn-primary btn-block"
-          type="submit"
-          name="_action"
-          value="save"
-        >
+        <button className="btn btn-primary btn-block" type="submit" name="_action" value="save">
           save preferences
         </button>
 
-        <button
-          className="btn btn-ghost btn-block"
-          type="submit"
-          name="_action"
-          value="destroy"
-        >
+        <button className="btn btn-ghost btn-block" type="submit" name="_action" value="destroy">
           destroy(!) preferences
         </button>
       </Form>
