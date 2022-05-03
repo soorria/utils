@@ -28,7 +28,7 @@ type LoaderData = { utilData: Util; result: RemoveTypesResult; options?: RemoveT
 
 export const loader: LoaderFunction = async ({ request }) => {
   const successHeaders: HeadersInit = {
-    'Cache-Control': 'public, s-maxage=31536000, max-age: 86400',
+    'Cache-Control': 'public, s-maxage=31536000',
   }
   const url = new URL(request.url)
   const params = Object.fromEntries(url.searchParams)

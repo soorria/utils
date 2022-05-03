@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from 'remix'
+import { json, Link, useLoaderData } from 'remix'
 import MainHeading from '~/components/ui/MainHeading'
 import { allUtils, Util } from '~/lib/all-utils.server'
 
@@ -7,9 +7,16 @@ type LoaderData = {
 }
 
 export const loader = () => {
-  return {
-    utils: allUtils,
-  }
+  return json<LoaderData>(
+    {
+      utils: allUtils,
+    },
+    {
+      headers: {
+        'Cache-Control': 'public, s-maxage=31536000',
+      },
+    }
+  )
 }
 
 const Index: React.FC = () => {
