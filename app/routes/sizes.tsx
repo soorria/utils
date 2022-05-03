@@ -114,7 +114,7 @@ export const loader: LoaderFunction = async () => {
 
   return json<LoaderData>(
     { maxSize, utilData },
-    { headers: { 'Cache-Control': 's-max-age=10, public' } }
+    { headers: { 'Cache-Control': 'public, s-maxage=31536000' } }
   )
 }
 
