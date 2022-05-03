@@ -54,7 +54,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       ? {
           headers: successHeaders,
         }
-      : { status: 500 }
+      : {}
   )
 }
 
@@ -74,19 +74,14 @@ const RemoveTypes: React.FC = () => {
   const [params] = useSearchParams()
 
   const tsInputRef = useRef<HTMLTextAreaElement>(null)
-  const preRef = useRef<HTMLPreElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   const [copy, copied] = useCopy()
 
   useEffect(() => {
     const textarea = tsInputRef.current
-    const pre = preRef.current
     if (textarea) {
       autosize(textarea)
-      if (pre) {
-        pre.style.height = textarea.style.height
-      }
       return () => {
         autosize.destroy(textarea)
       }
@@ -176,10 +171,7 @@ const RemoveTypes: React.FC = () => {
                 <label className="label text-xl" htmlFor={IDS.ts}>
                   your de-typed code
                 </label>
-                <pre
-                  ref={preRef}
-                  className="form-control font-mono leading-tight textarea textarea-primary rounded-btn w-full min-h-[16rem] whitespace-pre-wrap"
-                >
+                <pre className="form-control font-mono leading-tight textarea textarea-primary rounded-btn w-full min-h-[16rem] whitespace-pre-wrap">
                   {result.js}
                 </pre>
               </div>
