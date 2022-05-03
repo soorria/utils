@@ -32,15 +32,22 @@ type LoaderData = {
 }
 
 export const loader: LoaderFunction = () => {
-  return json<LoaderData>({
-    themes: themeNames,
-    utilData: {
-      description: '29+ themes!',
-      path: '/theme',
-      slug: 'theme',
-      title: 'Theme',
+  return json<LoaderData>(
+    {
+      themes: themeNames,
+      utilData: {
+        description: '29+ themes!',
+        path: '/theme',
+        slug: 'theme',
+        title: 'Theme',
+      },
     },
-  })
+    {
+      headers: {
+        'Cache-Control': 'public, s-maxage=31536000',
+      },
+    }
+  )
 }
 
 const OptionsPage: React.FC = () => {
