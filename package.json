@@ -4,6 +4,8 @@
   "description": "see the size of text and files in deflate, gzip and brotli formats",
   "license": "MIT",
   "dependencies": {
+    "@babel/core": "^7.17.10",
+    "@babel/preset-typescript": "^7.16.7",
     "@remix-run/react": "^1.2.1",
     "@remix-run/vercel": "^1.2.1",
     "@supabase/supabase-js": "^1.31.0",
@@ -22,6 +24,7 @@
     "@remix-run/dev": "^1.2.1",
     "@remix-run/serve": "^1.2.1",
     "@types/autosize": "^4.0.1",
+    "@types/babel__core": "^7.1.19",
     "@types/content-type": "^1.1.5",
     "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",

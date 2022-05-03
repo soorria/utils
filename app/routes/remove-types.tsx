@@ -202,6 +202,17 @@ const RemoveTypes: React.FC = () => {
                   </p>
                 </div>
               ) : null}
+              {result.errors.babel ? (
+                <div className="space-y-4">
+                  <p className="text-xl">De-Typing Errors (babel)</p>
+                  <p className="whitespace-pre-wrap">
+                    {result.errors.babel.stack || result.errors.babel.message}
+                  </p>
+                  <p className="text-sm">
+                    Try re-submitting after toggling <code>'does this code have tsx?'</code>
+                  </p>
+                </div>
+              ) : null}
               {result.errors.formErrors?.length ? (
                 <div className="space-y-4">
                   <p className="text-xl">Form Errors</p>

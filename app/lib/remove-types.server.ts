@@ -1,4 +1,5 @@
-import esbuild, { BuildFailure } from 'esbuild'
+import esbuild from 'esbuild'
+import * as babel from '@babel/core'
 import { z } from 'zod'
 import {
   coerceOptionalBooleanOrCheckboxValueToBoolean,
@@ -13,12 +14,40 @@ type RemoveTypesSuccess = {
 type RemoveTypesError = {
   status: 'error'
   errors: {
-    esbuild?: BuildFailure
+    esbuild?: esbuild.BuildFailure
+    babel?: Error
   } & Partial<RemoveTypesSchemaErrors>
   ts?: string
 }
 
 export type RemoveTypesResult = RemoveTypesSuccess | RemoveTypesError
+
+type RemoveTypesFunction = (ts: string, options: RemoveTypesOptions) => Promise<string>
+
+const removeTypesEsbuild: RemoveTypesFunction = async (ts, options) => {
+  const result = await esbuild.transform(ts, {
+    jsx: 'preserve',
+    loader: options.isTsx ? 'tsx' : 'ts',
+    minify: false,
+  })
+  return result.code
+}
+
+const removeTypesBabel: RemoveTypesFunction = async (ts, options) => {
+  const result = await babel.transformAsync(ts, {
+    filename: `file.${options.isTsx ? 'tsx' : 'ts'}`,
+    retainLines: false,
+    presets: ['@babel/typescript'],
+  })
+  return result?.code!
+}
+
+const removeTypesFunctions = {
+  esbuild: removeTypesEsbuild,
+  babel: removeTypesBabel,
+}
+
+const REMOVE_TYPES_FUNCTION: keyof typeof removeTypesFunctions = 'babel'
 
 export const removeTypes = async (
   ts: string,
@@ -28,20 +57,16 @@ export const removeTypes = async (
   if (!ts) return { status: 'success', ts, js: ts }
 
   try {
-    const result = await esbuild.transform(ts, {
-      jsx: 'preserve',
-      loader: options.isTsx ? 'tsx' : 'ts',
-      minify: false,
-    })
+    const js = await removeTypesFunctions[REMOVE_TYPES_FUNCTION](ts, options)
 
     return {
       status: 'success',
       ts,
-      js: result.code,
+      js,
     }
   } catch (err) {
     console.error(err)
-    return { status: 'error', ts, errors: { esbuild: err as BuildFailure } }
+    return { status: 'error', ts, errors: { esbuild: err as esbuild.BuildFailure } }
   }
 }
 
