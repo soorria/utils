@@ -19,7 +19,7 @@ export const commonMetaFactory =
     const title = TITLE_FORMAT.replace(PLACEHOLDER, data.utilData.title)
     const { description, path } = data.utilData
 
-    const image = ogImage(title)
+    const image = ogImage(data.utilData.title)
 
     return {
       title,

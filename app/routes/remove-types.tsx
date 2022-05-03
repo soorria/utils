@@ -20,6 +20,9 @@ import SectionLoader from '~/components/ui/sections/SectionLoader'
 import ResultsSection from '~/components/ui/sections/ResultsSection'
 import FormSection from '~/components/ui/sections/FormSection'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
+import { commonMetaFactory } from '~/lib/all-utils'
+
+export const meta = commonMetaFactory<LoaderData>()
 
 type LoaderData = { utilData: Util; result: RemoveTypesResult; options?: RemoveTypesOptions }
 
