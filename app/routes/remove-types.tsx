@@ -106,6 +106,8 @@ const RemoveTypes: React.FC = () => {
     copyResult()
   }, [copyResult])
 
+  if (process.env.NODE_ENV !== 'production') console.log(result)
+
   return (
     <MainLayout>
       <MainHeading>{utilData.title}</MainHeading>

@@ -1,5 +1,7 @@
 import esbuild from 'esbuild'
 import * as babel from '@babel/core'
+// @ts-expect-error no types
+import tsPreset from '@babel/preset-typescript'
 import { z } from 'zod'
 import {
   coerceOptionalBooleanOrCheckboxValueToBoolean,
@@ -37,7 +39,7 @@ const removeTypesBabel: RemoveTypesFunction = async (ts, options) => {
   const result = await babel.transformAsync(ts, {
     filename: `file.${options.isTsx ? 'tsx' : 'ts'}`,
     retainLines: false,
-    presets: ['@babel/typescript'],
+    presets: [tsPreset],
   })
   return result?.code!
 }
@@ -66,7 +68,13 @@ export const removeTypes = async (
     }
   } catch (err) {
     console.error(err)
-    return { status: 'error', ts, errors: { esbuild: err as esbuild.BuildFailure } }
+    return {
+      status: 'error',
+      ts,
+      errors: {
+        [REMOVE_TYPES_FUNCTION]: err as RemoveTypesError['errors'][typeof REMOVE_TYPES_FUNCTION],
+      },
+    }
   }
 }
 
