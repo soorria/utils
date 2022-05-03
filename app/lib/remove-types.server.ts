@@ -40,6 +40,7 @@ export const removeTypes = async (
       js: result.code,
     }
   } catch (err) {
+    console.error(err)
     return { status: 'error', ts, errors: { esbuild: err as BuildFailure } }
   }
 }

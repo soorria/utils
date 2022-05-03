@@ -50,7 +50,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   return json<LoaderData>(
     { utilData, result, options },
-    result.status === 'success' ? successHeaders : {}
+    result.status === 'success'
+      ? {
+          headers: successHeaders,
+        }
+      : { status: 500 }
   )
 }
 
