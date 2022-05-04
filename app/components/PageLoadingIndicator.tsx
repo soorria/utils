@@ -79,18 +79,6 @@ const PageLoadingIndicator: React.FC = () => {
           transitionDuration: `var(${PROGRESS_DURATION_VAR}, ${PROGRESS_DURATION_MS})`,
         }}
       />
-      <button
-        className="pointer-events-auto btn"
-        onClick={() => {
-          progressDuration.set('0ms')
-          progress.set('0.3')
-          requestAnimationFrame(() => {
-            progressDuration.remove()
-          })
-        }}
-      >
-        hello
-      </button>
     </div>
   )
 }
