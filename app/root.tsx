@@ -11,6 +11,7 @@ import {
   useLoaderData,
   useMatches,
   Link,
+  useTransition,
 } from 'remix'
 import type { MetaFunction } from 'remix'
 import appStyles from './app.css'
@@ -19,6 +20,8 @@ import { getPrefsFromSession, Prefs } from './lib/prefs.server'
 import { getSession } from './lib/session.server'
 import { Toaster } from 'react-hot-toast'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
+import PageLoadingIndicator from './components/PageLoadingIndicator'
+import { useMounted } from './lib/utils'
 
 export const links: LinksFunction = () => {
   return [
@@ -86,7 +89,8 @@ export const useRootLoaderData = (): LoaderData => {
   return rootMatch.data as LoaderData
 }
 
-const Layout: React.FC<Prefs> = ({ children, js, theme }) => {
+const Layout: React.FC<Prefs> = ({ children, theme }) => {
+  const mounted = useMounted()
   return (
     <html lang="en" data-theme={theme}>
       <head>
@@ -103,6 +107,7 @@ const Layout: React.FC<Prefs> = ({ children, js, theme }) => {
         <Links />
       </head>
       <body className="min-h-screen flex flex-col">
+        {mounted && <PageLoadingIndicator />}
         <div className="max-w-screen-lg w-full mx-auto py-8 px-4 md:px-8 md:py-12 space-y-8 flex flex-col h-full flex-1">
           <header>
             <nav className="flex items-center space-x-2">

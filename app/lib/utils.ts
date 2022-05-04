@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useState } from 'react'
+
 export const capitalise = (text: string): string =>
   text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 
@@ -37,3 +39,55 @@ export const range = (min: number, max: number): number[] =>
   Array.from({ length: max - min }, (_, i) => i + min)
 
 export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+type UseCssVarProps = {
+  /**
+   * Name of the CSS custom property, including the leading `--`.
+   *
+   * e.g. '--progress'
+   */
+  name: string
+
+  /**
+   * The element to add the custom property to.
+   *
+   * Defaults to `document.body`
+   */
+  root?: HTMLElement
+}
+
+type CssVarControls = {
+  set: (value: string) => void
+  get: () => string
+  remove: () => void
+}
+
+export const useCssVar = ({ name, root = document.body }: UseCssVarProps): CssVarControls => {
+  const controls: CssVarControls = useMemo(
+    () => ({
+      set: value => root.style.setProperty(name, value),
+      get: () => root.style.getPropertyValue(name),
+      remove: () => root.style.removeProperty(name),
+    }),
+    [name, root]
+  )
+
+  useEffect(() => {
+    return () => controls.remove()
+  }, [controls.remove])
+
+  return controls
+}
+
+export const useMounted = (): boolean => {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  return mounted
+}
+
+export const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max)

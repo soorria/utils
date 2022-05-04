@@ -89,7 +89,6 @@ const RemoveTypes: React.FC = () => {
   }, [])
 
   const didSubmit = Boolean(params.get('ts'))
-  console.log(transition)
   const isIdle =
     !didSubmit &&
     (transition.state === 'idle' ||
@@ -109,8 +108,6 @@ const RemoveTypes: React.FC = () => {
   useEffect(() => {
     copyResult()
   }, [copyResult])
-
-  if (process.env.NODE_ENV !== 'production') console.log(result)
 
   return (
     <MainLayout>
