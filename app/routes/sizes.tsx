@@ -332,7 +332,7 @@ export default function Sizes() {
           <CompressionFormatToggle formatName="total" id="total-enabled" name="totalEnabled" />
         </details>
 
-        <SubmitButton>see sizes!</SubmitButton>
+        <SubmitButton isLoading={isLoading} >see sizes!</SubmitButton>
       </BaseForm>
       <ResetButton isLoading={isLoading} onClick={resetForm} />
     </MainLayout>

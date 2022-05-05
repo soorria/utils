@@ -230,7 +230,7 @@ const RemoveTypes: React.FC = () => {
           )}
         </div>
 
-        <SubmitButton>Remove Types</SubmitButton>
+        <SubmitButton isLoading={isSubmitting}>Remove Types</SubmitButton>
       </BaseForm>
       <ResetButton onClick={() => formRef.current?.reset()} />
     </MainLayout>
