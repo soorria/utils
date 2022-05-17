@@ -105,3 +105,25 @@ body {
     scrollbar-color: theme('colors.primary') theme('colors.primary');
   }
 }
+
+:root {
+  --aqrm-bg: theme('colors.base-200');
+  --aqrm-fg: theme('colors.base-content');
+  --aqrm-primary: theme('colors.primary');
+  --aqrm-primary-dark: theme('colors.primary-focus');
+  --aqrm-primary-contrast: theme('colors.primary-content');
+  --aqrm-base: theme('colors.accent');
+  --aqrm-base-dark: theme('colors.accent-focus');
+  --aqrm-base-darker: theme('colors.accent-focus');
+  --aqrm-issue-1: theme('colors.error');
+  --aqrm-issue-2: theme('colors.error-content');
+  --aqrm-idea-1: theme('colors.warning');
+  --aqrm-idea-2: theme('colors.warning-content');
+  --aqrm-other-1: theme('colors.info');
+  --aqrm-success-1: theme('colors.success');
+  --aqrm-success-2: theme('colors.success-content');
+}
+
+.aqrm-w {
+  @apply !font-display;
+}

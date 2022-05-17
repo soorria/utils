@@ -22,6 +22,7 @@ import { Toaster } from 'react-hot-toast'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 import PageLoadingIndicator from './components/PageLoadingIndicator'
 import { useMounted } from './lib/utils'
+import FeedbackButton, { FeedbackButtonModalRoot } from './components/FeedbackButton'
 
 export const links: LinksFunction = () => {
   return [
@@ -130,7 +131,7 @@ const Layout: React.FC<Prefs> = ({ children, theme }) => {
         </div>
         <footer className="py-8 text-center flex flex-col items-center space-y-4">
           <a
-            href="https://mooth.tech/?ref=Sizes"
+            href="https://mooth.tech/?ref=Utils"
             target="_blank"
             rel="noopener noreferrer"
             className="group link link-hover inline-block focus-outline px-2 rounded-btn"
@@ -143,14 +144,16 @@ const Layout: React.FC<Prefs> = ({ children, theme }) => {
             by <span className="underline group-hover:no-underline">Soorria</span>
           </a>
           <a
-            href="https://github.com/mo0th/sizes"
+            href="https://github.com/mo0th/utils"
             target="_blank"
             rel="noopener noreferrer"
             className="group link link-hover inline-block focus-outline px-2 rounded-btn"
           >
             <span className="underline group-hover:no-underline">Source</span> on GitHub
           </a>
+          <FeedbackButton />
         </footer>
+        <FeedbackButtonModalRoot />
         <Toaster
           position="bottom-center"
           reverseOrder
