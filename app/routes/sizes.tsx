@@ -2,7 +2,6 @@ import { FormEventHandler, useEffect, useRef, useState } from 'react'
 import {
   ActionFunction,
   useActionData,
-  Link,
   LoaderFunction,
   useLoaderData,
   useTransition,
@@ -36,7 +35,7 @@ import { sizesRequestBodySchema } from '~/lib/sizes.server'
 import { getAllSizes, Sizes } from '~/lib/sizes.server'
 import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
 import { commonMetaFactory } from '~/lib/all-utils'
-import { sleep } from '~/lib/utils'
+import Link from '~/components/BaseLink'
 
 export const meta = commonMetaFactory<LoaderData>()
 
@@ -332,7 +331,7 @@ export default function Sizes() {
           <CompressionFormatToggle formatName="total" id="total-enabled" name="totalEnabled" />
         </details>
 
-        <SubmitButton isLoading={isLoading} >see sizes!</SubmitButton>
+        <SubmitButton isLoading={isLoading}>see sizes!</SubmitButton>
       </BaseForm>
       <ResetButton isLoading={isLoading} onClick={resetForm} />
     </MainLayout>

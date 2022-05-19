@@ -10,9 +10,8 @@ import {
   ScrollRestoration,
   useLoaderData,
   useMatches,
-  Link,
-  useTransition,
 } from 'remix'
+import Link from '~/components/BaseLink'
 import type { MetaFunction } from 'remix'
 import appStyles from './app.css'
 import { HeartIcon } from './components/icons'

@@ -1,4 +1,5 @@
-import { json, Link, useCatch } from 'remix'
+import { json, useCatch } from 'remix'
+import Link from '~/components/BaseLink'
 
 export const loader = () => {
   throw json({}, 404)

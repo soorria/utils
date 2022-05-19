@@ -1,6 +1,7 @@
-import { json, Link, useLoaderData } from 'remix'
+import { json, useLoaderData } from 'remix'
 import MainHeading from '~/components/ui/MainHeading'
 import { allUtils, Util } from '~/lib/all-utils.server'
+import Link from '~/components/BaseLink'
 
 type LoaderData = {
   utils: Util[]
