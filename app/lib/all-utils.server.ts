@@ -1,3 +1,4 @@
+import { details as supacronDetails } from './supacron'
 export type Util = {
   path: string
   slug: string
@@ -15,6 +16,11 @@ const _allUtils: (Omit<Util, 'path'> & { path?: string })[] = [
     slug: 'remove-types',
     title: 'Remove Types',
     description: 'Remove types from some TypeScript code',
+  },
+  {
+    slug: supacronDetails.slug,
+    title: 'SupaCron',
+    description: 'UI to manage your pg_cron cron jobs. Easiest with Supabase.',
   },
 ]
 export const allUtils: Util[] = _allUtils.map(u => ({ ...u, path: u.path || `/${u.slug}` }))

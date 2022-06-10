@@ -17,12 +17,9 @@ import FileInput from '~/components/FileInput'
 import SizesResultTable from '~/components/SizesResultTable'
 import BaseForm from '~/components/ui/BaseForm'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
-import MainHeading from '~/components/ui/MainHeading'
-import MainLayout from '~/components/ui/MainLayout'
 import ResetButton from '~/components/ui/ResetButton'
 import ResultsSection from '~/components/ui/sections/ResultsSection'
 import SubmitButton from '~/components/ui/SubmitButton'
-import UtilDescription from '~/components/ui/UtilDescription'
 import { Util, utilByPath } from '~/lib/all-utils.server'
 import { download } from '~/lib/download.client'
 import {
@@ -36,6 +33,7 @@ import { getAllSizes, Sizes } from '~/lib/sizes.server'
 import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
 import { commonMetaFactory } from '~/lib/all-utils'
 import Link from '~/components/BaseLink'
+import UtilLayout from '~/components/ui/layouts/UtilLayout'
 
 export const meta = commonMetaFactory<LoaderData>()
 
@@ -128,10 +126,7 @@ const ids = {
 }
 
 export default function Sizes() {
-  const {
-    maxSize,
-    utilData: { title, description, slug },
-  } = useLoaderData<LoaderData>()
+  const { maxSize, utilData } = useLoaderData<LoaderData>()
   const submit = useSubmit()
   const transition = useTransition()
   const actionData = useActionData<ActionData>()
@@ -196,12 +191,9 @@ export default function Sizes() {
   }
 
   return (
-    <MainLayout>
-      <MainHeading ref={titleRef}>{title}</MainHeading>
-      <UtilDescription>{description}</UtilDescription>
-
+    <UtilLayout util={utilData}>
       {isError ? (
-        <ErrorSection utilSlug={slug}>
+        <ErrorSection utilSlug={utilData.slug}>
           <div aria-live="assertive" className="space-y-6" id={ids.formError}>
             <ul className="list-disc pl-8 space-y-3">
               {actionData.formErrors?.map((message, i) => (
@@ -213,7 +205,7 @@ export default function Sizes() {
       ) : null}
 
       {isSuccess ? (
-        <ResultsSection title="your results" utilSlug="sizes">
+        <ResultsSection title="your results" utilSlug={utilData.slug}>
           {Object.entries(actionData.files).map(([name, sizes]) => (
             <SizesResultTable
               key={name}
@@ -334,7 +326,7 @@ export default function Sizes() {
         <SubmitButton isLoading={isLoading}>see sizes!</SubmitButton>
       </BaseForm>
       <ResetButton isLoading={isLoading} onClick={resetForm} />
-    </MainLayout>
+    </UtilLayout>
   )
 }
 

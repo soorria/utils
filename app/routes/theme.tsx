@@ -1,20 +1,20 @@
 import { ActionFunction, Form, json, LoaderFunction, useLoaderData } from 'remix'
+import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import { commonMetaFactory } from '~/lib/all-utils'
 import type { Util } from '~/lib/all-utils.server'
-import { setPrefsToSession, themeNames } from '~/lib/prefs.server'
-import { commitSession, destroySession, getSession } from '~/lib/session.server'
+import { prefsCookie, setPrefsToSession, themeNames } from '~/lib/prefs.server'
 import { cx } from '~/lib/utils'
 import { useRootLoaderData } from '~/root'
 
 export const meta = commonMetaFactory<LoaderData>()
 
 export const action: ActionFunction = async ({ request }) => {
-  const session = await getSession(request.headers.get('Cookie'))
+  const session = await prefsCookie.getSession(request.headers.get('Cookie'))
   const formData = await request.formData()
   const action = formData.get('_action')
 
   if (action === 'destroy') {
-    return json({}, { headers: { 'Set-Cookie': await destroySession(session) } })
+    return json({}, { headers: { 'Set-Cookie': await prefsCookie.destroySession(session) } })
   }
 
   const data = {
@@ -23,7 +23,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   setPrefsToSession(data, session)
 
-  return json({}, { headers: { 'Set-Cookie': await commitSession(session) } })
+  return json({}, { headers: { 'Set-Cookie': await prefsCookie.commitSession(session) } })
 }
 
 type LoaderData = {
@@ -51,12 +51,11 @@ export const loader: LoaderFunction = () => {
 }
 
 const OptionsPage: React.FC = () => {
-  const { themes } = useLoaderData<LoaderData>()
+  const { themes, utilData } = useLoaderData<LoaderData>()
   const rootData = useRootLoaderData()
 
   return (
-    <main className="space-y-8">
-      <h2 className="text-5xl mt-8 text-primary">theme</h2>
+    <UtilLayout util={utilData}>
       <Form replace method="post" className="space-y-8">
         <fieldset role="radiogroup" className="form-control space-y-4">
           <legend className="label text-xl">theme</legend>
@@ -125,7 +124,7 @@ const OptionsPage: React.FC = () => {
           destroy(!) preferences
         </button>
       </Form>
-    </main>
+    </UtilLayout>
   )
 }
 

@@ -15,8 +15,7 @@ import Link from '~/components/BaseLink'
 import type { MetaFunction } from 'remix'
 import appStyles from './app.css'
 import { HeartIcon } from './components/icons'
-import { getPrefsFromSession, Prefs } from './lib/prefs.server'
-import { getSession } from './lib/session.server'
+import { getPrefsFromSession, Prefs, prefsCookie } from './lib/prefs.server'
 import { Toaster } from 'react-hot-toast'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 import PageLoadingIndicator from './components/PageLoadingIndicator'
@@ -73,7 +72,7 @@ type LoaderData = {
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const session = await getSession(request.headers.get('Cookie'))
+  const session = await prefsCookie.getSession(request.headers.get('Cookie'))
   const prefs = getPrefsFromSession(session)
   return { prefs }
 }

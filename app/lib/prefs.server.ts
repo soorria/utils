@@ -1,6 +1,8 @@
 // @ts-expect-error doesn't have types
 import themes from 'daisyui/src/colors/themes'
 import type { Session } from 'remix'
+import { createCookieSessionStorage } from 'remix'
+import { isProd } from '~/constants.server'
 import { randomItem } from './utils'
 
 export type Prefs = {
@@ -51,3 +53,11 @@ export const setPrefsToSession = (prefs: Partial<Prefs>, session: Session) => {
     session.set(sessionKeys.theme, prefs.theme)
   }
 }
+
+export const prefsCookie = createCookieSessionStorage({
+  cookie: {
+    name: 'prefs',
+    httpOnly: true,
+    secure: isProd,
+  },
+})

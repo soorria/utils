@@ -1,10 +1,7 @@
 import { json, LoaderFunction, useLoaderData, useSearchParams, useTransition } from 'remix'
 import BaseForm from '~/components/ui/BaseForm'
-import MainHeading from '~/components/ui/MainHeading'
-import MainLayout from '~/components/ui/MainLayout'
 import ResetButton from '~/components/ui/ResetButton'
 import SubmitButton from '~/components/ui/SubmitButton'
-import UtilDescription from '~/components/ui/UtilDescription'
 import { Util, utilByPath } from '~/lib/all-utils.server'
 import autosize from 'autosize'
 import { useCallback, useEffect, useRef } from 'react'
@@ -21,6 +18,7 @@ import ResultsSection from '~/components/ui/sections/ResultsSection'
 import FormSection from '~/components/ui/sections/FormSection'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
 import { commonMetaFactory } from '~/lib/all-utils'
+import UtilLayout from '~/components/ui/layouts/UtilLayout'
 
 export const meta = commonMetaFactory<LoaderData>()
 
@@ -110,10 +108,7 @@ const RemoveTypes: React.FC = () => {
   }, [copyResult])
 
   return (
-    <MainLayout>
-      <MainHeading>{utilData.title}</MainHeading>
-      <UtilDescription>{utilData.description}</UtilDescription>
-
+    <UtilLayout util={utilData}>
       <BaseForm method="get" ref={formRef}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <FormSection title="TypeScript">
@@ -233,7 +228,7 @@ const RemoveTypes: React.FC = () => {
         <SubmitButton isLoading={isSubmitting}>Remove Types</SubmitButton>
       </BaseForm>
       <ResetButton onClick={() => formRef.current?.reset()} />
-    </MainLayout>
+    </UtilLayout>
   )
 }
 
