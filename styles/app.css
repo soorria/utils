@@ -75,7 +75,8 @@ body {
 
 .btn:not(.no-ring),
 .link,
-.textarea,
+.textarea-primary,
+.input-primary,
 .focus-outline {
   @apply focus:ring-2 ring-primary ring-offset-2 ring-offset-base-100 transition-shadow focus:outline-none;
 }

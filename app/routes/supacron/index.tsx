@@ -53,12 +53,12 @@ const SupaCronAuth = () => {
             placeholder="postgres://user:password@db.real.url.com:5432/database"
             disabled={submitting}
           />
-          <FormLabel variant="ALT" htmlFor={IDS.connectionString}>
+          {/* <FormLabel variant="ALT" htmlFor={IDS.connectionString}>
             I you're using Supabase (or just have connection pooling enabled), I recommend using the
             connection string for the connection pool. Utils deploys to Vercel which uses serverless
             functions under the hood so if you don't use pooling you may have issues with hitting
             connection limits.
-          </FormLabel>
+          </FormLabel> */}
         </FormControl>
 
         <SubmitButton isLoading={submitting}>Connect to Database</SubmitButton>
