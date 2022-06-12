@@ -1,21 +1,21 @@
-import type { MetaFunction } from 'remix'
+import type { MetaFunction, HtmlMetaDescriptor } from 'remix'
 import type { Util } from './all-utils.server'
 
-export const DEFAULT_TITLE = 'Utils | mooth.tech'
+export const DEFAULT_TITLE = 'Utils • utils.mooth.tech'
 export const PLACEHOLDER = '%s'
-export const TITLE_FORMAT = `${PLACEHOLDER} | ${DEFAULT_TITLE}`
+export const TITLE_FORMAT = `${PLACEHOLDER} • utils.mooth.tech`
 export const BASE_URL = 'https://utils.mooth.tech'
 export const OG_IMAGE_BASE = 'https://mooth.tech/api/og'
 export const ogImage = (title: string = '') =>
   `${OG_IMAGE_BASE}?${new URLSearchParams({ category: 'utils', title })}`
 
 export const commonMetaFactory =
-  <LoaderData extends { utilData: Util }>() =>
+  <LoaderData extends { utilData: Util }>(overrides?: HtmlMetaDescriptor) =>
   ({
     data,
   }: Omit<Parameters<MetaFunction>[0], 'data'> & {
     data: LoaderData
-  }): ReturnType<MetaFunction> => {
+  }): HtmlMetaDescriptor => {
     const title = TITLE_FORMAT.replace(PLACEHOLDER, data.utilData.title)
     const { description, path } = data.utilData
 
@@ -37,5 +37,6 @@ export const commonMetaFactory =
       'twitter:site': '@soorriously',
       'twitter:title': title,
       'twitter:alt': title,
+      ...overrides,
     }
   }

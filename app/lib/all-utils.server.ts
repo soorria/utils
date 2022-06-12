@@ -20,11 +20,11 @@ const _allUtils: (Omit<Util, 'path'> & { path?: string })[] = [
   {
     slug: supacronDetails.slug,
     title: 'SupaCron',
-    description: 'UI to manage your pg_cron cron jobs. Easiest with Supabase.',
+    description: 'UI to manage your pg_cron cron jobs. Mainly designed for use with Supabase',
   },
 ]
 export const allUtils: Util[] = _allUtils.map(u => ({ ...u, path: u.path || `/${u.slug}` }))
 
-export const utilByPath: Record<string, Util> = Object.fromEntries(
+export const utilBySlug: Record<string, Util> = Object.fromEntries(
   allUtils.map(util => [util.slug, util])
 )

@@ -15,7 +15,7 @@ export const weightedRandomItem = <T>(arr: WeightedRandomArray<T>): T => {
 }
 
 export const cx = (...classes: (string | boolean | null | undefined)[]) =>
-  classes.filter(cls => typeof cls === 'string').join(' ')
+  classes.filter(cls => typeof cls === 'string' && Boolean(cls)).join(' ')
 
 type FormDataEntryValue = string | File
 export const areFormValuesOnlyFiles = (arr: FormDataEntryValue[]): boolean =>
@@ -79,15 +79,16 @@ export const useCssVar = ({ name, root = document.body }: UseCssVarProps): CssVa
   return controls
 }
 
-export const useMounted = (): boolean => {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  return mounted
-}
-
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max)
+
+export const getCookieHeader = (request: Request) => request.headers.get('Cookie')
+
+type ErrorMap<TErrors extends Record<string, string[]>> = Record<keyof TErrors, string | null>
+export const getErrorMap = <TErrors extends Record<string, string[]>>(
+  errors: TErrors
+): ErrorMap<TErrors> => {
+  return Object.fromEntries(
+    Object.entries(errors || ({} as TErrors)).map(([field, errors]) => [field, errors?.[0] || null])
+  ) as ErrorMap<TErrors>
+}

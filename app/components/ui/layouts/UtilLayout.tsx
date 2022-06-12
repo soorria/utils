@@ -1,15 +1,15 @@
 import type { Util } from '~/lib/all-utils.server'
 import MainHeading from '../MainHeading'
-import MainLayout from '../MainLayout'
+import MainLayout, { MainLayoutProps } from './MainLayout'
 import UtilDescription from '../UtilDescription'
 
-interface UtilLayoutProps {
+export interface UtilLayoutProps extends MainLayoutProps {
   util: Util
 }
 
-const UtilLayout: React.FC<UtilLayoutProps> = ({ util, children }) => {
+const UtilLayout: React.FC<UtilLayoutProps> = ({ util, children, ...props }) => {
   return (
-    <MainLayout>
+    <MainLayout {...props}>
       <MainHeading>{util.title}</MainHeading>
       <UtilDescription>{util.description}</UtilDescription>
       {children}

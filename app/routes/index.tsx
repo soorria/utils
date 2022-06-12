@@ -2,7 +2,7 @@ import { json, useLoaderData } from 'remix'
 import MainHeading from '~/components/ui/MainHeading'
 import { allUtils, Util } from '~/lib/all-utils.server'
 import Link from '~/components/BaseLink'
-import MainLayout from '~/components/ui/MainLayout'
+import MainLayout from '~/components/ui/layouts/MainLayout'
 
 type LoaderData = {
   utils: Util[]
@@ -33,9 +33,11 @@ const Index: React.FC = () => {
           <Link
             to={util.path}
             key={util.slug}
-            className="focus-outline flex flex-col space-y-4 p-4 sm:p-6 bg-base-300 rounded-btn hover:shadow-lg transition"
+            className="focus-outline flex flex-col space-y-4 p-4 sm:p-6 bg-base-300 rounded-btn hover:shadow-lg transition group"
           >
-            <span className="text-xl">{util.title}</span>
+            <span className="text-xl font-bold font-display transition-colors group-hover:underline">
+              {util.title}
+            </span>
             <span>{util.description}</span>
           </Link>
         ))}

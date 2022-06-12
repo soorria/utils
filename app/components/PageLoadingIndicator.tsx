@@ -41,7 +41,8 @@ const PageLoadingIndicator: React.FC = () => {
       })
     }
 
-    let timeout: NodeJS.Timeout
+    let interval: NodeJS.Timeout
+    let unmounted = false
 
     show.set('1')
     void (async () => {
@@ -52,16 +53,18 @@ const PageLoadingIndicator: React.FC = () => {
 
       const loop = () => {
         progress.set(current.toString())
-
-        timeout = setTimeout(loop, PROGRESS_DURATION)
         current = clamp(current + (0.95 - current) / 20, 0, 0.95)
       }
 
-      loop()
+      if (!unmounted) {
+        loop()
+        interval = setInterval(loop, PROGRESS_DURATION)
+      }
     })()
 
     return () => {
-      clearTimeout(timeout)
+      clearTimeout(interval)
+      unmounted = true
     }
   }, [transition, show, progress])
 

@@ -1,9 +1,9 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { cx } from '~/lib/utils'
 
-const SCRIPT_SRC = 'https://aqrm.mooth.tech/aqrm.js?s=utils.mooth.tech'
+export const AQRM_SCRIPT_SRC = 'https://aqrm.mooth.tech/aqrm.js?s=utils.mooth.tech'
 
-const MODAL_ROOT_ID = 'aqrm-modal-root'
+export const MODAL_ROOT_ID = 'aqrm-modal-root'
 
 export const FeedbackButtonModalRoot: React.FC = memo(() => <div id={MODAL_ROOT_ID} />)
 
@@ -13,37 +13,30 @@ const FeedbackButton: React.FC = () => {
 
   useEffect(() => {
     let widget: { unregister: () => void }
+    let register = (window as any)._AQRM_REGISTER
 
     const root = document.getElementById(MODAL_ROOT_ID)
 
-    const loadedPromise = (() => {
-      let resolve: (v?: unknown) => void,
-        reject: (v?: unknown) => void,
-        done = false
-      const promise = new Promise((_resolve, _reject) => {
-        resolve = _resolve
-        reject = _reject
-      })
+    const loadedPromise = new Promise((resolve, reject) => {
+      let tries = 0
 
-      const script = document.createElement('script')
-      script.onload = () => {
-        console.log('load')
-        done = true
-        resolve()
+      const check = () => {
+        tries++
+        register = (window as any)._AQRM_REGISTER
+        if (register) {
+          resolve(true)
+        } else if (tries <= 5) {
+          setTimeout(() => check(), 500)
+        } else {
+          reject()
+        }
       }
-      script.src = SCRIPT_SRC
-      root?.append(script)
 
-      setTimeout(() => {
-        if (!done) reject()
-      }, 10000)
-
-      return promise
-    })()
+      check()
+    })
 
     loadedPromise
       .then(() => {
-        const register = (window as any)._AQRM_REGISTER
         if (register) {
           widget = register(root, buttonRef.current)
           setEnabled(true)
@@ -52,7 +45,7 @@ const FeedbackButton: React.FC = () => {
       .catch(() => setEnabled(false))
 
     return () => {
-      widget?.unregister()
+      widget?.unregister?.()
     }
   }, [])
 
@@ -61,7 +54,7 @@ const FeedbackButton: React.FC = () => {
       ref={buttonRef}
       disabled={!enabled}
       className={cx(
-        'inline-block focus-outline px-2 rounded-btn',
+        'inline-block focus-outline px-2',
         enabled ? 'link link-hover' : 'cursor-not-allowed opacity-75'
       )}
     >

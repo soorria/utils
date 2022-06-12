@@ -2,7 +2,7 @@ import { json, LoaderFunction, useLoaderData, useSearchParams, useTransition } f
 import BaseForm from '~/components/ui/BaseForm'
 import ResetButton from '~/components/ui/ResetButton'
 import SubmitButton from '~/components/ui/SubmitButton'
-import { Util, utilByPath } from '~/lib/all-utils.server'
+import { Util, utilBySlug } from '~/lib/all-utils.server'
 import autosize from 'autosize'
 import { useCallback, useEffect, useRef } from 'react'
 import {
@@ -15,10 +15,13 @@ import toast from 'react-hot-toast'
 import { useCopy } from '~/lib/use-copy'
 import SectionLoader from '~/components/ui/sections/SectionLoader'
 import ResultsSection from '~/components/ui/sections/ResultsSection'
-import FormSection from '~/components/ui/sections/FormSection'
+import MinimalSection from '~/components/ui/sections/MinimalSection'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
 import { commonMetaFactory } from '~/lib/all-utils'
 import UtilLayout from '~/components/ui/layouts/UtilLayout'
+import FormControl from '~/components/ui/forms/FormControl'
+import FormLabel from '~/components/ui/forms/FormLabel'
+import Textarea from '~/components/ui/forms/Textarea'
 
 export const meta = commonMetaFactory<LoaderData>()
 
@@ -30,7 +33,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
   const url = new URL(request.url)
   const params = Object.fromEntries(url.searchParams)
-  const utilData = utilByPath['remove-types']
+  const utilData = utilBySlug['remove-types']
 
   const parseResult = await removeTypesRequestParamsSchema.spa(params)
 
@@ -111,27 +114,26 @@ const RemoveTypes: React.FC = () => {
     <UtilLayout util={utilData}>
       <BaseForm method="get" ref={formRef}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <FormSection title="TypeScript">
-            <div className="space-y-4 form-control">
-              <label className="label text-xl" htmlFor={IDS.ts}>
-                your typescript code
-              </label>
-              <textarea
+          <MinimalSection title="TypeScript">
+            <FormControl>
+              <FormLabel htmlFor={IDS.ts}>your typescript code</FormLabel>
+              <Textarea
                 spellCheck="false"
                 disabled={isSubmitting}
                 ref={tsInputRef}
                 id={IDS.ts}
                 name="ts"
-                className="form-control font-mono leading-tight textarea textarea-primary rounded-btn w-full min-h-[16rem]"
+                className="font-mono leading-tight"
+                minHeight="16rem"
                 placeholder="your text here"
                 defaultValue={result.ts}
               />
-            </div>
+            </FormControl>
 
-            <div className="form-control flex-row items-center">
-              <label className="label cursor-pointer text-xl flex-1" htmlFor={IDS.isTsx}>
+            <FormControl variant="INLINE">
+              <FormLabel className="flex-1" htmlFor={IDS.isTsx}>
                 does this code have tsx?
-              </label>
+              </FormLabel>
               <input
                 type="checkbox"
                 className="toggle toggle-primary"
@@ -139,12 +141,12 @@ const RemoveTypes: React.FC = () => {
                 defaultChecked={options?.isTsx}
                 name="isTsx"
               />
-            </div>
+            </FormControl>
 
-            <div className="form-control flex-row items-center">
-              <label className="label cursor-pointer text-xl flex-1" htmlFor={IDS.copyWhenDone}>
+            <FormControl variant="INLINE">
+              <FormLabel className="cursor-pointer flex-1" htmlFor={IDS.copyWhenDone}>
                 copy to clipboard when done
-              </label>
+              </FormLabel>
               <input
                 type="checkbox"
                 className="toggle toggle-primary"
@@ -152,27 +154,25 @@ const RemoveTypes: React.FC = () => {
                 defaultChecked={options?.copyWhenDone}
                 name="copyWhenDone"
               />
-            </div>
-          </FormSection>
+            </FormControl>
+          </MinimalSection>
 
           {isIdle && (
-            <FormSection title="JavaScript">
+            <MinimalSection title="JavaScript">
               <p className="text-xl py-2">
                 You'll see your TypeScript code without its types here!
               </p>
-            </FormSection>
+            </MinimalSection>
           )}
           {isSubmitting && <SectionLoader />}
           {isSuccess && (
             <ResultsSection utilSlug={utilData.slug} title="JavaScript">
-              <div className="space-y-4 form-control">
-                <label className="label text-xl" htmlFor={IDS.ts}>
-                  your de-typed code
-                </label>
-                <pre className="form-control font-mono leading-tight textarea textarea-primary rounded-btn w-full min-h-[16rem] whitespace-pre-wrap">
+              <FormControl>
+                <p className="text-xl">your de-typed code</p>
+                <pre className="font-mono leading-tight textarea textarea-primary rounded-btn w-full min-h-[16rem] whitespace-pre-wrap">
                   {result.js}
                 </pre>
-              </div>
+              </FormControl>
 
               <button
                 type="button"

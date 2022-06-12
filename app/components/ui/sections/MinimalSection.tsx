@@ -1,9 +1,14 @@
+import type { ReactNode } from 'react'
 import { cx } from '~/lib/utils'
 import { classes } from './styles'
 
-const FormSection: React.FC<{ title?: string }> = ({ title = 'your results', children }) => {
+const MinimalSection: React.FC<{ title?: ReactNode; className?: string }> = ({
+  title,
+  className,
+  children,
+}) => {
   return (
-    <div className={cx(classes.root, 'border-neutral')}>
+    <div className={cx(classes.rootMinimal, className)}>
       {title && <h2 className={cx(classes.title, 'text-primary')}>{title}</h2>}
 
       <div className={cx(classes.childrenWrapper)}>{children}</div>
@@ -11,4 +16,4 @@ const FormSection: React.FC<{ title?: string }> = ({ title = 'your results', chi
   )
 }
 
-export default FormSection
+export default MinimalSection

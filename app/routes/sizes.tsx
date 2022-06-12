@@ -20,7 +20,7 @@ import ErrorSection from '~/components/ui/sections/ErrorSection'
 import ResetButton from '~/components/ui/ResetButton'
 import ResultsSection from '~/components/ui/sections/ResultsSection'
 import SubmitButton from '~/components/ui/SubmitButton'
-import { Util, utilByPath } from '~/lib/all-utils.server'
+import { Util, utilBySlug } from '~/lib/all-utils.server'
 import { download } from '~/lib/download.client'
 import {
   BROTLI_LEVEL_RANGE,
@@ -34,6 +34,9 @@ import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
 import { commonMetaFactory } from '~/lib/all-utils'
 import Link from '~/components/BaseLink'
 import UtilLayout from '~/components/ui/layouts/UtilLayout'
+import FormControl from '~/components/ui/forms/FormControl'
+import FormLabel from '~/components/ui/forms/FormLabel'
+import Textarea from '~/components/ui/forms/Textarea'
 
 export const meta = commonMetaFactory<LoaderData>()
 
@@ -107,7 +110,7 @@ type LoaderData = { maxSize: string; utilData: Util }
 
 export const loader: LoaderFunction = async () => {
   const maxSize = `~${(MAX_FILE_SIZE / 1e6).toFixed(1)}MB`
-  const utilData = utilByPath.sizes
+  const utilData = utilBySlug.sizes
 
   return json<LoaderData>(
     { maxSize, utilData },
@@ -227,7 +230,7 @@ export default function Sizes() {
           ) : null}
 
           <div className="grid gap-6">
-            <button className="btn" onClick={downloadResultsAsJson}>
+            <button type="button" className="btn" onClick={downloadResultsAsJson}>
               Download as JSON
             </button>
           </div>
@@ -241,10 +244,8 @@ export default function Sizes() {
         encType="multipart/form-data"
         ref={formRef}
       >
-        <div className="form-control">
-          <label className="label text-xl mb-4" htmlFor={ids.fileInput}>
-            your files
-          </label>
+        <FormControl>
+          <FormLabel htmlFor={ids.fileInput}>your files</FormLabel>
           <FileInput
             key={resetFileInputKey}
             id={ids.fileInput}
@@ -253,29 +254,25 @@ export default function Sizes() {
             disabled={isLoading}
             onFiles={files => setFiles(files)}
           />
-          <p id={ids.fileInputHelpText} className="label mt-2">
-            <span className="label-text-alt">
-              Any file <em>should</em> work. File size limited to about {maxSize}. App may explode
-              (idk why) or not work as expected (vercel payload limits) if the payload is too large.
-            </span>
-          </p>
-        </div>
+          <FormLabel variant="ALT" id={ids.fileInputHelpText}>
+            Any file <em>should</em> work. File size limited to about {maxSize}. App may explode
+            (idk why) or not work as expected (vercel payload limits) if the payload is too large.
+          </FormLabel>
+        </FormControl>
 
         <Divider>and / or</Divider>
 
-        <div className="space-y-4 form-control">
-          <label className="label text-xl" htmlFor={ids.textarea}>
-            your text
-          </label>
-          <textarea
+        <FormControl>
+          <FormLabel htmlFor={ids.textarea}>your text</FormLabel>
+          <Textarea
             id={ids.textarea}
             name="text"
-            className="form-control textarea textarea-primary rounded-btn w-full min-h-[16rem]"
+            minHeight="16rem"
             placeholder="your text here"
             defaultValue={(actionData?.status === 'success' && actionData.text) || ''}
             disabled={isLoading}
           />
-        </div>
+        </FormControl>
 
         <details className="space-y-8 bg-base-300 p-4 rounded-btn focus-within:outline-primary outline-offset-2">
           <summary className="cursor-pointer -m-4 p-4 focus-outline rounded-btn">

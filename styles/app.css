@@ -77,11 +77,11 @@ body {
 .link,
 .textarea,
 .focus-outline {
-  @apply focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-base-100 transition-shadow focus:outline-none;
+  @apply focus:ring-2 ring-primary ring-offset-2 ring-offset-base-100 transition-shadow focus:outline-none;
 }
 
 .focus-within-outline {
-  @apply focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-base-100 transition-shadow focus-within:outline-none;
+  @apply focus-within:ring-2 ring-primary ring-offset-2 ring-offset-base-100 transition-shadow focus-within:outline-none;
 }
 
 @screen sm {
@@ -101,12 +101,22 @@ body {
 
   /* Firefox */
   * {
-    scrollbar-width: 'thin';
     scrollbar-color: theme('colors.primary') theme('colors.primary');
+  }
+
+  /* Chrome */
+  pre::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Firefox */
+  pre {
+    scrollbar-width: 'thin';
   }
 }
 
-:root {
+/* [data-aqrm-root] {
   --aqrm-bg: theme('colors.base-200');
   --aqrm-fg: theme('colors.base-content');
   --aqrm-primary: theme('colors.primary');
@@ -122,8 +132,30 @@ body {
   --aqrm-other-1: theme('colors.info');
   --aqrm-success-1: theme('colors.success');
   --aqrm-success-2: theme('colors.success-content');
-}
+} */
 
 .aqrm-w {
   @apply !font-display;
+}
+
+.link { 
+  @apply rounded-btn;
+}
+
+.label-text {
+  @apply text-xl;
+}
+.label-text-alt {
+  @apply text-base;
+}
+
+:root {
+  --bleed-padding: 1rem;
+  --bleed-buffer: calc(var(--bleed-padding) * 2);
+}
+
+@screen md {
+  :root {
+  --bleed-padding: 2rem;
+  }
 }

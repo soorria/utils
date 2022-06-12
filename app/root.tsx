@@ -13,14 +13,25 @@ import {
 } from 'remix'
 import Link from '~/components/BaseLink'
 import type { MetaFunction } from 'remix'
+import { ClientOnly, ExternalScriptsFunction, ExternalScripts } from 'remix-utils'
 import appStyles from './app.css'
 import { HeartIcon } from './components/icons'
 import { getPrefsFromSession, Prefs, prefsCookie } from './lib/prefs.server'
 import { Toaster } from 'react-hot-toast'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 import PageLoadingIndicator from './components/PageLoadingIndicator'
-import { useMounted } from './lib/utils'
-import FeedbackButton, { FeedbackButtonModalRoot } from './components/FeedbackButton'
+import FeedbackButton, {
+  AQRM_SCRIPT_SRC,
+  FeedbackButtonModalRoot,
+} from './components/FeedbackButton'
+
+const scripts: ExternalScriptsFunction = () => [
+  {
+    src: AQRM_SCRIPT_SRC,
+  },
+]
+
+export const handle = { scripts }
 
 export const links: LinksFunction = () => {
   return [
@@ -89,7 +100,6 @@ export const useRootLoaderData = (): LoaderData => {
 }
 
 const Layout: React.FC<Prefs> = ({ children, theme }) => {
-  const mounted = useMounted()
   return (
     <html lang="en" data-theme={theme}>
       <head>
@@ -106,7 +116,7 @@ const Layout: React.FC<Prefs> = ({ children, theme }) => {
         <Links />
       </head>
       <body className="min-h-screen flex flex-col">
-        {mounted && <PageLoadingIndicator />}
+        <ClientOnly>{() => <PageLoadingIndicator />}</ClientOnly>
         <div className="max-w-screen-lg w-full mx-auto py-8 px-4 md:px-8 md:py-12 space-y-8 flex flex-col h-full flex-1">
           <header>
             <nav className="flex items-center space-x-2">
@@ -125,7 +135,7 @@ const Layout: React.FC<Prefs> = ({ children, theme }) => {
               </Link>
             </nav>
           </header>
-          <div className="flex-1">{children}</div>
+          <div className="flex-1 flex flex-col">{children}</div>
         </div>
         <footer className="py-8 text-center flex flex-col items-center space-y-4">
           <a
@@ -175,6 +185,7 @@ const Layout: React.FC<Prefs> = ({ children, theme }) => {
           }}
         />
         <ScrollRestoration />
+        <ExternalScripts />
         <Scripts />
         <LiveReload />
       </body>
@@ -195,7 +206,7 @@ const App: React.FC = () => {
 export default App
 
 export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
-  console.log(error)
+  console.error(error)
   return (
     <Layout js theme="dracula">
       <main className="space-y-8">

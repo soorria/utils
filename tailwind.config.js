@@ -1,4 +1,5 @@
 const { fontFamily } = require('tailwindcss/defaultTheme')
+const plugin = require('tailwindcss/plugin')
 const themes = require('daisyui/src/colors/themes')
 
 const drac = {
@@ -11,6 +12,7 @@ const drac = {
   yellow: '#f1fa8c',
 }
 
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./app/**/*.{ts,tsx}'],
   theme: {
@@ -22,9 +24,20 @@ module.exports = {
       animation: {
         spin: 'spin 0.5s linear infinite',
       },
+      gridTemplateColumns: {
+        '2/3': 'minmax(0,2fr) minmax(0,3fr)',
+      },
     },
   },
-  plugins: [require('daisyui')],
+  plugins: [
+    require('daisyui'),
+    plugin(({ addVariant }) => {
+      addVariant('hocus', ['&:hover', '&:focus'])
+      addVariant('hocus-within', ['&:hover', '&:focus-within'])
+      addVariant('group-hocus', [':merge(.group):hover &', ':merge(.group):focus &'])
+      addVariant('where', ':where(&)')
+    }),
+  ],
   daisyui: {
     logs: false,
     themes: [

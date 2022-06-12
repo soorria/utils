@@ -72,7 +72,7 @@ const FileInput: React.FC<
           name: 'file',
           type: 'file',
           className:
-            'sr-only no-js:not-sr-only form-control input input-primary border-none focus:outline-none block',
+            'sr-only no-js:not-sr-only input input-primary border-none focus:outline-none block',
           ...props,
         })}
       />
