@@ -48,7 +48,7 @@ export const links: LinksFunction = () => {
     },
     {
       rel: 'canonical',
-      href: 'https://sizes.mooth.tech',
+      href: 'https://utils.soorria.com',
     },
   ]
 }
@@ -108,9 +108,9 @@ const Layout: React.FC<Prefs> = ({ children, theme }) => {
         <script
           async
           defer
-          data-domain="sizes.mooth.tech"
-          data-api="https://mooth.tech/proxy/api/event"
-          src="https://mooth.tech/js/potato.js"
+          data-domain="utils.soorria.com"
+          data-api="https://soorria.com/proxy/api/event"
+          src="https://soorria.com/js/potato.js"
         />
         <Meta />
         <Links />
@@ -139,7 +139,7 @@ const Layout: React.FC<Prefs> = ({ children, theme }) => {
         </div>
         <footer className="py-8 text-center flex flex-col items-center space-y-4">
           <a
-            href="https://mooth.tech/?ref=Utils"
+            href="https://soorria.com/?ref=Utils"
             target="_blank"
             rel="noopener noreferrer"
             className="group link link-hover inline-block focus-outline px-2 rounded-btn"
@@ -152,7 +152,7 @@ const Layout: React.FC<Prefs> = ({ children, theme }) => {
             by <span className="underline group-hover:no-underline">Soorria</span>
           </a>
           <a
-            href="https://github.com/mo0th/utils"
+            href="https://github.com/soorria/utils"
             target="_blank"
             rel="noopener noreferrer"
             className="group link link-hover inline-block focus-outline px-2 rounded-btn"

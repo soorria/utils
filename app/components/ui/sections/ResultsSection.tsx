@@ -14,7 +14,7 @@ const ResultsSection: React.FC<{ title?: string; utilSlug: string }> = ({
 
       <p className={cx(classes.footer)}>
         <a
-          href={`https://mooth.tech/?ref=Utils&utm_medium=SuccessLink&utm_content=${utilSlug}#contact`}
+          href={`https://soorria.com/?ref=Utils&utm_medium=SuccessLink&utm_content=${utilSlug}#contact`}
           target="_blank"
           rel="noopener noreferrer"
           className="hover:underline group focus-outline px-2"

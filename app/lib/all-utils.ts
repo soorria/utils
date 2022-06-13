@@ -1,13 +1,13 @@
 import type { MetaFunction, HtmlMetaDescriptor } from 'remix'
 import type { Util } from './all-utils.server'
 
-export const DEFAULT_TITLE = 'Utils • utils.mooth.tech'
+export const DEFAULT_TITLE = 'Utils • utils.soorria.com'
 export const PLACEHOLDER = '%s'
-export const TITLE_FORMAT = `${PLACEHOLDER} • utils.mooth.tech`
-export const BASE_URL = 'https://utils.mooth.tech'
-export const OG_IMAGE_BASE = 'https://mooth.tech/api/og'
+export const TITLE_FORMAT = `${PLACEHOLDER} • utils.soorria.com`
+export const BASE_URL = 'https://utils.soorria.com'
+export const OG_IMAGE_BASE = 'https://soorria.com/api/og'
 export const ogImage = (title: string = '') =>
-  `${OG_IMAGE_BASE}?${new URLSearchParams({ category: 'utils', title })}`
+  `${OG_IMAGE_BASE}?${new URLSearchParams({ subtitle: 'utils.soorria.com', title })}`
 
 export const commonMetaFactory =
   <LoaderData extends { utilData: Util }>(overrides?: HtmlMetaDescriptor) =>

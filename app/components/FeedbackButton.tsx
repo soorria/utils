@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { cx } from '~/lib/utils'
 
-export const AQRM_SCRIPT_SRC = 'https://aqrm.mooth.tech/aqrm.js?s=utils.mooth.tech'
+export const AQRM_SCRIPT_SRC = 'https://aqrm.soorria.com/aqrm.js?s=utils.soorria.com'
 
 export const MODAL_ROOT_ID = 'aqrm-modal-root'
 

@@ -1,5 +1,5 @@
-# Sizes
+# Utils
 
-little app to see sizes of files & text in a few compression formats.
+Helpers that are too small for their own app.
 
-[live here](https://sizes.mooth.tech)
+[live here](https://utils.soorria.com)
