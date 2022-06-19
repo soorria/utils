@@ -22,6 +22,7 @@ import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import Textarea from '~/components/ui/forms/Textarea'
+import { sleep } from '~/lib/utils'
 
 export const meta = commonMetaFactory<LoaderData>()
 
@@ -164,13 +165,22 @@ const RemoveTypes: React.FC = () => {
               </p>
             </MinimalSection>
           )}
-          {isSubmitting && <SectionLoader />}
-          {isSuccess && (
-            <ResultsSection utilSlug={utilData.slug} title="JavaScript">
+          {isSubmitting && (
+            <SectionLoader variant="MINIMAL">
               <FormControl>
-                <p className="text-xl">your de-typed code</p>
-                <pre className="font-mono leading-tight textarea textarea-primary rounded-btn w-full min-h-[16rem] whitespace-pre-wrap">
-                  {result.js}
+                <div className="skeleton h-11 w-36" />
+                <div className="skeleton min-h-[16rem]" />
+              </FormControl>
+            </SectionLoader>
+          )}
+          {isSuccess && (
+            <ResultsSection utilSlug={utilData.slug} title="JavaScript" variant="MINIMAL">
+              <FormControl>
+                <p className="label">
+                  <span className="label-text">de-typed code</span>
+                </p>
+                <pre className="font-mono leading-tight textarea textarea-primary rounded-btn w-full min-h-[16rem] overflow-x-auto">
+                  <code>{result.js}</code>
                 </pre>
               </FormControl>
 
@@ -184,7 +194,7 @@ const RemoveTypes: React.FC = () => {
             </ResultsSection>
           )}
           {isError && (
-            <ErrorSection utilSlug={utilData.slug}>
+            <ErrorSection utilSlug={utilData.slug} variant="MINIMAL">
               {result.errors.esbuild?.errors ? (
                 <div className="space-y-4">
                   <p className="text-xl">De-Typing Errors (esbuild)</p>

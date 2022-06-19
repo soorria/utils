@@ -7,6 +7,7 @@ import {
   coerceOptionalBooleanOrCheckboxValueToBoolean,
   optionalBooleanOrCheckboxValue,
 } from './zod-utils'
+import { sleep } from './utils'
 
 type RemoveTypesSuccess = {
   status: 'success'
@@ -82,11 +83,9 @@ export const removeTypesRequestParamsSchema = z
   .object({
     ts: z.string().default(''),
     isTsx: optionalBooleanOrCheckboxValue(),
-    copyWhenDone: optionalBooleanOrCheckboxValue(),
+    copyWhenDone: optionalBooleanOrCheckboxValue(true),
   })
   .transform(val => {
-    val.isTsx = coerceOptionalBooleanOrCheckboxValueToBoolean(val.isTsx)
-    val.copyWhenDone = coerceOptionalBooleanOrCheckboxValueToBoolean(val.isTsx)
     if (!val.ts) {
       val.copyWhenDone = true
     }

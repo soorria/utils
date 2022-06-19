@@ -54,7 +54,7 @@ export const links: LinksFunction = () => {
 }
 
 export const meta: MetaFunction = () => {
-  const image = ogImage()
+  const image = ogImage('Utils')
   const description =
     'Sometimes helpful utils that I use. Has a bunch of color schemes because why not.'
   const title = DEFAULT_TITLE

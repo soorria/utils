@@ -27,6 +27,13 @@ module.exports = {
       gridTemplateColumns: {
         '2/3': 'minmax(0,2fr) minmax(0,3fr)',
       },
+      keyframes: {
+        pulse: {
+          '50%': {
+            opacity: '.3',
+          },
+        },
+      },
     },
   },
   plugins: [

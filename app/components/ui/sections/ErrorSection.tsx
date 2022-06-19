@@ -1,13 +1,15 @@
 import { cx } from '~/lib/utils'
-import { classes } from './styles'
+import type { SectionVariant } from './common-types'
+import { classes, getRootClassForVariant } from './styles'
 
-const ErrorSection: React.FC<{ title?: string; utilSlug: string }> = ({
+const ErrorSection: React.FC<{ title?: string; utilSlug: string; variant?: SectionVariant }> = ({
   title = 'something went wrong :(',
   utilSlug,
   children,
+  variant = 'DEFAULT',
 }) => {
   return (
-    <div className={cx(classes.root, 'border-error')}>
+    <div className={cx(getRootClassForVariant(variant), 'border-error')}>
       <h2 className={cx(classes.title, 'text-error')}>{title}</h2>
 
       <div className={cx(classes.childrenWrapper)}>{children}</div>

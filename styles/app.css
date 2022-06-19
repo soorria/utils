@@ -1,6 +1,5 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
 
 h1,
 h2,
@@ -160,3 +159,9 @@ body {
   --bleed-padding: 2rem;
   }
 }
+
+.skeleton {
+  @apply bg-neutral animate-pulse rounded-btn;
+}
+
+@tailwind utilities;

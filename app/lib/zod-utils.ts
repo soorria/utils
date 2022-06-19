@@ -11,9 +11,16 @@ export const booleanOrCheckboxValue = () =>
   })
 
 export const optionalBooleanOrCheckboxValue = (defaultValue = false) =>
-  booleanOrCheckboxValue().optional().default(defaultValue)
+  booleanOrCheckboxValue()
+    .optional()
+    .default(defaultValue)
+    .transform(val => (typeof val === 'boolean' ? val : val === 'on'))
 
 export const coerceOptionalBooleanOrCheckboxValueToBoolean = (
   val: boolean | 'on' | undefined,
   defaultValue: boolean = false
-): boolean => (typeof val === 'boolean' ? val : typeof val === 'undefined' ? defaultValue : true)
+): boolean => {
+  if (typeof val === 'boolean') return val
+  if (typeof val === 'undefined') return defaultValue
+  return val === 'on'
+}

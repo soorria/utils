@@ -1,13 +1,15 @@
 import { cx } from '~/lib/utils'
-import { classes } from './styles'
+import type { SectionVariant } from './common-types'
+import { classes, getRootClassForVariant } from './styles'
 
-const ResultsSection: React.FC<{ title?: string; utilSlug: string }> = ({
+const ResultsSection: React.FC<{ title?: string; utilSlug: string; variant?: SectionVariant }> = ({
   title = 'your results',
   utilSlug,
   children,
+  variant = 'DEFAULT',
 }) => {
   return (
-    <div className={cx(classes.root, 'border-success')}>
+    <div className={cx(getRootClassForVariant(variant), 'border-success')}>
       <h2 className={cx(classes.title, 'text-success')}>{title}</h2>
 
       <div className={cx(classes.childrenWrapper)}>{children}</div>
@@ -19,8 +21,8 @@ const ResultsSection: React.FC<{ title?: string; utilSlug: string }> = ({
           rel="noopener noreferrer"
           className="hover:underline group focus-outline px-2"
         >
-          <span className="underline group-hover:no-underline">Let me know</span> if something looks
-          off
+          <span className="underline group-hover:no-underline">Let me know</span> if these results
+          look off
         </a>
       </p>
     </div>
