@@ -39,6 +39,7 @@ import FormLabel from '~/components/ui/forms/FormLabel'
 import Textarea from '~/components/ui/forms/Textarea'
 import { ApiRef } from '~/components/ApiRef'
 import { ContentType, ParamSource } from '~/components/ApiRef/types'
+import { highlight } from '~/lib/prism.server'
 
 export const meta = commonMetaFactory<LoaderData>()
 
@@ -108,14 +109,43 @@ export const action: ActionFunction = async ({ request }) => {
   }
 }
 
-type LoaderData = { maxSize: string; utilData: Util }
+type LoaderData = { maxSize: string; utilData: Util; highlighted: { apiExample: string } }
 
 export const loader: LoaderFunction = async () => {
   const maxSize = `~${(MAX_FILE_SIZE / 1e6).toFixed(1)}MB`
   const utilData = getUtilBySlug('sizes')
+  const apiExample = highlight(
+    JSON.stringify(
+      {
+        text: {
+          initial: 672,
+          deflate: 308,
+          gzip: 320,
+          brotli: 283,
+        },
+        files: {
+          'test-file.txt': {
+            initial: 3006723,
+            deflate: 1280565,
+            gzip: 1280577,
+            brotli: 1199472,
+          },
+        },
+        total: {
+          initial: 3007395,
+          deflate: 1280873,
+          gzip: 1280897,
+          brotli: 1199755,
+        },
+      },
+      null,
+      2
+    ),
+    'json'
+  )
 
   return json<LoaderData>(
-    { maxSize, utilData },
+    { maxSize, utilData, highlighted: { apiExample: apiExample } },
     { headers: { 'Cache-Control': 'public, s-maxage=31536000' } }
   )
 }
@@ -131,7 +161,7 @@ const ids = {
 }
 
 export default function Sizes() {
-  const { maxSize, utilData } = useLoaderData<LoaderData>()
+  const { maxSize, utilData, highlighted } = useLoaderData<LoaderData>()
   const submit = useSubmit()
   const transition = useTransition()
   const actionData = useActionData<ActionData>()
@@ -347,13 +377,23 @@ export default function Sizes() {
                       'Files for which you want to see the compressed size. Files should have unique names.',
                   },
                 ],
+                note: {
+                  body: (
+                    <>
+                      <code>text</code> and <code>files</code> are both optional but at least one
+                      must be provided. If <code>text</code> is empty, at least 1 file must be
+                      provided.
+                    </>
+                  ),
+                },
               },
               response: {
                 contentType: ContentType.APPLICATION_JSON,
                 statuses: [
                   {
                     code: 200,
-                    description: 'success',
+                    description: 'Successfully compressed & measured file sizes.',
+                    example: <code dangerouslySetInnerHTML={{ __html: highlighted.apiExample }} />,
                   },
                   {
                     code: 400,

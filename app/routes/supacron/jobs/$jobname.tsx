@@ -3,7 +3,6 @@ import {
   LoaderFunction,
   useParams,
   useLoaderData,
-  LinksFunction,
   Form,
   ActionFunction,
   useTransition,
@@ -34,17 +33,12 @@ import SubmitButton from '~/components/ui/SubmitButton'
 import BaseForm from '~/components/ui/BaseForm'
 import { getUtilBySlug } from '~/lib/all-utils.server'
 import BaseLink from '~/components/BaseLink'
-import { PRISM_CSS_HREF } from '~/lib/prism'
 import Divider from '~/components/Divider'
 import MinimalSection from '~/components/ui/sections/MinimalSection'
 
 type LoaderData = {
   job: CronJob
   highlightedCommand: string
-}
-
-export const links: LinksFunction = () => {
-  return [{ rel: 'stylesheet', href: PRISM_CSS_HREF }]
 }
 
 export const action: ActionFunction = async ({ request, params }) => {

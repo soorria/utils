@@ -11,11 +11,7 @@ import {
   GZIP_LEVEL_RANGE,
 } from './sizes'
 import { boolean, z } from 'zod'
-import {
-  coerceOptionalBooleanOrCheckboxValueToBoolean,
-  optionalBooleanOrCheckboxValue as defaultedBooleanOrCheckboxValue,
-} from './zod-utils'
-import { CalculatorIcon } from '@heroicons/react/solid'
+import { optionalBooleanOrCheckboxValue as defaultedBooleanOrCheckboxValue } from './zod-utils'
 
 export type SizeFormats = 'initial' | 'gzip' | 'brotli' | 'deflate'
 export type Sizes = Partial<Record<SizeFormats, number>>

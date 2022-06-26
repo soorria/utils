@@ -22,6 +22,7 @@ import FeedbackButton, {
   AQRM_SCRIPT_SRC,
   FeedbackButtonModalRoot,
 } from './components/FeedbackButton'
+import { PRISM_CSS_HREF } from './lib/prism'
 
 const scripts: ExternalScriptsFunction = () => [
   {
@@ -34,6 +35,7 @@ export const handle = { scripts }
 export const links: LinksFunction = () => {
   return [
     { rel: 'stylesheet', href: appStyles },
+    { rel: 'stylesheet', href: PRISM_CSS_HREF },
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     {
       rel: 'preconnect',

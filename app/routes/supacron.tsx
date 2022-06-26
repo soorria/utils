@@ -1,13 +1,4 @@
-import {
-  ActionFunction,
-  Form,
-  json,
-  LinksFunction,
-  LoaderFunction,
-  Outlet,
-  redirect,
-  useLoaderData,
-} from 'remix'
+import { ActionFunction, Form, json, LoaderFunction, Outlet, redirect, useLoaderData } from 'remix'
 import { ClientOnly } from 'remix-utils'
 import Dialog, {
   DialogActions,
@@ -21,7 +12,6 @@ import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import { ActionMethodInput, getActionFromFormData } from '~/lib/action-utils'
 import { commonMetaFactory } from '~/lib/all-utils'
 import { getUtilBySlug, Util } from '~/lib/all-utils.server'
-import { PRISM_CSS_HREF } from '~/lib/prism'
 import {
   checkPgCronExtension,
   getConfigFromSession,
@@ -33,10 +23,6 @@ import {
 import { cx, getCookieHeader } from '~/lib/utils'
 
 export const meta = commonMetaFactory()
-
-export const links: LinksFunction = () => {
-  return [{ rel: 'prefetch', href: PRISM_CSS_HREF, as: 'style' }]
-}
 
 export type ActionData = {
   connectionString: string

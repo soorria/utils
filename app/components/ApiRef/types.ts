@@ -29,12 +29,18 @@ export type ApiRefEndpoint = {
       source: ParamSource
       description: ReactNode
     }[]
+    note?: {
+      title?: ReactNode
+      body: ReactNode
+    }
   }
   response: {
     contentType: ContentType
     statuses: {
       code: number
-      description: ReactNode
+      description?: ReactNode
+
+      example?: ReactNode
     }[]
   }
 }

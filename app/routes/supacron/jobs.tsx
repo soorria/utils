@@ -6,11 +6,8 @@ import {
   useLoaderData,
   Outlet,
   useParams,
-  LinksFunction,
   useLocation,
-  useMatches,
   useOutletContext,
-  useTransition,
 } from 'remix'
 import { XCircleIcon, CheckCircleIcon, PlusIcon } from '@heroicons/react/solid'
 import {
@@ -21,16 +18,11 @@ import {
   withClient,
 } from '~/lib/supacron'
 import { cx, getCookieHeader } from '~/lib/utils'
-import { PRISM_CSS_HREF } from '~/lib/prism'
 import type { SupacronOutletData } from '../supacron'
 import Bleed from '~/components/ui/Bleed'
 
 type LoaderData = {
   jobs: AllCronJobsResult
-}
-
-export const links: LinksFunction = () => {
-  return [{ rel: 'prefetch', href: PRISM_CSS_HREF, as: 'style' }]
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
