@@ -45,7 +45,7 @@ const Index: React.FC = () => {
               </span>
               {util.api && <span className="badge badge-primary font-mono font-bold">+ API</span>}
             </span>
-            <span>{util.description}</span>
+            <span className="min-h-12">{util.description}</span>
           </Link>
         ))}
       </div>

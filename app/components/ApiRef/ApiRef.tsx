@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cx } from '~/lib/utils'
-import MinimalSection from '../sections/MinimalSection'
+import MinimalSection from '../ui/sections/MinimalSection'
 import type { ApiRefSchema, ContentType } from './types'
 import { contentTypeToDisplay, httpMethodToColorClasses, paramSourceToDisplayText } from './utils'
 
@@ -22,7 +22,7 @@ export const ApiRef: React.FC<ApiRefProps> = ({ id = 'api', schema }) => {
     >
       {schema.endpoints.map(endpoint => (
         <div className="space-y-6" key={endpoint.method + endpoint.path}>
-          <h3 className="space-x-4 text-xl relative">
+          <h3 className="space-x-4 text-xl relative flex items-center">
             <span
               className={cx(
                 'uppercase py-1 px-2 rounded text-base',

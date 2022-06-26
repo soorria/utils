@@ -37,8 +37,8 @@ import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import Textarea from '~/components/ui/forms/Textarea'
-import { ApiRef } from '~/components/ui/ApiRef'
-import { ContentType, ParamSource } from '~/components/ui/ApiRef/types'
+import { ApiRef } from '~/components/ApiRef'
+import { ContentType, ParamSource } from '~/components/ApiRef/types'
 
 export const meta = commonMetaFactory<LoaderData>()
 
