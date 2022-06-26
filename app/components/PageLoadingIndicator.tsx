@@ -28,6 +28,9 @@ const PageLoadingIndicator: React.FC = () => {
       }
     }
 
+    if (transition.type === 'normalLoad' && transition.location.pathname === location.pathname)
+      return
+
     const setWithoutTransition = (val: string): Promise<void> => {
       return new Promise(resolve => {
         requestAnimationFrame(() => {

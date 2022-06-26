@@ -1,4 +1,11 @@
-import { json, LoaderFunction, useLoaderData, useSearchParams, useTransition } from 'remix'
+import {
+  HeadersFunction,
+  json,
+  LoaderFunction,
+  useLoaderData,
+  useSearchParams,
+  useTransition,
+} from 'remix'
 import BaseForm from '~/components/ui/BaseForm'
 import ResetButton from '~/components/ui/ResetButton'
 import SubmitButton from '~/components/ui/SubmitButton'
@@ -26,6 +33,12 @@ import Textarea from '~/components/ui/forms/Textarea'
 export const meta = commonMetaFactory<LoaderData>()
 
 type LoaderData = { utilData: Util; result: RemoveTypesResult; options?: RemoveTypesOptions }
+
+export const headers: HeadersFunction = ({ loaderHeaders }) => {
+  const caching = loaderHeaders.get('Cache-Control')
+  if (caching) return { 'Cache-Control': caching }
+  return {} as HeadersInit
+}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const successHeaders: HeadersInit = {

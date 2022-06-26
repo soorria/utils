@@ -8,6 +8,10 @@ type LoaderData = {
   utils: Util[]
 }
 
+export const headers = () => ({
+  'Cache-Control': 'public, s-maxage=31536000',
+})
+
 export const loader = () => {
   return json<LoaderData>(
     {
@@ -35,8 +39,11 @@ const Index: React.FC = () => {
             key={util.slug}
             className="focus-outline flex flex-col space-y-4 p-4 sm:p-6 bg-base-300 rounded-btn hover:shadow-lg transition group"
           >
-            <span className="text-xl font-bold font-display transition-colors group-hover:underline">
-              {util.title}
+            <span className="flex justify-between space-x-4 items-center">
+              <span className="text-xl font-bold font-display transition-colors group-hover:underline">
+                {util.title}
+              </span>
+              {util.api && <span className="badge badge-primary font-mono font-bold">+ API</span>}
             </span>
             <span>{util.description}</span>
           </Link>

@@ -8,7 +8,7 @@ export const classes = {
   title: 'text-3xl',
   childrenWrapper: 'space-y-6 flex-1',
   footer: 'text-center text-sm',
-}
+} as const
 
 const variantToRootClass: Record<SectionVariant, string> = {
   DEFAULT: classes.rootBase,

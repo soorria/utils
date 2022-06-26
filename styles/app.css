@@ -149,6 +149,10 @@ body {
   @apply text-base;
 }
 
+.table th:first-child {
+  position: static;
+}
+
 :root {
   --bleed-padding: 1rem;
   --bleed-buffer: calc(var(--bleed-padding) * 2);
@@ -162,6 +166,31 @@ body {
 
 .skeleton {
   @apply bg-neutral animate-pulse rounded-btn;
+}
+
+/*
+ * Heading anchors
+ */
+.heading-anchor {
+  @apply absolute no-underline opacity-0 transition-opacity;
+
+  margin-left: 0.5em;
+  padding-right: -1em;
+  cursor: pointer;
+}
+
+.heading-anchor:hover,
+*:hover > .heading-anchor {
+  @apply opacity-100;
+}
+
+.heading-anchor:after {
+  @apply font-normal text-neutral-focus transition-colors duration-100;
+  content: '#';
+}
+
+*:hover > .heading-anchor:hover:after {
+  @apply text-current;
 }
 
 @tailwind utilities;

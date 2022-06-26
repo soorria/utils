@@ -5,6 +5,7 @@ export type Util = {
   slug: string
   title: string
   description: string
+  api?: boolean
 }
 
 const _allUtils = [
@@ -12,6 +13,7 @@ const _allUtils = [
     slug: 'sizes',
     title: 'Sizes',
     description: 'See the size of files or text in the deflate, gzip and brotli formats',
+    api: true,
   },
   {
     slug: 'remove-types',

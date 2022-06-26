@@ -67,6 +67,7 @@ const CompressionFormatOptions: React.FC<CompressionFormatOptionsProps> = ({
             <button
               type="button"
               key={i}
+              tabIndex={-1}
               onClick={() => {
                 const input = inputRef.current
                 if (input) input.value = i.toString()

@@ -5,13 +5,21 @@ import { getAllSizes, sizesRequestBodySchema } from '~/lib/sizes.server'
 
 export const action: ActionFunction = async ({ request }) => {
   if (request.method.toLowerCase() !== 'post') {
-    return json({}, 404)
+    return json(
+      {},
+      {
+        status: 405,
+        headers: {
+          Allow: 'POST',
+        },
+      }
+    )
   }
 
   let contentType: ParsedMediaType
   try {
     contentType = parseContentType(request.headers.get('Content-Type') ?? '')
-  } catch (_) {
+  } catch {
     return json({ formErrors: ['Invalid Content-Type header'] }, 400)
   }
 
@@ -46,7 +54,11 @@ export const action: ActionFunction = async ({ request }) => {
     )
   }
 
+  if (payload && typeof payload === 'object') (payload as any)._isFromApi = true
+
   const parseResult = await sizesRequestBodySchema.spa(payload)
+
+  console.log(parseResult, payload)
 
   if (!parseResult.success) {
     return json(parseResult.error.flatten(), 400)

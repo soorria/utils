@@ -37,6 +37,8 @@ import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import Textarea from '~/components/ui/forms/Textarea'
+import { ApiRef } from '~/components/ui/ApiRef'
+import { ContentType, ParamSource } from '~/components/ui/ApiRef/types'
 
 export const meta = commonMetaFactory<LoaderData>()
 
@@ -137,8 +139,6 @@ export default function Sizes() {
   const formRef = useRef<HTMLFormElement>(null)
   const [resetFileInputKey, setResetFileInputKey] = useState(0)
 
-  const titleRef = useRef<HTMLHeadingElement>(null)
-
   const isSuccess = !transition.submission && actionData?.status === 'success'
   const isError = !transition.submission && actionData?.status === 'error'
   const isLoading = Boolean(transition.submission)
@@ -146,11 +146,11 @@ export default function Sizes() {
   const prevSubmissionRef = useRef<typeof transition.submission>()
   useEffect(() => {
     const submission = transition.submission
-
     if (prevSubmissionRef.current && !submission) {
-      titleRef.current?.scrollIntoView({ behavior: 'smooth' })
+      window.scrollTo({
+        top: 0,
+      })
     }
-
     prevSubmissionRef.current = submission
   }, [transition.submission])
 
@@ -323,6 +323,48 @@ export default function Sizes() {
         <SubmitButton isLoading={isLoading}>see sizes!</SubmitButton>
       </BaseForm>
       <ResetButton isLoading={isLoading} onClick={resetForm} />
+
+      <Divider />
+
+      <ApiRef
+        schema={{
+          endpoints: [
+            {
+              method: 'post',
+              path: '/api/sizes',
+              request: {
+                contentType: ContentType.MULTIPART_FORMDATA,
+                params: [
+                  {
+                    name: 'text',
+                    source: ParamSource.FORMDATA,
+                    description: 'Text for which you want to see the compressed size.',
+                  },
+                  {
+                    name: 'files',
+                    source: ParamSource.FORMDATA,
+                    description:
+                      'Files for which you want to see the compressed size. Files should have unique names.',
+                  },
+                ],
+              },
+              response: {
+                contentType: ContentType.APPLICATION_JSON,
+                statuses: [
+                  {
+                    code: 200,
+                    description: 'success',
+                  },
+                  {
+                    code: 400,
+                    description: 'Invalid request parameters',
+                  },
+                ],
+              },
+            },
+          ],
+        }}
+      />
     </UtilLayout>
   )
 }

@@ -107,9 +107,6 @@ const Layout: React.FC = ({ children }) => {
               <Link to="/" className="link link-hover link-primary text-xl rounded-btn px-1">
                 home
               </Link>
-              <Link to="/theme" className="link link-hover link-primary text-xl rounded-btn px-1">
-                theme
-              </Link>
             </nav>
           </header>
           <div className="flex-1 flex flex-col">{children}</div>

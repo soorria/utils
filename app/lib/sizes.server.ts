@@ -7,13 +7,15 @@ import {
   BROTLI_LEVEL_RANGE,
   CompressionLevelRange,
   DEFLATE_LEVEL_RANGE,
+  getCompressionRangeDefault,
   GZIP_LEVEL_RANGE,
 } from './sizes'
-import { z } from 'zod'
+import { boolean, z } from 'zod'
 import {
   coerceOptionalBooleanOrCheckboxValueToBoolean,
-  optionalBooleanOrCheckboxValue,
+  optionalBooleanOrCheckboxValue as defaultedBooleanOrCheckboxValue,
 } from './zod-utils'
+import { CalculatorIcon } from '@heroicons/react/solid'
 
 export type SizeFormats = 'initial' | 'gzip' | 'brotli' | 'deflate'
 export type Sizes = Partial<Record<SizeFormats, number>>
@@ -234,7 +236,7 @@ const sumSizes = (sizes: Sizes[]): Sizes => {
     return { brotli: 0, deflate: 0, gzip: 0, initial: 0 }
   }
 
-  const keys = Object.keys({ brotli: 0, deflate: 0, gzip: 0, initial: 0 }) as (keyof Sizes)[]
+  const keys = Object.keys(sizes[0]!) as (keyof Sizes)[]
   const result = Object.fromEntries(keys.map(key => [key, 0])) as Sizes
   for (const measurement of sizes) {
     for (const key of keys) {
@@ -258,16 +260,19 @@ export const sizesRequestBodySchema = z
   .object({
     text: z.string(),
     files: z
-      .array(z.instanceof(File, { message: 'files should only contain Files' }))
+      .instanceof(File, { message: 'files should only contain Files' })
+      .array()
       .transform(files => files.filter(file => Boolean(file.name))),
-    initialEnabled: optionalBooleanOrCheckboxValue(),
-    totalEnabled: optionalBooleanOrCheckboxValue(),
-    brotliEnabled: optionalBooleanOrCheckboxValue(),
+    initialEnabled: defaultedBooleanOrCheckboxValue(true),
+    totalEnabled: defaultedBooleanOrCheckboxValue(true),
+    brotliEnabled: defaultedBooleanOrCheckboxValue(true),
     brotliLevel: stringToIntInRange(BROTLI_LEVEL_RANGE),
-    gzipEnabled: optionalBooleanOrCheckboxValue(),
+    gzipEnabled: defaultedBooleanOrCheckboxValue(true),
     gzipLevel: stringToIntInRange(GZIP_LEVEL_RANGE),
-    deflateEnabled: optionalBooleanOrCheckboxValue(),
+    deflateEnabled: defaultedBooleanOrCheckboxValue(true),
     deflateLevel: stringToIntInRange(DEFLATE_LEVEL_RANGE),
+
+    _isFromApi: boolean(),
   })
   .partial()
   .superRefine((val, ctx) => {
@@ -278,46 +283,39 @@ export const sizesRequestBodySchema = z
         message: 'you must provide at least one of text or files',
       })
     }
+
+    const optionKeys = ['deflateEnabled', 'gzipEnabled', 'brotliEnabled', 'initialEnabled'] as const
+    if (optionKeys.every(k => !val[k])) {
+      if (val._isFromApi) {
+        optionKeys.forEach(k => (val[k] = true))
+      } else {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          fatal: true,
+          message: 'all measuring options were disabled - at least one must be enabled',
+        })
+      }
+    }
+    delete val._isFromApi
   })
   .transform(val => {
-    val.initialEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(val.initialEnabled)
-    val.totalEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(val.totalEnabled)
-
     if (typeof val.deflateLevel === 'undefined') {
-      val.deflateLevel = DEFLATE_LEVEL_RANGE.def
+      val.deflateLevel = getCompressionRangeDefault(DEFLATE_LEVEL_RANGE)
     }
-    val.deflateEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(val.deflateEnabled)
 
     if (typeof val.gzipLevel === 'undefined') {
-      val.gzipLevel = GZIP_LEVEL_RANGE.def
+      val.gzipLevel = getCompressionRangeDefault(GZIP_LEVEL_RANGE)
     }
-    val.gzipEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(val.gzipEnabled)
 
     if (typeof val.brotliLevel === 'undefined') {
-      val.brotliLevel = BROTLI_LEVEL_RANGE.def
+      val.brotliLevel = getCompressionRangeDefault(BROTLI_LEVEL_RANGE)
     }
-    val.brotliEnabled = coerceOptionalBooleanOrCheckboxValueToBoolean(val.brotliEnabled)
 
     if (!val.text) {
       val.text = undefined
     }
 
     return val as SizesRequest
-  })
-  .superRefine((val, ctx) => {
-    const optionValues = [
-      val.deflateEnabled,
-      val.gzipEnabled,
-      val.brotliEnabled,
-      val.initialEnabled,
-    ]
-    if (optionValues.every(b => !b)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        fatal: true,
-        message: 'all measuring options were disabled - at least one must be enabled',
-      })
-    }
   })
 
 export type SizesRequest = {
