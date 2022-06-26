@@ -1,7 +1,7 @@
 import { ActionFunction, json, redirect, useActionData, useTransition } from 'remix'
 import BaseLink from '~/components/BaseLink'
 import MinimalSection from '~/components/ui/sections/MinimalSection'
-import { utilBySlug } from '~/lib/all-utils.server'
+import { getUtilBySlug } from '~/lib/all-utils.server'
 import {
   createCronJob,
   CreateCronJobSchema,
@@ -40,7 +40,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const jobname = parseResult.data.name
 
-  return redirect(`${utilBySlug.supacron.path}/jobs/${jobname}`)
+  return redirect(`${getUtilBySlug('supacron').path}/jobs/${jobname}`)
 }
 
 const CreateNewCronJob: React.FC = () => {

@@ -234,7 +234,7 @@ const sumSizes = (sizes: Sizes[]): Sizes => {
     return { brotli: 0, deflate: 0, gzip: 0, initial: 0 }
   }
 
-  const keys = Object.keys(sizes[0]) as (keyof Sizes)[]
+  const keys = Object.keys({ brotli: 0, deflate: 0, gzip: 0, initial: 0 }) as (keyof Sizes)[]
   const result = Object.fromEntries(keys.map(key => [key, 0])) as Sizes
   for (const measurement of sizes) {
     for (const key of keys) {
@@ -249,8 +249,8 @@ const stringToIntInRange = (range: CompressionLevelRange) =>
   z
     .string()
     .regex(/^\d+$/)
-    .transform(parseInt)
-    .refine(val => val >= range.min && val <= range.max, {
+    .transform(val => parseInt(val))
+    .refine(val => Number.isSafeInteger(val) && val >= range.min && val <= range.max, {
       message: `must be between ${range.min} and ${range.max}, inclusive`,
     })
 

@@ -19,16 +19,12 @@ export const action: ActionFunction = async ({ request }) => {
 
   if (contentType.type === 'application/json') {
     payload = await request.json()
-  } else if (contentType.type === 'application/x-www-form-urlencoded') {
-    payload = Object.fromEntries(await request.formData())
   } else if (contentType.type === 'multipart/form-data') {
     const formData = await parseMultipartFormData(request)
     if (!formData) {
       return json(
         {
-          formErrors: [
-            'Could not read request body. Maybe files are too large?',
-          ],
+          formErrors: ['Could not read request body. Maybe files are too large?'],
         },
         400
       )

@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 
 export const capitalise = (text: string): string =>
   text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 
-export const randomItem = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]
+export const randomItem = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!
 
 export type WeightedRandomArray<T> = ([T, number] | [T])[]
 export const weightedRandomItem = <T>(arr: WeightedRandomArray<T>): T => {

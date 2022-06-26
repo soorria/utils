@@ -32,7 +32,7 @@ import Dialog, {
 import { ClientOnly } from 'remix-utils'
 import SubmitButton from '~/components/ui/SubmitButton'
 import BaseForm from '~/components/ui/BaseForm'
-import { utilBySlug } from '~/lib/all-utils.server'
+import { getUtilBySlug } from '~/lib/all-utils.server'
 import BaseLink from '~/components/BaseLink'
 import { PRISM_CSS_HREF } from '~/lib/prism'
 import Divider from '~/components/Divider'
@@ -63,7 +63,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   if (action === 'delete') {
     await withClient(config, client => deleteCronJobByName(client, { name: jobname }))
-    return redirect(`${utilBySlug.supacron.path}/jobs`)
+    return redirect(`${getUtilBySlug('supacron').path}/jobs`)
   }
 
   throw json({ jobname }, 404)

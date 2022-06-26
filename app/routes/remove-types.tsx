@@ -2,7 +2,7 @@ import { json, LoaderFunction, useLoaderData, useSearchParams, useTransition } f
 import BaseForm from '~/components/ui/BaseForm'
 import ResetButton from '~/components/ui/ResetButton'
 import SubmitButton from '~/components/ui/SubmitButton'
-import { Util, utilBySlug } from '~/lib/all-utils.server'
+import { getUtilBySlug, Util } from '~/lib/all-utils.server'
 import autosize from 'autosize'
 import { useCallback, useEffect, useRef } from 'react'
 import {
@@ -22,7 +22,6 @@ import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import Textarea from '~/components/ui/forms/Textarea'
-import { sleep } from '~/lib/utils'
 
 export const meta = commonMetaFactory<LoaderData>()
 
@@ -34,7 +33,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
   const url = new URL(request.url)
   const params = Object.fromEntries(url.searchParams)
-  const utilData = utilBySlug['remove-types']
+  const utilData = getUtilBySlug('remove-types')
 
   const parseResult = await removeTypesRequestParamsSchema.spa(params)
 

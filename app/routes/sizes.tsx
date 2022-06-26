@@ -20,7 +20,7 @@ import ErrorSection from '~/components/ui/sections/ErrorSection'
 import ResetButton from '~/components/ui/ResetButton'
 import ResultsSection from '~/components/ui/sections/ResultsSection'
 import SubmitButton from '~/components/ui/SubmitButton'
-import { Util, utilBySlug } from '~/lib/all-utils.server'
+import { getUtilBySlug, Util } from '~/lib/all-utils.server'
 import { download } from '~/lib/download.client'
 import {
   BROTLI_LEVEL_RANGE,
@@ -110,7 +110,7 @@ type LoaderData = { maxSize: string; utilData: Util }
 
 export const loader: LoaderFunction = async () => {
   const maxSize = `~${(MAX_FILE_SIZE / 1e6).toFixed(1)}MB`
-  const utilData = utilBySlug.sizes
+  const utilData = getUtilBySlug('sizes')
 
   return json<LoaderData>(
     { maxSize, utilData },

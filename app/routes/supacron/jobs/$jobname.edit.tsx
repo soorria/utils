@@ -11,7 +11,7 @@ import {
 import invariant from 'tiny-invariant'
 import BaseLink from '~/components/BaseLink'
 import MinimalSection from '~/components/ui/sections/MinimalSection'
-import { utilBySlug } from '~/lib/all-utils.server'
+import { getUtilBySlug } from '~/lib/all-utils.server'
 import {
   CronJob,
   CronJobForm,
@@ -64,7 +64,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     })
   )
 
-  return redirect(`${utilBySlug.supacron.path}/jobs/${jobname}`)
+  return redirect(`${getUtilBySlug('supacron').path}/jobs/${jobname}`)
 }
 
 export const loader: LoaderFunction = async ({ params, request }) => {

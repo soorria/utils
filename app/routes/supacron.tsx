@@ -20,7 +20,7 @@ import Dialog, {
 import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import { ActionMethodInput, getActionFromFormData } from '~/lib/action-utils'
 import { commonMetaFactory } from '~/lib/all-utils'
-import { Util, utilBySlug } from '~/lib/all-utils.server'
+import { getUtilBySlug, Util } from '~/lib/all-utils.server'
 import { PRISM_CSS_HREF } from '~/lib/prism'
 import {
   checkPgCronExtension,
@@ -52,7 +52,7 @@ export const action: ActionFunction = async ({ request }) => {
   const session = await sbConnStringSession.getSession(getCookieHeader(request))
 
   if (action === 'logout') {
-    return redirect(utilBySlug.supacron.path, {
+    return redirect(getUtilBySlug('supacron').path, {
       headers: {
         'Set-Cookie': await sbConnStringSession.destroySession(session),
       },
@@ -97,7 +97,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   setConfigToSession(session, connectionConfig)
 
-  return redirect(`${utilBySlug.supacron.slug}/jobs`, {
+  return redirect(`${getUtilBySlug('supacron').slug}/jobs`, {
     headers: {
       'Set-Cookie': await sbConnStringSession.commitSession(session),
     },
@@ -112,7 +112,7 @@ type LoaderData = {
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const utilData = utilBySlug.supacron
+  const utilData = getUtilBySlug('supacron')
 
   const session = await sbConnStringSession.getSession(getCookieHeader(request))
 

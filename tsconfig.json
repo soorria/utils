@@ -16,6 +16,8 @@
     "importsNotUsedAsValues": "error",
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
-    "allowJs": true
+    "allowJs": true,
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
   }
 }

@@ -3,7 +3,6 @@ import {
   Links,
   LinksFunction,
   LiveReload,
-  LoaderFunction,
   Meta,
   Outlet,
   Scripts,
@@ -16,7 +15,6 @@ import type { MetaFunction } from 'remix'
 import { ClientOnly, ExternalScriptsFunction, ExternalScripts } from 'remix-utils'
 import appStyles from './app.css'
 import { HeartIcon } from './components/icons'
-import { getPrefsFromSession, Prefs, prefsCookie } from './lib/prefs.server'
 import { Toaster } from 'react-hot-toast'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 import PageLoadingIndicator from './components/PageLoadingIndicator'
@@ -78,30 +76,9 @@ export const meta: MetaFunction = () => {
   }
 }
 
-type LoaderData = {
-  prefs: Prefs
-}
-
-export const loader: LoaderFunction = async ({ request }) => {
-  const session = await prefsCookie.getSession(request.headers.get('Cookie'))
-  const prefs = getPrefsFromSession(session)
-  return { prefs }
-}
-
-export const useRootLoaderData = (): LoaderData => {
-  const matches = useMatches()
-  const rootMatch = matches.find(match => match.id === 'root')
-
-  if (!rootMatch) {
-    throw new Error("Can't get root loader data")
-  }
-
-  return rootMatch.data as LoaderData
-}
-
-const Layout: React.FC<Prefs> = ({ children, theme }) => {
+const Layout: React.FC = ({ children }) => {
   return (
-    <html lang="en" data-theme={theme}>
+    <html lang="en" data-theme="dracula">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -194,10 +171,8 @@ const Layout: React.FC<Prefs> = ({ children, theme }) => {
 }
 
 const App: React.FC = () => {
-  const data = useLoaderData<LoaderData>()
-
   return (
-    <Layout {...data.prefs}>
+    <Layout>
       <Outlet />
     </Layout>
   )
@@ -208,7 +183,7 @@ export default App
 export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
   console.error(error)
   return (
-    <Layout js theme="dracula">
+    <Layout>
       <main className="space-y-8">
         <h1 className="text-5xl mt-8">something broke somewhere :(</h1>
 

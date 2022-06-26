@@ -1,3 +1,4 @@
+import invariant from 'tiny-invariant'
 import { details as supacronDetails } from './supacron'
 export type Util = {
   path: string
@@ -6,7 +7,7 @@ export type Util = {
   description: string
 }
 
-const _allUtils: (Omit<Util, 'path'> & { path?: string })[] = [
+const _allUtils = [
   {
     slug: 'sizes',
     title: 'Sizes',
@@ -22,9 +23,20 @@ const _allUtils: (Omit<Util, 'path'> & { path?: string })[] = [
     title: 'SupaCron',
     description: 'UI to manage your pg_cron cron jobs. Mainly designed for use with Supabase',
   },
-]
-export const allUtils: Util[] = _allUtils.map(u => ({ ...u, path: u.path || `/${u.slug}` }))
+] as const
+export const allUtils: Util[] = _allUtils.map(u => ({
+  ...u,
+  path: (u as Util).path || `/${u.slug}`,
+}))
 
-export const utilBySlug: Record<string, Util> = Object.fromEntries(
-  allUtils.map(util => [util.slug, util])
-)
+type UtilSlug = typeof _allUtils[number]['slug']
+
+const utilBySlug = Object.fromEntries(allUtils.map(util => [util.slug, util])) as Readonly<
+  Record<UtilSlug, Util>
+>
+
+export const getUtilBySlug = (slug: UtilSlug): Util => {
+  const u = utilBySlug[slug]
+  invariant(u, `Util for slug '${slug}' does not exist`)
+  return u
+}
