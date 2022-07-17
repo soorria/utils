@@ -25,6 +25,11 @@ const _allUtils = [
     title: 'SupaCron',
     description: 'UI to manage your pg_cron cron jobs. Mainly designed for use with Supabase',
   },
+  {
+    slug: 'link-lines',
+    title: 'Link Lines',
+    description: 'Get links from some text, split on any whitespace',
+  },
 ] as const
 export const allUtils: Util[] = _allUtils.map(u => ({
   ...u,
