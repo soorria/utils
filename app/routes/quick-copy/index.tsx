@@ -5,15 +5,18 @@ import BaseForm from '~/components/ui/BaseForm'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import BaseSection from '~/components/ui/sections/BaseSection'
 import SubmitButton from '~/components/ui/SubmitButton'
-import { passthroughCachingHeaderFactory } from '~/lib/headers'
 import { getSlugForGroupName, useQuickCopyStore } from '~/lib/quick-copy'
 import { CopyBar, CreateStringForm, StringItemCard } from '~/lib/quick-copy/components'
 import Input from '~/components/ui/forms/Input'
 import BaseLink from '~/components/BaseLink'
 import Checkbox from '~/components/ui/forms/Checkbox'
-import { useCopy } from '~/lib/use-copy'
+import type { HeadersFunction } from 'remix'
 
-export const headers = passthroughCachingHeaderFactory()
+export const headers: HeadersFunction = () => {
+  return {
+    'Cache-Control': 'public, s-maxage=31536000',
+  }
+}
 
 const IDS = {
   text: 'string-text',

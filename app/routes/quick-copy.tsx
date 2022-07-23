@@ -1,4 +1,4 @@
-import { json, LoaderFunction, Outlet, useLoaderData } from 'remix'
+import { HeadersFunction, json, LoaderFunction, Outlet, useLoaderData } from 'remix'
 import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import { commonMetaFactory } from '~/lib/all-utils'
 import { getUtilBySlug, Util } from '~/lib/all-utils.server'
@@ -6,6 +6,12 @@ import { ClientOnly } from 'remix-utils'
 import { QuickCopyProvider } from '~/lib/quick-copy'
 
 export const meta = commonMetaFactory()
+
+export const headers: HeadersFunction = () => {
+  return {
+    'Cache-Control': 'public, s-maxage=31536000',
+  }
+}
 
 type LoaderData = {
   utilData: Util

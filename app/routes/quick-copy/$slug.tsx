@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'remix'
+import { HeadersFunction, useNavigate, useParams } from 'remix'
 import BaseLink from '~/components/BaseLink'
 import Dialog, {
   DialogActions,
@@ -11,6 +11,12 @@ import Dialog, {
 } from '~/components/ui/Dialog'
 import Checkbox from '~/components/ui/forms/Checkbox'
 import { CopyBar, CreateStringForm, StringItemCard, useQuickCopyStore } from '~/lib/quick-copy'
+
+export const headers: HeadersFunction = () => {
+  return {
+    'Cache-Control': 'public, s-maxage=31536000',
+  }
+}
 
 const QuickCopySingleGroup: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
