@@ -2,6 +2,7 @@ import { ExclamationIcon } from '@heroicons/react/solid'
 import {
   ActionFunction,
   json,
+  LinksFunction,
   LoaderFunction,
   redirect,
   useActionData,
@@ -9,7 +10,9 @@ import {
   useTransition,
 } from 'remix'
 import invariant from 'tiny-invariant'
+
 import BaseLink from '~/components/BaseLink'
+import { codeMirrorLinks } from '~/components/ui/forms/CodeMirrorTextarea'
 import BaseSection from '~/components/ui/sections/BaseSection'
 import { getUtilBySlug } from '~/lib/all-utils.server'
 import {
@@ -25,6 +28,10 @@ import {
   withClient,
 } from '~/lib/supacron'
 import { cx, getCookieHeader, getErrorMap } from '~/lib/utils'
+
+export const links: LinksFunction = () => {
+  return [...codeMirrorLinks]
+}
 
 type LoaderData = {
   job: CronJob
@@ -134,6 +141,7 @@ const JobDetails: React.FC = () => {
           errors={errorMap}
           submitText="Save Changes"
           cancelText="Cancel Edit"
+          cancelHref={`../${data.jobname}`}
           defaultValues={data}
           isSubmitting={isSubmitting}
         />

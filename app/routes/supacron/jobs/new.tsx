@@ -1,5 +1,6 @@
-import { ActionFunction, json, redirect, useActionData, useTransition } from 'remix'
+import { ActionFunction, json, LinksFunction, redirect, useActionData, useTransition } from 'remix'
 import BaseLink from '~/components/BaseLink'
+import { codeMirrorLinks } from '~/components/ui/forms/CodeMirrorTextarea'
 import BaseSection from '~/components/ui/sections/BaseSection'
 import { getUtilBySlug } from '~/lib/all-utils.server'
 import {
@@ -13,6 +14,10 @@ import {
 } from '~/lib/supacron'
 import { CronJobForm } from '~/lib/supacron'
 import { getCookieHeader } from '~/lib/utils'
+
+export const links: LinksFunction = () => {
+  return [...codeMirrorLinks]
+}
 
 type ActionData = Partial<CreateCronJobSchemaErrors> & {
   data: Record<keyof CreateCronJobSchema, any>
@@ -67,6 +72,7 @@ const CreateNewCronJob: React.FC = () => {
           defaultValues={data}
           submitText="Create Job"
           cancelText="Cancel Create Job"
+          cancelHref=".."
           isSubmitting={isSubmitting}
           errors={errorMap}
         />

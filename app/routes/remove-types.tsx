@@ -1,10 +1,16 @@
-import { json, LoaderFunction, useLoaderData, useSearchParams, useTransition } from 'remix'
+import {
+  json,
+  LinksFunction,
+  LoaderFunction,
+  useLoaderData,
+  useSearchParams,
+  useTransition,
+} from 'remix'
 import BaseForm from '~/components/ui/BaseForm'
 import ResetButton from '~/components/ui/ResetButton'
 import SubmitButton from '~/components/ui/SubmitButton'
 import { getUtilBySlug, Util } from '~/lib/all-utils.server'
-import autosize from 'autosize'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   removeTypes,
   RemoveTypesOptions,
@@ -21,12 +27,27 @@ import { commonMetaFactory } from '~/lib/all-utils'
 import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
-import Textarea from '~/components/ui/forms/Textarea'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
+import CodeMirrorTextarea, { codeMirrorLinks } from '~/components/ui/forms/CodeMirrorTextarea'
+import { highlight } from '~/lib/prism.server'
+
+if (typeof window !== 'undefined') {
+  require('codemirror/mode/javascript/javascript')
+  require('codemirror/mode/jsx/jsx')
+}
+
+export const links: LinksFunction = () => {
+  return [...codeMirrorLinks]
+}
 
 export const meta = commonMetaFactory<LoaderData>()
 
-type LoaderData = { utilData: Util; result: RemoveTypesResult; options?: RemoveTypesOptions }
+type LoaderData = {
+  utilData: Util
+  result: RemoveTypesResult
+  options?: RemoveTypesOptions
+  highlightedJs?: string | null
+}
 
 export const headers = passthroughCachingHeaderFactory()
 
@@ -52,8 +73,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const result = await removeTypes(ts, options)
 
+  const highlightedJs =
+    result.status === 'success' ? highlight(result.js, options.isTsx ? 'jsx' : 'js') : null
+
   return json<LoaderData>(
-    { utilData, result, options },
+    { utilData, result, options, highlightedJs },
     result.status === 'success'
       ? {
           headers: successHeaders,
@@ -73,24 +97,14 @@ const copiedToast = () => {
 }
 
 const RemoveTypes: React.FC = () => {
-  const { utilData, result, options } = useLoaderData<LoaderData>()
+  const { utilData, result, options, highlightedJs } = useLoaderData<LoaderData>()
   const transition = useTransition()
   const [params] = useSearchParams()
+  const [isTsx, setIsTsx] = useState(options?.isTsx)
 
-  const tsInputRef = useRef<HTMLTextAreaElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   const [copy, copied] = useCopy()
-
-  useEffect(() => {
-    const textarea = tsInputRef.current
-    if (textarea) {
-      autosize(textarea)
-      return () => {
-        autosize.destroy(textarea)
-      }
-    }
-  }, [])
 
   const didSubmit = Boolean(params.get('ts'))
   const isIdle =
@@ -120,14 +134,15 @@ const RemoveTypes: React.FC = () => {
           <BaseSection title="TypeScript" variant="MINIMAL">
             <FormControl>
               <FormLabel htmlFor={IDS.ts}>your typescript code</FormLabel>
-              <Textarea
+              <CodeMirrorTextarea
                 spellCheck="false"
                 disabled={isSubmitting}
-                ref={tsInputRef}
+                options={{
+                  mode: isTsx ? 'text/typescript-jsx' : 'application/typescript',
+                }}
                 id={IDS.ts}
                 name="ts"
                 className="font-mono leading-tight"
-                minHeight="16rem"
                 placeholder="your text here"
                 defaultValue={result.ts}
               />
@@ -142,6 +157,7 @@ const RemoveTypes: React.FC = () => {
                 className="toggle toggle-primary"
                 id={IDS.isTsx}
                 defaultChecked={options?.isTsx}
+                onChange={e => setIsTsx(e.currentTarget.checked)}
                 name="isTsx"
               />
             </FormControl>
@@ -182,7 +198,7 @@ const RemoveTypes: React.FC = () => {
                   <span className="label-text">de-typed code</span>
                 </p>
                 <pre className="font-mono leading-tight textarea textarea-primary rounded-btn w-full min-h-[16rem] overflow-x-auto">
-                  <code>{result.js}</code>
+                  <code dangerouslySetInnerHTML={{ __html: highlightedJs || '' }} />
                 </pre>
               </FormControl>
 

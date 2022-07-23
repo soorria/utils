@@ -3,11 +3,7 @@ import * as babel from '@babel/core'
 // @ts-expect-error no types
 import tsPreset from '@babel/preset-typescript'
 import { z } from 'zod'
-import {
-  coerceOptionalBooleanOrCheckboxValueToBoolean,
-  optionalBooleanOrCheckboxValue,
-} from './zod-utils'
-import { sleep } from './utils'
+import { optionalBooleanOrCheckboxValue } from './zod-utils'
 
 type RemoveTypesSuccess = {
   status: 'success'

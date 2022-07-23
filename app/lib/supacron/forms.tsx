@@ -3,9 +3,13 @@ import FormControl from '~/components/ui/forms/FormControl'
 import FormErrorMessage from '~/components/ui/forms/FormErrorMessage'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import Input from '~/components/ui/forms/Input'
-import Textarea from '~/components/ui/forms/Textarea'
 import ResetButton from '~/components/ui/ResetButton'
 import SubmitButton from '~/components/ui/SubmitButton'
+import CodeMirrorTextarea from '~/components/ui/forms/CodeMirrorTextarea'
+
+if (typeof window !== 'undefined') {
+  require('codemirror/mode/sql/sql')
+}
 
 type Fields = 'name' | 'schedule' | 'command'
 
@@ -16,6 +20,7 @@ interface CronJobFormProps {
   isSubmitting?: boolean
   submitText: string
   cancelText: string
+  cancelHref: string
 }
 
 const IDS = {
@@ -34,6 +39,7 @@ export const CronJobForm: React.FC<CronJobFormProps> = ({
   submitText,
   cancelText,
   fields,
+  cancelHref,
 }) => {
   return (
     <BaseForm replace={false} method="post" className="space-y-6">
@@ -92,16 +98,10 @@ export const CronJobForm: React.FC<CronJobFormProps> = ({
           <FormLabel required htmlFor={IDS.commandInput}>
             Command
           </FormLabel>
-          <Textarea
-            id={IDS.commandInput}
-            name="command"
+          <CodeMirrorTextarea
             defaultValue={defaultValues?.command}
-            aria-errormessage={errors?.command ? IDS.commandError : undefined}
-            required
-            disabled={isSubmitting}
-            className="font-mono leading-tight"
-            minHeight="16rem"
-            placeholder="your text here"
+            name="command"
+            options={{ mode: 'sql' }}
           />
           {errors?.command ? (
             <FormErrorMessage id={IDS.commandError}>{errors.command}</FormErrorMessage>
@@ -111,7 +111,7 @@ export const CronJobForm: React.FC<CronJobFormProps> = ({
 
       <SubmitButton isLoading={isSubmitting}>{submitText}</SubmitButton>
 
-      <ResetButton isLoading={isSubmitting} resetHref="..">
+      <ResetButton isLoading={isSubmitting} resetHref={cancelHref}>
         {cancelText}
       </ResetButton>
     </BaseForm>
