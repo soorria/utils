@@ -4,8 +4,11 @@ import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
 import SubmitButton from '~/components/ui/SubmitButton'
+import { passthroughCachingHeaderFactory } from '~/lib/headers'
 import type { SupacronOutletData, ActionData } from '../supacron'
 import { action } from '../supacron'
+
+export const headers = passthroughCachingHeaderFactory()
 
 const IDS = {
   connectionString: 'connection-string',

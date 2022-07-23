@@ -14,13 +14,16 @@
     "@supabase/supabase-js": "^1.31.0",
     "@types/pg": "^8.6.5",
     "@zag-js/dialog": "^0.1.7",
+    "@zag-js/editable": "^0.1.12",
     "@zag-js/react": "^0.1.8",
     "autosize": "^5.0.1",
     "content-type": "^1.0.4",
     "cron-validate": "^1.4.3",
+    "cuid": "^2.1.8",
     "dedent": "^0.7.0",
     "dotenv": "^16.0.0",
     "esbuild": "^0.14.38",
+    "mitt": "^3.0.0",
     "pg": "^8.7.3",
     "pg-connection-string": "^2.5.0",
     "prismjs": "^1.28.0",
@@ -30,8 +33,10 @@
     "react-hot-toast": "^2.2.0",
     "remix": "^1.2.1",
     "remix-utils": "^3.3.0",
+    "slugify": "^1.6.5",
     "tiny-invariant": "^1.2.0",
-    "zod": "^3.12.0"
+    "zod": "^3.12.0",
+    "zustand": "^4.0.0-rc.1"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.2.1",

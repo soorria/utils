@@ -40,8 +40,10 @@ import Textarea from '~/components/ui/forms/Textarea'
 import { ApiRef } from '~/components/ApiRef'
 import { ContentType, ParamSource } from '~/components/ApiRef/types'
 import { highlight } from '~/lib/prism.server'
+import { passthroughCachingHeaderFactory } from '~/lib/headers'
 
 export const meta = commonMetaFactory<LoaderData>()
+export const headers = passthroughCachingHeaderFactory()
 
 type ActionData =
   | {

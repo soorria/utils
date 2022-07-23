@@ -7,14 +7,11 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
-  useMatches,
 } from 'remix'
 import Link from '~/components/BaseLink'
 import type { MetaFunction } from 'remix'
 import { ClientOnly, ExternalScriptsFunction, ExternalScripts } from 'remix-utils'
 import appStyles from './app.css'
-import { HeartIcon } from './components/icons'
 import { Toaster } from 'react-hot-toast'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 import PageLoadingIndicator from './components/PageLoadingIndicator'
@@ -23,6 +20,7 @@ import FeedbackButton, {
   FeedbackButtonModalRoot,
 } from './components/FeedbackButton'
 import { PRISM_CSS_HREF } from './lib/prism'
+import { HeartIcon } from '@heroicons/react/outline'
 
 const scripts: ExternalScriptsFunction = () => [
   {

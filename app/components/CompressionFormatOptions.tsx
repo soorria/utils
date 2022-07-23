@@ -16,7 +16,7 @@ export const CompressionFormatToggle: React.FC<CompressionFormatToggleProps> = (
   name,
 }) => {
   return (
-    <FormControl variant="INLINE" className="flex-row items-center">
+    <FormControl variant="INLINE">
       <FormLabel className="cursor-pointer flex-1" htmlFor={id}>
         include {formatName}
       </FormLabel>

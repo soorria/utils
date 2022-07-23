@@ -34,7 +34,7 @@ import BaseForm from '~/components/ui/BaseForm'
 import { getUtilBySlug } from '~/lib/all-utils.server'
 import BaseLink from '~/components/BaseLink'
 import Divider from '~/components/Divider'
-import MinimalSection from '~/components/ui/sections/MinimalSection'
+import BaseSection from '~/components/ui/sections/BaseSection'
 
 type LoaderData = {
   job: CronJob
@@ -98,8 +98,9 @@ const JobDetails: React.FC = () => {
       <BaseLink className="link md:hidden mb-4 link-hover inline-block" to="..">
         &larr; Back to all jobs
       </BaseLink>
-      <MinimalSection
+      <BaseSection
         className={cx('sticky top-4 transition-opacity', isDeleting && 'opacity-80')}
+        variant="MINIMAL"
         title={
           <>
             <code className="break-all pr-2">{job.jobname}</code> Details
@@ -172,7 +173,6 @@ const JobDetails: React.FC = () => {
                 )}
                 disabled={isDeleting}
                 type="button"
-                ref={dialog.ref}
                 {...dialog.api.triggerProps}
               >
                 {deleteTriggerText}
@@ -196,7 +196,7 @@ const JobDetails: React.FC = () => {
             </>
           )}
         </ClientOnly>
-      </MinimalSection>
+      </BaseSection>
     </>
   )
 }

@@ -1,6 +1,11 @@
 import type { MetaFunction, HtmlMetaDescriptor } from 'remix'
 import type { Util } from './all-utils.server'
 
+export enum Tag {
+  API = 'API',
+  NEEDS_JS = 'NEEDS_JS',
+}
+
 export const DEFAULT_TITLE = 'Utils • utils.soorria.com'
 export const PLACEHOLDER = '%s'
 export const TITLE_FORMAT = `${PLACEHOLDER} • utils.soorria.com`

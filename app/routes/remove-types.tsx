@@ -1,11 +1,4 @@
-import {
-  HeadersFunction,
-  json,
-  LoaderFunction,
-  useLoaderData,
-  useSearchParams,
-  useTransition,
-} from 'remix'
+import { json, LoaderFunction, useLoaderData, useSearchParams, useTransition } from 'remix'
 import BaseForm from '~/components/ui/BaseForm'
 import ResetButton from '~/components/ui/ResetButton'
 import SubmitButton from '~/components/ui/SubmitButton'
@@ -22,23 +15,20 @@ import toast from 'react-hot-toast'
 import { useCopy } from '~/lib/use-copy'
 import SectionLoader from '~/components/ui/sections/SectionLoader'
 import ResultsSection from '~/components/ui/sections/ResultsSection'
-import MinimalSection from '~/components/ui/sections/MinimalSection'
+import BaseSection from '~/components/ui/sections/BaseSection'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
 import { commonMetaFactory } from '~/lib/all-utils'
 import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import Textarea from '~/components/ui/forms/Textarea'
+import { passthroughCachingHeaderFactory } from '~/lib/headers'
 
 export const meta = commonMetaFactory<LoaderData>()
 
 type LoaderData = { utilData: Util; result: RemoveTypesResult; options?: RemoveTypesOptions }
 
-export const headers: HeadersFunction = ({ loaderHeaders }) => {
-  const caching = loaderHeaders.get('Cache-Control')
-  if (caching) return { 'Cache-Control': caching }
-  return {} as HeadersInit
-}
+export const headers = passthroughCachingHeaderFactory()
 
 export const loader: LoaderFunction = async ({ request }) => {
   const successHeaders: HeadersInit = {
@@ -127,7 +117,7 @@ const RemoveTypes: React.FC = () => {
     <UtilLayout util={utilData}>
       <BaseForm method="get" ref={formRef}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <MinimalSection title="TypeScript">
+          <BaseSection title="TypeScript" variant="MINIMAL">
             <FormControl>
               <FormLabel htmlFor={IDS.ts}>your typescript code</FormLabel>
               <Textarea
@@ -168,14 +158,14 @@ const RemoveTypes: React.FC = () => {
                 name="copyWhenDone"
               />
             </FormControl>
-          </MinimalSection>
+          </BaseSection>
 
           {isIdle && (
-            <MinimalSection title="JavaScript">
+            <BaseSection title="JavaScript" variant="MINIMAL">
               <p className="text-xl py-2">
                 You'll see your TypeScript code without its types here!
               </p>
-            </MinimalSection>
+            </BaseSection>
           )}
           {isSubmitting && (
             <SectionLoader variant="MINIMAL">

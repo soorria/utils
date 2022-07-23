@@ -1,7 +1,6 @@
 import { FormEventHandler, useCallback, useState } from 'react'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { json, LoaderFunction, useLoaderData } from 'remix'
-import { useHydrated } from 'remix-utils'
 import BaseForm from '~/components/ui/BaseForm'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
@@ -12,9 +11,10 @@ import SubmitButton from '~/components/ui/SubmitButton'
 import { commonMetaFactory } from '~/lib/all-utils'
 import { getUtilBySlug, Util } from '~/lib/all-utils.server'
 import { getMaybeLinksFromTextParam } from '~/lib/link-lines'
-import { sleep } from '~/lib/utils'
+import { passthroughCachingHeaderFactory } from '~/lib/headers'
 
 export const meta = commonMetaFactory()
+export const headers = passthroughCachingHeaderFactory()
 
 type LoaderData = {
   utilData: Util
@@ -27,7 +27,14 @@ export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url)
   const text = url.searchParams.get('text')
 
-  return json<LoaderData>({ utilData, links: getMaybeLinksFromTextParam(text) })
+  return json<LoaderData>(
+    { utilData, links: getMaybeLinksFromTextParam(text) },
+    {
+      headers: {
+        'Cache-Control': 'public, s-maxage=31536000',
+      },
+    }
+  )
 }
 
 const IDS = {
@@ -37,7 +44,6 @@ const IDS = {
 
 const SupaCron = () => {
   const { utilData, links: initialLinks } = useLoaderData<LoaderData>()
-  const hydrated = useHydrated()
 
   const { links, onHydratedSubmit } = useSplitLinks(initialLinks)
 

@@ -54,7 +54,7 @@ export const DialogBox = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElemen
     const api = useDialogContext()
     return (
       <div
-        className="relative rounded-t-box sm:rounded-b-box p-6 sm:px-8 space-y-4 bg-base-100 shadow-lg"
+        className="relative rounded-t-box sm:rounded-b-box p-6 sm:px-8 space-y-4 bg-base-100 shadow-lg max-w-screen-sm w-full"
         {...api.contentProps}
         {...props}
         ref={ref}

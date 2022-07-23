@@ -1,11 +1,13 @@
 import invariant from 'tiny-invariant'
+import { Tag } from './all-utils'
 import { details as supacronDetails } from './supacron'
+
 export type Util = {
   path: string
   slug: string
   title: string
   description: string
-  api?: boolean
+  tags?: Tag[]
 }
 
 const _allUtils = [
@@ -13,12 +15,19 @@ const _allUtils = [
     slug: 'sizes',
     title: 'Sizes',
     description: 'See the size of files or text in the deflate, gzip and brotli formats',
-    api: true,
+    tags: [Tag.API],
   },
   {
     slug: 'remove-types',
     title: 'Remove Types',
     description: 'Remove types from some TypeScript code',
+  },
+  {
+    slug: 'quick-copy',
+    title: 'Quick Copy',
+    description:
+      'Manage a list of text you want to copy in groups later. Useful to make sure comments are consistent when marking assignments, etc.',
+    tags: [Tag.NEEDS_JS],
   },
   {
     slug: supacronDetails.slug,
@@ -33,6 +42,7 @@ const _allUtils = [
 ] as const
 export const allUtils: Util[] = _allUtils.map(u => ({
   ...u,
+  tags: [...((u as Util).tags || [])],
   path: (u as Util).path || `/${u.slug}`,
 }))
 

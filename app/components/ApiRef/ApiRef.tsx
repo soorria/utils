@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cx } from '~/lib/utils'
-import MinimalSection from '../ui/sections/MinimalSection'
+import BaseSection from '../ui/sections/BaseSection'
 import type { ApiRefSchema, ContentType } from './types'
 import { contentTypeToDisplay, httpMethodToColorClasses, paramSourceToDisplayText } from './utils'
 
@@ -11,13 +11,14 @@ interface ApiRefProps {
 
 export const ApiRef: React.FC<ApiRefProps> = ({ id = 'api', schema }) => {
   return (
-    <MinimalSection
+    <BaseSection
       title={
         <>
           {schema.title || 'Api Reference'}
           <a href={`#${id}`} className="heading-anchor" aria-hidden="true" tabIndex={-1} />
         </>
       }
+      variant="MINIMAL"
       id={id}
     >
       {schema.endpoints.map(endpoint => (
@@ -96,7 +97,7 @@ export const ApiRef: React.FC<ApiRefProps> = ({ id = 'api', schema }) => {
           </div>
         </div>
       ))}
-    </MinimalSection>
+    </BaseSection>
   )
 }
 

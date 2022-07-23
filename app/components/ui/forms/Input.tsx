@@ -9,7 +9,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, error = false, ...props }, ref) => {
     return (
       <input
-        className={cx('input', error ? 'input-error' : 'input-primary')}
+        className={cx('input', error ? 'input-error' : 'input-primary', className)}
         aria-invalid={error}
         {...props}
         ref={ref}

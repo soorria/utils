@@ -10,7 +10,7 @@ import {
 } from 'remix'
 import invariant from 'tiny-invariant'
 import BaseLink from '~/components/BaseLink'
-import MinimalSection from '~/components/ui/sections/MinimalSection'
+import BaseSection from '~/components/ui/sections/BaseSection'
 import { getUtilBySlug } from '~/lib/all-utils.server'
 import {
   CronJob,
@@ -105,8 +105,9 @@ const JobDetails: React.FC = () => {
       <BaseLink className="link md:hidden mb-4 link-hover inline-block" to="..">
         &larr; Back to job details
       </BaseLink>
-      <MinimalSection
+      <BaseSection
         className={cx('sticky top-4 transition-opacity')}
+        variant="MINIMAL"
         title={<>Edit {job.jobname}</>}
       >
         {job.username !== user && (
@@ -136,7 +137,7 @@ const JobDetails: React.FC = () => {
           defaultValues={data}
           isSubmitting={isSubmitting}
         />
-      </MinimalSection>
+      </BaseSection>
     </>
   )
 }

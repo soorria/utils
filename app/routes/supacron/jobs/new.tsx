@@ -1,6 +1,6 @@
 import { ActionFunction, json, redirect, useActionData, useTransition } from 'remix'
 import BaseLink from '~/components/BaseLink'
-import MinimalSection from '~/components/ui/sections/MinimalSection'
+import BaseSection from '~/components/ui/sections/BaseSection'
 import { getUtilBySlug } from '~/lib/all-utils.server'
 import {
   createCronJob,
@@ -61,7 +61,7 @@ const CreateNewCronJob: React.FC = () => {
       <BaseLink className="link md:hidden mb-4 link-hover inline-block" to="..">
         &larr; Back to all jobs
       </BaseLink>
-      <MinimalSection title="Create Job">
+      <BaseSection variant="MINIMAL" title="Create Job">
         <CronJobForm
           fields={{ name: true, schedule: true, command: true }}
           defaultValues={data}
@@ -70,7 +70,7 @@ const CreateNewCronJob: React.FC = () => {
           isSubmitting={isSubmitting}
           errors={errorMap}
         />
-      </MinimalSection>
+      </BaseSection>
     </>
   )
 }
