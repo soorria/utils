@@ -1,4 +1,4 @@
-import { FormEventHandler, useCallback, useState } from 'react'
+import { FormEventHandler, useCallback, useRef, useState } from 'react'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { json, LoaderFunction, useLoaderData } from 'remix'
 import BaseForm from '~/components/ui/BaseForm'
@@ -12,6 +12,7 @@ import { commonMetaFactory } from '~/lib/all-utils'
 import { getUtilBySlug, Util } from '~/lib/all-utils.server'
 import { getMaybeLinksFromTextParam } from '~/lib/link-lines'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
+import ResetButton from '~/components/ui/ResetButton'
 
 export const meta = commonMetaFactory()
 export const headers = passthroughCachingHeaderFactory()
@@ -44,6 +45,7 @@ const IDS = {
 
 const SupaCron = () => {
   const { utilData, links: initialLinks } = useLoaderData<LoaderData>()
+  const form = useRef<HTMLFormElement>(null)
 
   const { links, onHydratedSubmit } = useSplitLinks(initialLinks)
 
@@ -65,13 +67,19 @@ const SupaCron = () => {
           ))}
         </ResultsSection>
       ) : null}
-      <BaseForm onSubmit={onHydratedSubmit} id={IDS.form}>
+      <BaseForm onSubmit={onHydratedSubmit} id={IDS.form} ref={form}>
         <FormControl>
           <FormLabel htmlFor={IDS.textarea}>Your links</FormLabel>
           <Textarea name="text" id={IDS.textarea} minHeight="16rem" />
         </FormControl>
         <SubmitButton>Get Links!</SubmitButton>
       </BaseForm>
+      <ResetButton
+        onClick={event => {
+          event.preventDefault()
+          form.current?.reset()
+        }}
+      />
     </UtilLayout>
   )
 }
@@ -81,14 +89,21 @@ export default SupaCron
 const useSplitLinks = (initialLinks: string[] | null) => {
   const [links, setLinks] = useState(initialLinks)
 
-  const onHydratedSubmit = useCallback<FormEventHandler<HTMLFormElement>>(event => {
-    event.preventDefault()
-    const formdata = new FormData(event.currentTarget)
+  const onHydratedSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
+    event => {
+      event.preventDefault()
+      const formdata = new FormData(event.currentTarget)
 
-    const textFromForm = formdata.get('text')
+      const textFromForm = formdata.get('text')
 
-    setLinks(typeof textFromForm === 'string' ? getMaybeLinksFromTextParam(textFromForm) : null)
-  }, [])
+      setLinks(
+        typeof textFromForm === 'string'
+          ? getMaybeLinksFromTextParam(textFromForm)
+          : null
+      )
+    },
+    []
+  )
 
   return {
     links,

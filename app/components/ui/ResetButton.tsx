@@ -1,8 +1,8 @@
-import { Link } from 'remix'
+import { Link, LinkProps } from 'remix'
 import { cx } from '~/lib/utils'
 
 interface ResetButtonProps {
-  onClick?: () => any
+  onClick?: LinkProps['onClick']
   isLoading?: boolean
   resetHref?: string
 }
