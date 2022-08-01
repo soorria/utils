@@ -49,7 +49,7 @@ const removeTypesFunctions = {
   babel: removeTypesBabel,
 }
 
-const REMOVE_TYPES_FUNCTION: keyof typeof removeTypesFunctions = 'esbuild'
+const REMOVE_TYPES_FUNCTION: keyof typeof removeTypesFunctions = 'babel'
 
 export const removeTypes = async (
   ts: string,
