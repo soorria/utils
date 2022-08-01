@@ -21,7 +21,10 @@ type RemoveTypesError = {
 
 export type RemoveTypesResult = RemoveTypesSuccess | RemoveTypesError
 
-type RemoveTypesFunction = (ts: string, options: RemoveTypesOptions) => Promise<string>
+type RemoveTypesFunction = (
+  ts: string,
+  options: RemoveTypesOptions
+) => Promise<string>
 
 const removeTypesEsbuild: RemoveTypesFunction = async (ts, options) => {
   const result = await esbuild.transform(ts, {
@@ -46,7 +49,7 @@ const removeTypesFunctions = {
   babel: removeTypesBabel,
 }
 
-const REMOVE_TYPES_FUNCTION: keyof typeof removeTypesFunctions = 'babel'
+const REMOVE_TYPES_FUNCTION: keyof typeof removeTypesFunctions = 'esbuild'
 
 export const removeTypes = async (
   ts: string,
@@ -69,7 +72,8 @@ export const removeTypes = async (
       status: 'error',
       ts,
       errors: {
-        [REMOVE_TYPES_FUNCTION]: err as RemoveTypesError['errors'][typeof REMOVE_TYPES_FUNCTION],
+        [REMOVE_TYPES_FUNCTION]:
+          err as RemoveTypesError['errors'][typeof REMOVE_TYPES_FUNCTION],
       },
     }
   }
@@ -94,4 +98,6 @@ export type RemoveTypesRequestParams = {
   copyWhenDone: boolean
 }
 export type RemoveTypesOptions = Omit<RemoveTypesRequestParams, 'ts'>
-type RemoveTypesSchemaErrors = z.inferFlattenedErrors<typeof removeTypesRequestParamsSchema>
+type RemoveTypesSchemaErrors = z.inferFlattenedErrors<
+  typeof removeTypesRequestParamsSchema
+>
