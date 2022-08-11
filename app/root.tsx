@@ -10,25 +10,13 @@ import {
 } from 'remix'
 import Link from '~/components/BaseLink'
 import type { MetaFunction } from 'remix'
-import { ClientOnly, ExternalScriptsFunction, ExternalScripts } from 'remix-utils'
+import { ClientOnly } from 'remix-utils'
 import appStyles from './app.css'
 import { Toaster } from 'react-hot-toast'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 import PageLoadingIndicator from './components/PageLoadingIndicator'
-import FeedbackButton, {
-  AQRM_SCRIPT_SRC,
-  FeedbackButtonModalRoot,
-} from './components/FeedbackButton'
 import { PRISM_CSS_HREF } from './lib/prism'
 import { HeartIcon } from '@heroicons/react/outline'
-
-const scripts: ExternalScriptsFunction = () => [
-  {
-    src: AQRM_SCRIPT_SRC,
-  },
-]
-
-export const handle = { scripts }
 
 export const links: LinksFunction = () => {
   return [
@@ -104,7 +92,10 @@ const Layout: React.FC = ({ children }) => {
                 utils
               </Link>
               <div className="flex-1" />
-              <Link to="/" className="link link-hover link-primary text-xl rounded-btn px-1">
+              <Link
+                to="/"
+                className="link link-hover link-primary text-xl rounded-btn px-1"
+              >
                 home
               </Link>
             </nav>
@@ -123,7 +114,8 @@ const Layout: React.FC = ({ children }) => {
               <HeartIcon className="absolute inset-0 fill-current text-pink" />
               <HeartIcon className="absolute inset-0 fill-current text-purple group-hover:animate-ping" />
             </span>{' '}
-            by <span className="underline group-hover:no-underline">Soorria</span>
+            by{' '}
+            <span className="underline group-hover:no-underline">Soorria</span>
           </a>
           <a
             href="https://github.com/soorria/utils"
@@ -131,11 +123,18 @@ const Layout: React.FC = ({ children }) => {
             rel="noopener noreferrer"
             className="group link link-hover inline-block focus-outline px-2 rounded-btn"
           >
-            <span className="underline group-hover:no-underline">Source</span> on GitHub
+            <span className="underline group-hover:no-underline">Source</span>{' '}
+            on GitHub
           </a>
-          <FeedbackButton />
+          <a
+            href="https://soorria.com/#contact"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group link link-hover inline-block focus-outline px-2 rounded-btn"
+          >
+            Feedback &amp; Suggestions
+          </a>
         </footer>
-        <FeedbackButtonModalRoot />
         <Toaster
           position="bottom-center"
           reverseOrder
@@ -159,7 +158,6 @@ const Layout: React.FC = ({ children }) => {
           }}
         />
         <ScrollRestoration />
-        <ExternalScripts />
         <Scripts />
         <LiveReload />
       </body>
