@@ -4,6 +4,7 @@ import type { Util } from './all-utils.server'
 export enum Tag {
   API = 'API',
   NEEDS_JS = 'NEEDS_JS',
+  WIP = 'WIP',
 }
 
 export const DEFAULT_TITLE = 'Utils • utils.soorria.com'
@@ -12,7 +13,10 @@ export const TITLE_FORMAT = `${PLACEHOLDER} • utils.soorria.com`
 export const BASE_URL = 'https://utils.soorria.com'
 export const OG_IMAGE_BASE = 'https://soorria.com/api/og'
 export const ogImage = (title: string = '') =>
-  `${OG_IMAGE_BASE}?${new URLSearchParams({ subtitle: 'utils.soorria.com', title })}`
+  `${OG_IMAGE_BASE}?${new URLSearchParams({
+    subtitle: 'utils.soorria.com',
+    title,
+  })}`
 
 export const commonMetaFactory =
   <LoaderData extends { utilData: Util }>(overrides?: HtmlMetaDescriptor) =>

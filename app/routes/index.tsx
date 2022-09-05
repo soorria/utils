@@ -1,4 +1,5 @@
 import { json, useLoaderData } from 'remix'
+import { ExclamationIcon } from '@heroicons/react/solid'
 import MainHeading from '~/components/ui/MainHeading'
 import { allUtils, Util } from '~/lib/all-utils.server'
 import { Tag } from '~/lib/all-utils'
@@ -6,6 +7,7 @@ import Link from '~/components/BaseLink'
 import MainLayout from '~/components/ui/layouts/MainLayout'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
 import { cx } from '~/lib/utils'
+import type { ReactNode } from 'react'
 
 type LoaderData = {
   utils: Util[]
@@ -26,7 +28,7 @@ export const loader = () => {
   )
 }
 
-const tagDetailsMap: Record<Tag, { className: string; label: string }> = {
+const tagDetailsMap: Record<Tag, { className: string; label: ReactNode }> = {
   [Tag.API]: {
     className: 'badge-primary',
     label: '+ API',
@@ -35,10 +37,20 @@ const tagDetailsMap: Record<Tag, { className: string; label: string }> = {
     className: 'badge-warning',
     label: 'NEEDS JS',
   },
+  [Tag.WIP]: {
+    className: 'badge-error',
+    label: (
+      <>
+        <ExclamationIcon className="w-3 h-3 mr-1" /> WIP
+      </>
+    ),
+  },
 }
 const TagBadge: React.FC<{ tag: Tag }> = props => {
   const { className, label } = tagDetailsMap[props.tag]
-  return <span className={cx('badge font-mono font-bold', className)}>{label}</span>
+  return (
+    <span className={cx('badge font-mono font-bold', className)}>{label}</span>
+  )
 }
 
 const Index: React.FC = () => {
@@ -55,10 +67,11 @@ const Index: React.FC = () => {
             key={util.slug}
             className="focus-outline flex flex-col space-y-4 p-4 sm:p-6 bg-base-300 rounded-btn hover:shadow-lg transition group"
           >
-            <span className="flex justify-between space-x-4 items-center">
+            <span className="flex space-x-4 items-center">
               <span className="text-xl font-bold font-display transition-colors group-hover:underline">
                 {util.title}
               </span>
+              <div className="flex-1" />
               {util.tags?.map(tag => (
                 <TagBadge tag={tag} key={tag} />
               ))}

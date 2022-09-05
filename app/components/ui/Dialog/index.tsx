@@ -1,6 +1,12 @@
 import { Transition } from '@headlessui/react'
 import Portal from '@reach/portal'
-import { ButtonHTMLAttributes, createContext, forwardRef, HTMLAttributes, useContext } from 'react'
+import {
+  ButtonHTMLAttributes,
+  createContext,
+  forwardRef,
+  HTMLAttributes,
+  useContext,
+} from 'react'
 import invariant from 'tiny-invariant'
 import type { DialogApi } from './hooks'
 
@@ -40,7 +46,9 @@ const Dialog: React.FC<DialogProps> = ({ api, children }) => {
           className="flex justify-center items-end sm:items-center fixed inset-0 transition duration-150"
           {...api.underlayProps}
         >
-          <DialogContext.Provider value={api}>{children}</DialogContext.Provider>
+          <DialogContext.Provider value={api}>
+            {children}
+          </DialogContext.Provider>
         </Transition.Child>
       </Transition>
     </Portal>
@@ -49,26 +57,29 @@ const Dialog: React.FC<DialogProps> = ({ api, children }) => {
 
 export default Dialog
 
-export const DialogBox = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  (props, ref) => {
-    const api = useDialogContext()
-    return (
-      <div
-        className="relative rounded-t-box sm:rounded-b-box p-6 sm:px-8 space-y-4 bg-base-100 shadow-lg max-w-screen-sm w-full"
-        {...api.contentProps}
-        {...props}
-        ref={ref}
-      />
-    )
-  }
-)
+export const DialogBox = forwardRef<
+  HTMLDivElement,
+  HTMLAttributes<HTMLDivElement>
+>((props, ref) => {
+  const api = useDialogContext()
+  return (
+    <div
+      className="relative rounded-t-box sm:rounded-b-box p-6 sm:px-8 space-y-4 bg-base-100 shadow-lg max-w-screen-sm w-full max-h-dialog-box"
+      {...api.contentProps}
+      {...props}
+      ref={ref}
+    />
+  )
+})
 
 export const DialogHeading = forwardRef<
   HTMLHeadingElement,
   HTMLAttributes<HTMLHeadingElement> & { level?: `h${2 | 3}` }
 >(({ level: Component = 'h2', ...props }, ref) => {
   const api = useDialogContext()
-  return <Component className="text-xl" {...api.titleProps} {...props} ref={ref} />
+  return (
+    <Component className="text-xl" {...api.titleProps} {...props} ref={ref} />
+  )
 })
 
 export const DialogDescription = forwardRef<
@@ -76,14 +87,17 @@ export const DialogDescription = forwardRef<
   HTMLAttributes<HTMLParagraphElement>
 >((props, ref) => {
   const api = useDialogContext()
-  return <p className="text-base" {...api.descriptionProps} {...props} ref={ref} />
+  return (
+    <p className="text-base" {...api.descriptionProps} {...props} ref={ref} />
+  )
 })
 
-export const DialogActions = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  (props, ref) => {
-    return <div className="flex justify-end space-x-2" {...props} ref={ref} />
-  }
-)
+export const DialogActions = forwardRef<
+  HTMLDivElement,
+  HTMLAttributes<HTMLDivElement>
+>((props, ref) => {
+  return <div className="flex justify-end space-x-2" {...props} ref={ref} />
+})
 
 export const DialogCloseAction = forwardRef<
   HTMLButtonElement,
@@ -91,6 +105,11 @@ export const DialogCloseAction = forwardRef<
 >((props, ref) => {
   const api = useDialogContext()
   return (
-    <button className="btn btn-error btn-outline" {...api.closeButtonProps} {...props} ref={ref} />
+    <button
+      className="btn btn-error btn-outline"
+      {...api.closeButtonProps}
+      {...props}
+      ref={ref}
+    />
   )
 })

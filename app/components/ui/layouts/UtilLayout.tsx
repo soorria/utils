@@ -7,11 +7,22 @@ export interface UtilLayoutProps extends MainLayoutProps {
   util: Util
 }
 
-const UtilLayout: React.FC<UtilLayoutProps> = ({ util, children, ...props }) => {
+const UtilLayout: React.FC<UtilLayoutProps> = ({
+  util,
+  children,
+  ...props
+}) => {
   return (
     <MainLayout {...props}>
       <MainHeading>{util.title}</MainHeading>
       <UtilDescription>{util.description}</UtilDescription>
+
+      <noscript>
+        <div className="h-48 text-xl font-bold grid place-items-center">
+          <p>{util.title} requires javascript to be enabled.</p>
+        </div>
+      </noscript>
+
       {children}
     </MainLayout>
   )

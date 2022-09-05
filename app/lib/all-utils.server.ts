@@ -14,7 +14,8 @@ const _allUtils = [
   {
     slug: 'sizes',
     title: 'Sizes',
-    description: 'See the size of files or text in the deflate, gzip and brotli formats',
+    description:
+      'See the size of files or text in the deflate, gzip and brotli formats',
     tags: [Tag.API],
   },
   {
@@ -27,12 +28,13 @@ const _allUtils = [
     title: 'Quick Copy',
     description:
       'Manage a list of text you want to copy in groups later. Useful to make sure comments are consistent when marking assignments, etc.',
-    tags: [Tag.NEEDS_JS],
+    tags: [Tag.NEEDS_JS, Tag.WIP],
   },
   {
     slug: supacronDetails.slug,
     title: 'SupaCron',
-    description: 'UI to manage your pg_cron cron jobs. Mainly designed for use with Supabase',
+    description:
+      'UI to manage your pg_cron cron jobs. Mainly designed for use with Supabase',
   },
   {
     slug: 'link-lines',
@@ -48,9 +50,9 @@ export const allUtils: Util[] = _allUtils.map(u => ({
 
 type UtilSlug = typeof _allUtils[number]['slug']
 
-const utilBySlug = Object.fromEntries(allUtils.map(util => [util.slug, util])) as Readonly<
-  Record<UtilSlug, Util>
->
+const utilBySlug = Object.fromEntries(
+  allUtils.map(util => [util.slug, util])
+) as Readonly<Record<UtilSlug, Util>>
 
 export const getUtilBySlug = (slug: UtilSlug): Util => {
   const u = utilBySlug[slug]

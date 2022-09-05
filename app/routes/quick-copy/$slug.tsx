@@ -10,7 +10,12 @@ import Dialog, {
   useDialog,
 } from '~/components/ui/Dialog'
 import Checkbox from '~/components/ui/forms/Checkbox'
-import { CopyBar, CreateStringForm, StringItemCard, useQuickCopyStore } from '~/lib/quick-copy'
+import {
+  CopyBar,
+  CreateStringForm,
+  StringItemCard,
+  useQuickCopyStore,
+} from '~/lib/quick-copy'
 
 export const headers: HeadersFunction = () => {
   return {
@@ -20,8 +25,10 @@ export const headers: HeadersFunction = () => {
 
 const QuickCopySingleGroup: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
-  const [getGroup, deleteGroup] = useQuickCopyStore(s => [s.getGroup, s.deleteGroup])
-  const group = useMemo(() => (slug ? getGroup(slug) : null), [slug, getGroup])
+  const [deleteGroup] = useQuickCopyStore(s => [s.deleteGroup])
+  const group = useQuickCopyStore(
+    s => (typeof slug === 'string' && s.groups[slug]) || null
+  )
   const navigate = useNavigate()
 
   const [selected, setSelected] = useState<string[]>([])
@@ -61,13 +68,16 @@ const QuickCopySingleGroup: React.FC = () => {
         <label className="flex items-center space-x-4 cursor-pointer">
           <Checkbox
             className="checkbox checkbox-primary"
+            disabled={group.strings.length === 0}
             checked={checked}
             indeterminate={indeterminate}
             onChange={() => {
               const ids = group.strings.map(s => s.id)
               const groupStringIdSet = new Set(ids)
               if (checked || indeterminate) {
-                setSelected(selected => selected.filter(id => !groupStringIdSet.has(id)))
+                setSelected(selected =>
+                  selected.filter(id => !groupStringIdSet.has(id))
+                )
               } else {
                 setSelected(selected => [...selected, ...ids])
               }
@@ -116,8 +126,8 @@ const QuickCopySingleGroup: React.FC = () => {
         <DialogBox>
           <DialogHeading>Delete {group.name} group</DialogHeading>
           <DialogDescription>
-            Are you sure you want to delete this group and all of the strings inside it? This action
-            cannot be undone.
+            Are you sure you want to delete this group and all of the strings
+            inside it? This action cannot be undone.
           </DialogDescription>
           <DialogActions>
             <DialogCloseAction>Cancel</DialogCloseAction>

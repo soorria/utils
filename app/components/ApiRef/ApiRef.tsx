@@ -1,8 +1,12 @@
-import type { ReactNode } from 'react'
+import { isValidElement, ReactNode } from 'react'
 import { cx } from '~/lib/utils'
 import BaseSection from '../ui/sections/BaseSection'
 import type { ApiRefSchema, ContentType } from './types'
-import { contentTypeToDisplay, httpMethodToColorClasses, paramSourceToDisplayText } from './utils'
+import {
+  contentTypeToDisplay,
+  httpMethodToColorClasses,
+  paramSourceToDisplayText,
+} from './utils'
 
 interface ApiRefProps {
   id?: string
@@ -15,7 +19,12 @@ export const ApiRef: React.FC<ApiRefProps> = ({ id = 'api', schema }) => {
       title={
         <>
           {schema.title || 'Api Reference'}
-          <a href={`#${id}`} className="heading-anchor" aria-hidden="true" tabIndex={-1} />
+          <a
+            href={`#${id}`}
+            className="heading-anchor"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
         </>
       }
       variant="MINIMAL"
@@ -67,7 +76,10 @@ export const ApiRef: React.FC<ApiRefProps> = ({ id = 'api', schema }) => {
           </div>
 
           <div className="space-y-4">
-            <RequestResponseHeader title="Response" contentType={endpoint.response.contentType} />
+            <RequestResponseHeader
+              title="Response"
+              contentType={endpoint.response.contentType}
+            />
             <Table
               head={
                 <tr>
@@ -102,24 +114,29 @@ export const ApiRef: React.FC<ApiRefProps> = ({ id = 'api', schema }) => {
 }
 
 const wrapExample = (ex: ReactNode) => {
-  if (React.isValidElement(ex)) return ex
+  if (isValidElement(ex)) return ex
   if (typeof ex === 'string') return <code>{ex}</code>
   return null
 }
 
-const RequestResponseHeader: React.FC<{ title: string; contentType?: ContentType }> = ({
-  title,
-  contentType,
-}) => (
+const RequestResponseHeader: React.FC<{
+  title: string
+  contentType?: ContentType
+}> = ({ title, contentType }) => (
   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end">
     <h4 className="text-lg">{title}</h4>
     {typeof contentType !== 'undefined' && (
-      <div className="font-mono">Content-Type: {contentTypeToDisplay(contentType)}</div>
+      <div className="font-mono">
+        Content-Type: {contentTypeToDisplay(contentType)}
+      </div>
     )}
   </div>
 )
 
-const Table: React.FC<{ head: ReactNode; body: ReactNode }> = ({ head, body }) => (
+const Table: React.FC<{ head: ReactNode; body: ReactNode }> = ({
+  head,
+  body,
+}) => (
   <div className="overflow-x-auto">
     <table className="table w-full">
       <thead>{head}</thead>

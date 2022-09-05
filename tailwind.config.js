@@ -34,6 +34,9 @@ module.exports = {
           },
         },
       },
+      animation: {
+        'spin-fast': 'spin 0.5s linear infinite',
+      },
     },
   },
   plugins: [
@@ -41,7 +44,10 @@ module.exports = {
     plugin(({ addVariant }) => {
       addVariant('hocus', ['&:hover', '&:focus'])
       addVariant('hocus-within', ['&:hover', '&:focus-within'])
-      addVariant('group-hocus', [':merge(.group):hover &', ':merge(.group):focus &'])
+      addVariant('group-hocus', [
+        ':merge(.group):hover &',
+        ':merge(.group):focus &',
+      ])
       addVariant('where', ':where(&)')
     }),
   ],
@@ -57,7 +63,9 @@ module.exports = {
           info: drac.cyan,
         },
       },
-      ...Object.keys(themes).map(selector => selector.replace('[data-theme=', '').replace(']', '')),
+      ...Object.keys(themes).map(selector =>
+        selector.replace('[data-theme=', '').replace(']', '')
+      ),
     ],
   },
 }
