@@ -48,6 +48,8 @@ export const action = async ({ request }: ActionArgs) => {
   const typedJson = json<ActionData>
   const formData = await parseMultipartFormData(request)
 
+  console.log({ formData })
+
   if (!formData) {
     return typedJson(
       {
@@ -65,7 +67,11 @@ export const action = async ({ request }: ActionArgs) => {
     images: formData.getAll('images'),
   }
 
+  console.log(body)
+
   const parseResult = await plaiceholderRequestBodySchema.spa(body)
+
+  console.log(parseResult)
 
   if (!parseResult.success) {
     return typedJson(
@@ -79,6 +85,7 @@ export const action = async ({ request }: ActionArgs) => {
 
   try {
     const placeholders = await getPlaiceholdersForFiles(parseResult.data.images)
+    console.log({ placeholders })
     return typedJson({
       status: 'success',
       placeholders,
@@ -129,11 +136,11 @@ export default function Plaiceholder() {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
 
-    const existingFiles = new Set(data.getAll('files'))
+    const existingFiles = new Set(data.getAll('images'))
 
     files.forEach(file => {
       if (!existingFiles.has(file)) {
-        data.append('files', file)
+        data.append('images', file)
       }
     })
 
@@ -151,18 +158,6 @@ export default function Plaiceholder() {
 
   return (
     <UtilLayout util={utilData}>
-      {isError ? (
-        <ErrorSection utilSlug={utilData.slug}>
-          <div aria-live="assertive" className="space-y-6" id={ids.formError}>
-            <ul className="list-disc pl-8 space-y-3">
-              {/* {actionData.formErrors?.map((message, i) => (
-                <li key={i}>{message}</li>
-              ))} */}
-            </ul>
-          </div>
-        </ErrorSection>
-      ) : null}
-
       <BaseForm
         method="post"
         aria-errormessage={isError ? ids.formError : undefined}
