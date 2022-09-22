@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 export const capitalise = (text: string): string =>
   text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
@@ -6,13 +6,18 @@ export const capitalise = (text: string): string =>
 export const plural = (num: number, singular: string, pluralised: string) =>
   num === 1 ? singular : pluralised
 
-export const randomItem = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!
+export const randomItem = <T>(arr: T[]): T =>
+  arr[Math.floor(Math.random() * arr.length)]!
 
 export type WeightedRandomArray<T> = ([T, number] | [T])[]
 export const weightedRandomItem = <T>(arr: WeightedRandomArray<T>): T => {
-  const smallestWeight = Math.min(...arr.map(([_, w]) => (typeof w === 'undefined' ? 1 : w)))
+  const smallestWeight = Math.min(
+    ...arr.map(([_, w]) => (typeof w === 'undefined' ? 1 : w))
+  )
   const multiplier = Math.ceil(1 / smallestWeight)
-  const choices = arr.flatMap(([val, n = 1]) => Array.from({ length: n * multiplier }, _ => val))
+  const choices = arr.flatMap(([val, n = 1]) =>
+    Array.from({ length: n * multiplier }, _ => val)
+  )
 
   return randomItem(choices)
 }
@@ -31,17 +36,23 @@ export const getResolvedPromiseValueOrDefault = <T>(
   promiseResult: PromiseSettledResult<T>,
   defaultValue: T
 ): T => {
-  if (process.env.NODE_ENV !== 'production' && promiseResult.status === 'rejected') {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    promiseResult.status === 'rejected'
+  ) {
     console.error(promiseResult.reason)
   }
 
-  return promiseResult.status === 'fulfilled' ? promiseResult.value : defaultValue
+  return promiseResult.status === 'fulfilled'
+    ? promiseResult.value
+    : defaultValue
 }
 
 export const range = (min: number, max: number): number[] =>
   Array.from({ length: max - min }, (_, i) => i + min)
 
-export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+export const sleep = (ms: number) =>
+  new Promise(resolve => setTimeout(resolve, ms))
 
 type UseCssVarProps = {
   /**
@@ -65,7 +76,10 @@ type CssVarControls = {
   remove: () => void
 }
 
-export const useCssVar = ({ name, root = document.body }: UseCssVarProps): CssVarControls => {
+export const useCssVar = ({
+  name,
+  root = document.body,
+}: UseCssVarProps): CssVarControls => {
   const controls: CssVarControls = useMemo(
     () => ({
       set: value => root.style.setProperty(name, value),
@@ -85,13 +99,37 @@ export const useCssVar = ({ name, root = document.body }: UseCssVarProps): CssVa
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max)
 
-export const getCookieHeader = (request: Request) => request.headers.get('Cookie')
+export const getCookieHeader = (request: Request) =>
+  request.headers.get('Cookie')
 
-type ErrorMap<TErrors extends Record<string, string[]>> = Record<keyof TErrors, string | null>
+type ErrorMap<TErrors extends Record<string, string[]>> = Record<
+  keyof TErrors,
+  string | null
+>
 export const getErrorMap = <TErrors extends Record<string, string[]>>(
   errors: TErrors
 ): ErrorMap<TErrors> => {
   return Object.fromEntries(
-    Object.entries(errors || ({} as TErrors)).map(([field, errors]) => [field, errors?.[0] || null])
+    Object.entries(errors || ({} as TErrors)).map(([field, errors]) => [
+      field,
+      errors?.[0] || null,
+    ])
   ) as ErrorMap<TErrors>
+}
+
+const UNITS = {
+  1000: ['B', 'kB', 'MB', 'GB', 'TB'],
+  1024: ['B', 'kiB', 'MiB', 'GiB', 'TiB'],
+}
+
+// Adapted from https://stackoverflow.com/a/20732091
+export const humanFileSize = (size: number, base: 1024 | 1000 = 1000) => {
+  const i = size == 0 ? 0 : Math.floor(Math.log(size) / Math.log(base))
+  return `${(size / Math.pow(base, i)).toFixed(2)} ${UNITS[base][i]}`
+}
+
+export const useScrollIntoViewOnMount = <T extends Element>() => {
+  return useCallback((el: T | null) => {
+    el?.scrollIntoView(true)
+  }, [])
 }

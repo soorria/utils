@@ -10,7 +10,7 @@ import {
   getCompressionRangeDefault,
   GZIP_LEVEL_RANGE,
 } from './sizes'
-import { boolean, z } from 'zod'
+import { z } from 'zod'
 import { optionalBooleanOrCheckboxValue as defaultedBooleanOrCheckboxValue } from './zod-utils'
 
 export type SizeFormats = 'initial' | 'gzip' | 'brotli' | 'deflate'
@@ -45,7 +45,8 @@ export const getSizes = async (
   stringOrFile: string | File,
   options: SizesOptions
 ): Promise<Sizes> => {
-  const text = typeof stringOrFile === 'string' ? stringOrFile : await stringOrFile.text()
+  const text =
+    typeof stringOrFile === 'string' ? stringOrFile : await stringOrFile.text()
 
   const resultEntries = (
     await Promise.all([
@@ -55,7 +56,12 @@ export const getSizes = async (
       ),
       getSizeWithKeyAndOptions(
         'deflate',
-        getSizeIfEnabled(deflateSize, text, options.deflateEnabled, options.deflateLevel)
+        getSizeIfEnabled(
+          deflateSize,
+          text,
+          options.deflateEnabled,
+          options.deflateLevel
+        )
       ),
       getSizeWithKeyAndOptions(
         'gzip',
@@ -63,7 +69,12 @@ export const getSizes = async (
       ),
       getSizeWithKeyAndOptions(
         'brotli',
-        getSizeIfEnabled(brotliSize, text, options.brotliEnabled, options.brotliLevel)
+        getSizeIfEnabled(
+          brotliSize,
+          text,
+          options.brotliEnabled,
+          options.brotliLevel
+        )
       ),
     ])
   ).filter(([_, val]) => val !== null)
@@ -78,9 +89,13 @@ const createStringStream = (string: string): Readable => {
   return stream
 }
 
-export const getSizesUsingStream = async (stringOrFile: string | File): Promise<Sizes> => {
+export const getSizesUsingStream = async (
+  stringOrFile: string | File
+): Promise<Sizes> => {
   const stream =
-    typeof stringOrFile === 'string' ? createStringStream(stringOrFile) : stringOrFile.stream()
+    typeof stringOrFile === 'string'
+      ? createStringStream(stringOrFile)
+      : stringOrFile.stream()
 
   const [initial, gzip, brotli, deflate] = (
     await Promise.allSettled([
@@ -248,9 +263,12 @@ const stringToIntInRange = (range: CompressionLevelRange) =>
     .string()
     .regex(/^\d+$/)
     .transform(val => parseInt(val))
-    .refine(val => Number.isSafeInteger(val) && val >= range.min && val <= range.max, {
-      message: `must be between ${range.min} and ${range.max}, inclusive`,
-    })
+    .refine(
+      val => Number.isSafeInteger(val) && val >= range.min && val <= range.max,
+      {
+        message: `must be between ${range.min} and ${range.max}, inclusive`,
+      }
+    )
 
 export const sizesRequestBodySchema = z
   .object({
@@ -268,7 +286,7 @@ export const sizesRequestBodySchema = z
     deflateEnabled: defaultedBooleanOrCheckboxValue(true),
     deflateLevel: stringToIntInRange(DEFLATE_LEVEL_RANGE),
 
-    _isFromApi: boolean(),
+    _isFromApi: z.boolean(),
   })
   .partial()
   .superRefine((val, ctx) => {
@@ -280,7 +298,12 @@ export const sizesRequestBodySchema = z
       })
     }
 
-    const optionKeys = ['deflateEnabled', 'gzipEnabled', 'brotliEnabled', 'initialEnabled'] as const
+    const optionKeys = [
+      'deflateEnabled',
+      'gzipEnabled',
+      'brotliEnabled',
+      'initialEnabled',
+    ] as const
     if (optionKeys.every(k => !val[k])) {
       if (val._isFromApi) {
         optionKeys.forEach(k => (val[k] = true))
@@ -288,7 +311,8 @@ export const sizesRequestBodySchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           fatal: true,
-          message: 'all measuring options were disabled - at least one must be enabled',
+          message:
+            'all measuring options were disabled - at least one must be enabled',
         })
       }
     }
@@ -327,4 +351,6 @@ export type SizesRequest = {
   brotliLevel: number
 }
 
-export type SizesRequestErrors = z.inferFlattenedErrors<typeof sizesRequestBodySchema>
+export type SizesRequestErrors = z.inferFlattenedErrors<
+  typeof sizesRequestBodySchema
+>

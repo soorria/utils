@@ -13,7 +13,7 @@ import CompressionFormatOptions, {
   CompressionFormatToggle,
 } from '~/components/CompressionFormatOptions'
 import Divider from '~/components/Divider'
-import FileInput from '~/components/FileInput'
+import FileInput, { FileSizeInfo } from '~/components/FileInput'
 import SizesResultTable from '~/components/SizesResultTable'
 import BaseForm from '~/components/ui/BaseForm'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
@@ -41,6 +41,8 @@ import { ApiRef } from '~/components/ApiRef'
 import { ContentType, ParamSource } from '~/components/ApiRef/types'
 import { highlight } from '~/lib/prism.server'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
+import { humanFileSize } from '~/lib/utils'
+import toast from 'react-hot-toast'
 
 export const meta = commonMetaFactory<LoaderData>()
 export const headers = passthroughCachingHeaderFactory()
@@ -111,10 +113,13 @@ export const action: ActionFunction = async ({ request }) => {
   }
 }
 
-type LoaderData = { maxSize: string; utilData: Util; highlighted: { apiExample: string } }
+type LoaderData = {
+  maxSize: number
+  utilData: Util
+  highlighted: { apiExample: string }
+}
 
 export const loader: LoaderFunction = async () => {
-  const maxSize = `~${(MAX_FILE_SIZE / 1e6).toFixed(1)}MB`
   const utilData = getUtilBySlug('sizes')
   const apiExample = highlight(
     JSON.stringify(
@@ -147,7 +152,11 @@ export const loader: LoaderFunction = async () => {
   )
 
   return json<LoaderData>(
-    { maxSize, utilData, highlighted: { apiExample: apiExample } },
+    {
+      maxSize: MAX_FILE_SIZE,
+      utilData,
+      highlighted: { apiExample: apiExample },
+    },
     { headers: { 'Cache-Control': 'public, s-maxage=31536000' } }
   )
 }
@@ -173,18 +182,8 @@ export default function Sizes() {
 
   const isSuccess = !transition.submission && actionData?.status === 'success'
   const isError = !transition.submission && actionData?.status === 'error'
+  const isComplete = isError || isSuccess
   const isLoading = Boolean(transition.submission)
-
-  const prevSubmissionRef = useRef<typeof transition.submission>()
-  useEffect(() => {
-    const submission = transition.submission
-    if (prevSubmissionRef.current && !submission) {
-      window.scrollTo({
-        top: 0,
-      })
-    }
-    prevSubmissionRef.current = submission
-  }, [transition.submission])
 
   // need this since we can't set the value of file inputs with js
   const handleSubmit: FormEventHandler<HTMLFormElement> = event => {
@@ -227,48 +226,6 @@ export default function Sizes() {
 
   return (
     <UtilLayout util={utilData}>
-      {isError ? (
-        <ErrorSection utilSlug={utilData.slug}>
-          <div aria-live="assertive" className="space-y-6" id={ids.formError}>
-            <ul className="list-disc pl-8 space-y-3">
-              {actionData.formErrors?.map((message, i) => (
-                <li key={i}>{message}</li>
-              ))}
-            </ul>
-          </div>
-        </ErrorSection>
-      ) : null}
-
-      {isSuccess ? (
-        <ResultsSection title="your results" utilSlug={utilData.slug}>
-          {Object.entries(actionData.files).map(([name, sizes]) => (
-            <SizesResultTable
-              key={name}
-              title={
-                <>
-                  sizes for your file: <code>{name}</code>
-                </>
-              }
-              sizes={sizes}
-            />
-          ))}
-
-          {actionData.textSizes ? (
-            <SizesResultTable title="sizes for your text" sizes={actionData.textSizes} />
-          ) : null}
-
-          {actionData.total ? (
-            <SizesResultTable title="total sizes" sizes={actionData.total} />
-          ) : null}
-
-          <div className="grid gap-6">
-            <button type="button" className="btn" onClick={downloadResultsAsJson}>
-              Download as JSON
-            </button>
-          </div>
-        </ResultsSection>
-      ) : null}
-
       <BaseForm
         method="post"
         aria-errormessage={isError ? ids.formError : undefined}
@@ -282,14 +239,27 @@ export default function Sizes() {
             key={resetFileInputKey}
             id={ids.fileInput}
             name="files"
+            itemsName="files to measure"
             aria-describedby={ids.fileInputHelpText}
             disabled={isLoading}
             onFiles={files => setFiles(files)}
+            onError={() =>
+              toast.error(
+                <div className="space-y-2">
+                  <p className="font-bold">Invalid files ignored</p>
+                  <p className="text-sm">
+                    Files must be less than {humanFileSize(maxSize)}.
+                  </p>
+                </div>,
+                {
+                  duration: 5000,
+                }
+              )
+            }
+            multiple
+            maxSize={maxSize}
           />
-          <FormLabel variant="ALT" id={ids.fileInputHelpText}>
-            Any file <em>should</em> work. File size limited to about {maxSize}. App may explode
-            (idk why) or not work as expected (vercel payload limits) if the payload is too large.
-          </FormLabel>
+          <FileSizeInfo id={ids.fileInputHelpText} maxSize={maxSize} />
         </FormControl>
 
         <Divider>and / or</Divider>
@@ -301,7 +271,9 @@ export default function Sizes() {
             name="text"
             minHeight="16rem"
             placeholder="your text here"
-            defaultValue={(actionData?.status === 'success' && actionData.text) || ''}
+            defaultValue={
+              (actionData?.status === 'success' && actionData.text) || ''
+            }
             disabled={isLoading}
           />
         </FormControl>
@@ -349,12 +321,71 @@ export default function Sizes() {
 
           <hr className="border-base-100" />
 
-          <CompressionFormatToggle formatName="total" id="total-enabled" name="totalEnabled" />
+          <CompressionFormatToggle
+            formatName="total"
+            id="total-enabled"
+            name="totalEnabled"
+          />
         </details>
 
         <SubmitButton isLoading={isLoading}>see sizes!</SubmitButton>
       </BaseForm>
       <ResetButton isLoading={isLoading} onClick={resetForm} />
+
+      {isError ? (
+        <ErrorSection utilSlug={utilData.slug}>
+          <div aria-live="assertive" className="space-y-6" id={ids.formError}>
+            <ul className="list-disc pl-8 space-y-3">
+              {actionData.formErrors?.map((message, i) => (
+                <li key={i}>{message}</li>
+              ))}
+            </ul>
+          </div>
+        </ErrorSection>
+      ) : null}
+
+      {isSuccess ? (
+        <ResultsSection
+          scrollOnMount
+          title="your results"
+          utilSlug={utilData.slug}
+        >
+          {Object.entries(actionData.files).map(([name, sizes]) => (
+            <SizesResultTable
+              key={name}
+              title={
+                <>
+                  sizes for your file: <code>{name}</code>
+                </>
+              }
+              sizes={sizes}
+            />
+          ))}
+
+          {actionData.textSizes ? (
+            <SizesResultTable
+              title="sizes for your text"
+              sizes={actionData.textSizes}
+            />
+          ) : null}
+
+          {actionData.total ? (
+            <SizesResultTable title="total sizes" sizes={actionData.total} />
+          ) : null}
+
+          <div className="grid gap-6">
+            <button
+              type="button"
+              className="btn"
+              onClick={downloadResultsAsJson}
+            >
+              Download as JSON
+            </button>
+          </div>
+        </ResultsSection>
+      ) : null}
+
+      {isComplete && <ResetButton isLoading={isLoading} onClick={resetForm} />}
 
       <Divider />
 
@@ -370,7 +401,8 @@ export default function Sizes() {
                   {
                     name: 'text',
                     source: ParamSource.FORMDATA,
-                    description: 'Text for which you want to see the compressed size.',
+                    description:
+                      'Text for which you want to see the compressed size.',
                   },
                   {
                     name: 'files',
@@ -382,9 +414,9 @@ export default function Sizes() {
                 note: {
                   body: (
                     <>
-                      <code>text</code> and <code>files</code> are both optional but at least one
-                      must be provided. If <code>text</code> is empty, at least 1 file must be
-                      provided.
+                      <code>text</code> and <code>files</code> are both optional
+                      but at least one must be provided. If <code>text</code> is
+                      empty, at least 1 file must be provided.
                     </>
                   ),
                 },
@@ -394,8 +426,15 @@ export default function Sizes() {
                 statuses: [
                   {
                     code: 200,
-                    description: 'Successfully compressed & measured file sizes.',
-                    example: <code dangerouslySetInnerHTML={{ __html: highlighted.apiExample }} />,
+                    description:
+                      'Successfully compressed & measured file sizes.',
+                    example: (
+                      <code
+                        dangerouslySetInnerHTML={{
+                          __html: highlighted.apiExample,
+                        }}
+                      />
+                    ),
                   },
                   {
                     code: 400,
@@ -417,7 +456,10 @@ export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
   return (
     <main className="space-y-8">
       <h1 className="text-5xl mt-8">something broke somewhere :(</h1>
-      <p>Maybe you uploaded files that were too big? Check the console for more details</p>
+      <p>
+        Maybe you uploaded files that were too big? Check the console for more
+        details
+      </p>
 
       <Link to="." className="btn btn-ghost btn-block btn-outline">
         Try again ?

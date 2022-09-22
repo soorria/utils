@@ -8,7 +8,5 @@ declare namespace React {
 }
 
 declare namespace NodeJS {
-  interface ProcessEnv {
-    OOOKIE_SECRET: string
-  }
+  interface ProcessEnv {}
 }

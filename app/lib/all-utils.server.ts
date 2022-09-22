@@ -15,8 +15,15 @@ const _allUtils = [
     slug: 'sizes',
     title: 'Sizes',
     description:
-      'See the size of files or text in the deflate, gzip and brotli formats',
+      'See how much bandwidth you can save by compressing files in any of the deflate, gzip and brotli formats',
     tags: [Tag.API],
+  },
+  {
+    slug: 'plaiceholder',
+    title: 'Plaiceholder',
+    description:
+      "Generate a placeholder image using Plaiceholder. Useful for Next.js' Image components' `blurDataUrl` prop.",
+    tags: [Tag.WIP],
   },
   {
     slug: 'remove-types',

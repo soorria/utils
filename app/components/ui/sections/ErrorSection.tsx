@@ -1,15 +1,25 @@
-import { cx } from '~/lib/utils'
+import { cx, useScrollIntoViewOnMount } from '~/lib/utils'
 import type { SectionVariant } from './common-types'
 import { classes, getRootClassForVariant } from './styles'
 
-const ErrorSection: React.FC<{ title?: string; utilSlug: string; variant?: SectionVariant }> = ({
+const ErrorSection: React.FC<{
+  title?: string
+  utilSlug: string
+  variant?: SectionVariant
+  scrollOnMount?: boolean
+}> = ({
   title = 'something went wrong :(',
   utilSlug,
   children,
   variant = 'DEFAULT',
+  scrollOnMount,
 }) => {
+  const ref = useScrollIntoViewOnMount()
   return (
-    <div className={cx(getRootClassForVariant(variant), 'border-error')}>
+    <div
+      ref={scrollOnMount ? ref : undefined}
+      className={cx(getRootClassForVariant(variant), 'border-error')}
+    >
       <h2 className={cx(classes.title, 'text-error')}>{title}</h2>
 
       <div className={cx(classes.childrenWrapper)}>{children}</div>
@@ -22,7 +32,10 @@ const ErrorSection: React.FC<{ title?: string; utilSlug: string; variant?: Secti
           className="hover:underline group focus-outline px-2"
         >
           If this is unexpected,{' '}
-          <span className="underline group-hover:no-underline">let me know</span> what happened.
+          <span className="underline group-hover:no-underline">
+            let me know
+          </span>{' '}
+          what happened.
         </a>
       </p>
     </div>

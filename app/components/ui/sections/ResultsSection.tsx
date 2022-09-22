@@ -1,15 +1,26 @@
-import { cx } from '~/lib/utils'
+import { cx, useScrollIntoViewOnMount } from '~/lib/utils'
 import type { SectionVariant } from './common-types'
 import { classes, getRootClassForVariant } from './styles'
 
-const ResultsSection: React.FC<{ title?: string; utilSlug: string; variant?: SectionVariant }> = ({
+const ResultsSection: React.FC<{
+  title?: string
+  utilSlug: string
+  variant?: SectionVariant
+  scrollOnMount?: boolean
+}> = ({
   title = 'your results',
   utilSlug,
   children,
   variant = 'DEFAULT',
+  scrollOnMount,
 }) => {
+  const ref = useScrollIntoViewOnMount()
+
   return (
-    <div className={cx(getRootClassForVariant(variant), 'border-success')}>
+    <div
+      ref={scrollOnMount ? ref : undefined}
+      className={cx(getRootClassForVariant(variant), 'border-success')}
+    >
       <h2 className={cx(classes.title, 'text-success')}>{title}</h2>
 
       <div className={cx(classes.childrenWrapper)}>{children}</div>
@@ -21,8 +32,10 @@ const ResultsSection: React.FC<{ title?: string; utilSlug: string; variant?: Sec
           rel="noopener noreferrer"
           className="hover:underline group focus-outline px-2"
         >
-          <span className="underline group-hover:no-underline">Let me know</span> if these results
-          look off
+          <span className="underline group-hover:no-underline">
+            Let me know
+          </span>{' '}
+          if these results look off
         </a>
       </p>
     </div>

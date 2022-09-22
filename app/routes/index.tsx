@@ -72,11 +72,15 @@ const Index: React.FC = () => {
                 {util.title}
               </span>
               <div className="flex-1" />
-              {util.tags?.map(tag => (
-                <TagBadge tag={tag} key={tag} />
-              ))}
             </span>
             <span className="min-h-12">{util.description}</span>
+            <div className="!-mt-0 -ml-4">
+              {util.tags?.map(tag => (
+                <span key={tag} className="inline-block ml-4 mt-4">
+                  <TagBadge tag={tag} />
+                </span>
+              ))}
+            </div>
           </Link>
         ))}
       </div>
