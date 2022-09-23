@@ -1,4 +1,4 @@
-import { createElement, FormEventHandler, useRef, useState } from 'react'
+import { FormEventHandler, useRef, useState } from 'react'
 import {
   useActionData,
   useLoaderData,
@@ -33,6 +33,7 @@ import ResultsSection from '~/components/ui/sections/ResultsSection'
 import toast from 'react-hot-toast'
 import { cx, humanFileSize } from '~/lib/utils'
 import { useCopy } from '~/lib/use-copy'
+import Input from '~/components/ui/forms/Input'
 
 export const meta = commonMetaFactory()
 export const headers = passthroughCachingHeaderFactory()
@@ -47,8 +48,6 @@ type ActionData =
 export const action = async ({ request }: ActionArgs) => {
   const typedJson = json<ActionData>
   const formData = await parseMultipartFormData(request)
-
-  console.log({ formData })
 
   if (!formData) {
     return typedJson(
@@ -65,13 +64,10 @@ export const action = async ({ request }: ActionArgs) => {
 
   const body = {
     images: formData.getAll('images'),
+    size: formData.get('size'),
   }
 
-  console.log(body)
-
   const parseResult = await plaiceholderRequestBodySchema.spa(body)
-
-  console.log(parseResult)
 
   if (!parseResult.success) {
     return typedJson(
@@ -84,8 +80,10 @@ export const action = async ({ request }: ActionArgs) => {
   }
 
   try {
-    const placeholders = await getPlaiceholdersForFiles(parseResult.data.images)
-    console.log({ placeholders })
+    const placeholders = await getPlaiceholdersForFiles(
+      parseResult.data.images,
+      parseResult.data.size
+    )
     return typedJson({
       status: 'success',
       placeholders,
@@ -115,6 +113,8 @@ const ids = {
   formError: 'form-error',
   fileInput: 'file',
   fileInputHelpText: 'file-help-text',
+  sizeInput: 'size',
+  sizeInputHelpText: 'size-help-text',
 }
 
 export default function Plaiceholder() {
@@ -194,6 +194,24 @@ export default function Plaiceholder() {
             maxSize={maxSize}
           />
           <FileSizeInfo id={ids.fileInputHelpText} maxSize={maxSize} />
+        </FormControl>
+
+        <FormControl>
+          <FormLabel htmlFor={ids.sizeInput}>Placeholder Size</FormLabel>
+          <Input
+            type="number"
+            id={ids.sizeInput}
+            aria-describedby={ids.sizeInputHelpText}
+            min={4}
+            max={64}
+            name="size"
+            className="w-full"
+            defaultValue={16}
+          />
+          <FormLabel variant="ALT" id={ids.sizeInputHelpText}>
+            A higher size increases the quality of the placeholder, but also
+            increases the size. Value must be within 4 and 64 inclusive.
+          </FormLabel>
         </FormControl>
 
         <SubmitButton isLoading={isLoading}>Get Plaiceholders!</SubmitButton>
