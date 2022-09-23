@@ -23,7 +23,6 @@ const _allUtils = [
     title: 'Plaiceholder',
     description:
       "Generate a placeholder image using Plaiceholder. Useful for Next.js' Image components' `blurDataUrl` prop.",
-    tags: [Tag.WIP],
   },
   {
     slug: 'remove-types',

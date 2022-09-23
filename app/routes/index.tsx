@@ -65,22 +65,23 @@ const Index: React.FC = () => {
           <Link
             to={util.path}
             key={util.slug}
-            className="focus-outline flex flex-col space-y-4 p-4 sm:p-6 bg-base-300 rounded-btn hover:shadow-lg transition group"
+            className="focus-outline flex font-display flex-col space-y-4 p-4 sm:p-6 bg-base-300 rounded-btn hover:shadow-lg transition group"
           >
-            <span className="flex space-x-4 items-center">
-              <span className="text-xl font-bold font-display transition-colors group-hover:underline">
-                {util.title}
-              </span>
-              <div className="flex-1" />
+            <span className="text-xl font-bold transition-colors group-hover:underline">
+              {util.title}
             </span>
+
             <span className="min-h-12">{util.description}</span>
-            <div className="!-mt-0 -ml-4">
-              {util.tags?.map(tag => (
-                <span key={tag} className="inline-block ml-4 mt-4">
-                  <TagBadge tag={tag} />
-                </span>
-              ))}
-            </div>
+
+            {util.tags?.length ? (
+              <div className="!-mt-0 -ml-4">
+                {util.tags.map(tag => (
+                  <span key={tag} className="inline-block ml-4 mt-4">
+                    <TagBadge tag={tag} />
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </Link>
         ))}
       </div>
