@@ -41,6 +41,7 @@ const _allUtils = [
     title: 'SupaCron',
     description:
       'UI to manage your pg_cron cron jobs. Mainly designed for use with Supabase',
+    tags: [Tag.WIP],
   },
   {
     slug: 'link-lines',

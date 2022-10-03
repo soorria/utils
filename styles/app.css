@@ -199,3 +199,21 @@ body {
 }
 
 @tailwind utilities;
+
+.tooltip:before {
+  content: attr(aria-label);
+}
+.tooltip-fade-up:before {
+  transform: translateX(-50%) translateY(0%);
+  text-transform: none;
+}
+.tooltip:after {
+  display: none;
+}
+
+.tooltip-fade-up.tooltip-open:before,
+.tooltip-fade-up.tooltip-open:after,
+.tooltip-fade-up:hover:before,
+.tooltip-fade-up:hover:after {
+  transform: translateX(-50%) translateY(-20%);
+}

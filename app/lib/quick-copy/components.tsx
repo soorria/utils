@@ -30,7 +30,7 @@ import { StringItem, useQuickCopyStore } from './store'
 const UNGROUPED_MENU_ITEM_VALUE = '$UNGROUPED'
 
 const classes = {
-  icon: 'w-6 h-6',
+  icon: 'w-6 h-6 mx-auto',
 }
 
 export const StringItemCard: React.FC<{
@@ -46,7 +46,9 @@ export const StringItemCard: React.FC<{
     s.updateString,
   ])
   const groups = useQuickCopyStore(s => Object.values(s.groups))
-  const deleteDialog = useDialog({ id: `delete-${item.id}` })
+  const deleteDialog = useDialog({
+    id: `delete-${item.id}`,
+  })
   const moveDialog = useDialog({ id: `move-${item.id}` })
   const editable = useEditable({
     id: `edit-${item.id}`,
@@ -88,6 +90,9 @@ export const StringItemCard: React.FC<{
     <label
       htmlFor={inputId}
       className="flex flex-col cursor-pointer rounded-btn focus-within-outline p-4 sm:px-6 bg-base-200 hocus-within:bg-base-300 hover:shadow-xl"
+      style={{
+        '--tooltip-offset': '110%',
+      }}
     >
       <span className="block mb-4" {...editable.api.areaProps}>
         <textarea
@@ -127,9 +132,9 @@ export const StringItemCard: React.FC<{
         {editable.api.isEditing ? (
           <button
             type="button"
-            title="Save changes to string"
-            className="btn btn-ghost btn-square btn-sm"
+            className="btn btn-ghost btn-square btn-sm tooltip tooltip-fade-up"
             {...editable.api.submitButtonProps}
+            aria-label="Save changes"
             onClick={event => {
               event.preventDefault()
               editable.api.submitButtonProps.onClick?.(event)
@@ -140,9 +145,9 @@ export const StringItemCard: React.FC<{
         ) : (
           <button
             type="button"
-            title="Edit string"
-            className="btn btn-ghost btn-square btn-sm"
+            className="btn btn-ghost btn-square btn-sm tooltip"
             {...editable.api.editButtonProps}
+            aria-label="Edit string"
             onClick={event => {
               event.preventDefault()
               editable.api.editButtonProps.onClick?.(event)
@@ -155,7 +160,8 @@ export const StringItemCard: React.FC<{
         <button
           type="button"
           title="Copy string to clipboard"
-          className={cx('btn btn-ghost btn-square btn-sm')}
+          className={cx('btn btn-ghost btn-square btn-sm tooltip')}
+          aria-label={copied ? 'Copied' : 'Copy string'}
           onClick={() => copy(item.text)}
         >
           <span className={cx('swap', copied && 'swap-active')}>
@@ -172,8 +178,8 @@ export const StringItemCard: React.FC<{
 
         <button
           type="button"
-          title="Move string to another group"
-          className="btn btn-ghost btn-square btn-sm"
+          aria-label="Move to another group"
+          className="btn btn-ghost btn-square btn-sm tooltip"
           {...moveDialog.api.triggerProps}
         >
           <SelectorIcon className={classes.icon} />
@@ -227,11 +233,13 @@ export const StringItemCard: React.FC<{
 
         <button
           type="button"
-          className="btn btn-ghost btn-square btn-sm"
+          className="btn btn-ghost btn-square btn-sm tooltip"
           {...deleteDialog.api.triggerProps}
+          aria-label="Delete"
         >
           <TrashIcon className={classes.icon} />
         </button>
+
         <Dialog api={deleteDialog.api}>
           <DialogBox>
             <DialogHeading>Delete this string?</DialogHeading>
