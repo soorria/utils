@@ -89,7 +89,7 @@ export const StringItemCard: React.FC<{
   return (
     <label
       htmlFor={inputId}
-      className="flex flex-col cursor-pointer rounded-btn focus-within-outline p-4 sm:px-6 bg-base-200 hocus-within:bg-base-300 hover:shadow-xl"
+      className="flex flex-col cursor-pointer rounded-btn focus-within-outline focus-outline p-4 sm:px-6 bg-base-200 hocus-within:bg-base-300 hover:shadow-xl"
       style={{
         '--tooltip-offset': '110%',
       }}
