@@ -2,34 +2,22 @@ import { FormEventHandler, useRef, useState } from 'react'
 import {
   ActionFunction,
   useActionData,
-  LoaderFunction,
   useLoaderData,
   useTransition,
   json,
   useSubmit,
   ErrorBoundaryComponent,
 } from 'remix'
-import CompressionFormatOptions, {
-  CompressionFormatToggle,
-} from '~/components/CompressionFormatOptions'
 import Divider from '~/components/Divider'
 import FileInput, { FileSizeInfo } from '~/components/FileInput'
-import SizesResultTable from '~/components/SizesResultTable'
 import BaseForm from '~/components/ui/BaseForm'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
 import ResetButton from '~/components/ui/ResetButton'
 import ResultsSection from '~/components/ui/sections/ResultsSection'
 import SubmitButton from '~/components/ui/SubmitButton'
-import { getUtilBySlug, Util } from '~/lib/all-utils.server'
+import { getUtilBySlug } from '~/lib/all-utils.server'
 import { download } from '~/lib/download.client'
-import {
-  BROTLI_LEVEL_RANGE,
-  DEFLATE_LEVEL_RANGE,
-  GZIP_LEVEL_RANGE,
-  SizesRequestErrors,
-} from '~/lib/sizes'
-import { sizesRequestBodySchema } from '~/lib/sizes.server'
-import { getAllSizes, Sizes } from '~/lib/sizes.server'
+import { Sizes } from '~/lib/sizes.server'
 import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
 import { commonMetaFactory } from '~/lib/all-utils'
 import Link from '~/components/BaseLink'
@@ -37,25 +25,23 @@ import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import Textarea from '~/components/ui/forms/Textarea'
-import { ApiRef } from '~/components/ApiRef'
-import { ContentType, ParamSource } from '~/components/ApiRef/types'
-import { highlight } from '~/lib/prism.server'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
 import { humanFileSize } from '~/lib/utils'
 import toast from 'react-hot-toast'
+import {
+  doWC,
+  DoWCResult,
+  wcRequestBodySchema,
+  WCRequestErrors,
+} from '~/lib/wc'
+import WCResultTable from '~/components/WCResultTable'
 
-export const meta = commonMetaFactory<LoaderData>()
+export const meta = commonMetaFactory()
 export const headers = passthroughCachingHeaderFactory()
 
 type ActionData =
-  | {
-      status: 'success'
-      text: string | null
-      textSizes?: Sizes
-      files: Record<string, Sizes>
-      total?: Sizes
-    }
-  | ({ status: 'error' } & SizesRequestErrors)
+  | ({ status: 'success'; inputText: string } & DoWCResult)
+  | ({ status: 'error' } & WCRequestErrors)
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await parseMultipartFormData(request)
@@ -80,12 +66,13 @@ export const action: ActionFunction = async ({ request }) => {
     _payload.files = inputFiles
     return _payload
   })()
-  const parseResult = await sizesRequestBodySchema.spa(payload)
+
+  const parseResult = await wcRequestBodySchema.spa(payload)
 
   if (!parseResult.success) {
     const parseErrors = parseResult.error.flatten()
 
-    return json<ActionData>(
+    return json(
       {
         status: 'error',
         ...parseErrors,
@@ -96,66 +83,26 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { text, files = [], ...options } = parseResult.data
 
-  const sizes = await getAllSizes(
-    {
-      text,
-      files,
-    },
-    options
-  )
+  const wcs = await doWC({
+    text,
+    files,
+  })
 
   return {
     status: 'success',
-    text,
-    textSizes: sizes.text,
-    files: sizes.files,
-    total: sizes.total,
+    inputText: text,
+    text: wcs.text,
+    files: wcs.files,
+    total: wcs.total,
   }
 }
 
-type LoaderData = {
-  maxSize: number
-  utilData: Util
-  highlighted: { apiExample: string }
-}
-
-export const loader: LoaderFunction = async () => {
-  const utilData = getUtilBySlug('sizes')
-  const apiExample = highlight(
-    JSON.stringify(
-      {
-        text: {
-          initial: 672,
-          deflate: 308,
-          gzip: 320,
-          brotli: 283,
-        },
-        files: {
-          'test-file.txt': {
-            initial: 3006723,
-            deflate: 1280565,
-            gzip: 1280577,
-            brotli: 1199472,
-          },
-        },
-        total: {
-          initial: 3007395,
-          deflate: 1280873,
-          gzip: 1280897,
-          brotli: 1199755,
-        },
-      },
-      null,
-      2
-    ),
-    'json'
-  )
-
-  return json<LoaderData>(
+export const loader = async () => {
+  const utilData = getUtilBySlug('wc')
+  return json(
     {
       maxSize: MAX_FILE_SIZE,
       utilData,
-      highlighted: { apiExample: apiExample },
     },
     { headers: { 'Cache-Control': 'public, s-maxage=31536000' } }
   )
@@ -172,7 +119,7 @@ const ids = {
 }
 
 export default function Sizes() {
-  const { maxSize, utilData, highlighted } = useLoaderData<LoaderData>()
+  const { maxSize, utilData } = useLoaderData<typeof loader>()
   const submit = useSubmit()
   const transition = useTransition()
   const actionData = useActionData<ActionData>()
@@ -272,63 +219,13 @@ export default function Sizes() {
             minHeight="16rem"
             placeholder="your text here"
             defaultValue={
-              (actionData?.status === 'success' && actionData.text) || ''
+              (actionData?.status === 'success' && actionData.inputText) || ''
             }
             disabled={isLoading}
           />
         </FormControl>
 
-        <details className="space-y-8 bg-base-300 p-4 rounded-btn focus-within:outline-primary outline-offset-2">
-          <summary className="cursor-pointer -m-4 p-4 focus-outline rounded-btn">
-            <h2 className="inline-block ml-1">compression options</h2>
-          </summary>
-
-          <CompressionFormatOptions
-            formatName="deflate"
-            idBase="deflate-options"
-            levelName="deflateLevel"
-            toggleName="deflateEnabled"
-            levelRange={DEFLATE_LEVEL_RANGE}
-          />
-
-          <hr className="border-base-100" />
-
-          <CompressionFormatOptions
-            formatName="gzip"
-            idBase="gzip-options"
-            levelName="gzipLevel"
-            toggleName="gzipEnabled"
-            levelRange={GZIP_LEVEL_RANGE}
-          />
-
-          <hr className="border-base-100" />
-
-          <CompressionFormatOptions
-            formatName="brotli"
-            idBase="brotli-options"
-            levelName="brotliLevel"
-            toggleName="brotliEnabled"
-            levelRange={BROTLI_LEVEL_RANGE}
-          />
-
-          <hr className="border-base-100" />
-
-          <CompressionFormatToggle
-            formatName="initial size"
-            id="initial-enabled"
-            name="initialEnabled"
-          />
-
-          <hr className="border-base-100" />
-
-          <CompressionFormatToggle
-            formatName="total"
-            id="total-enabled"
-            name="totalEnabled"
-          />
-        </details>
-
-        <SubmitButton isLoading={isLoading}>see sizes!</SubmitButton>
+        <SubmitButton isLoading={isLoading}>use wc!</SubmitButton>
       </BaseForm>
       <ResetButton isLoading={isLoading} onClick={resetForm} />
 
@@ -350,28 +247,11 @@ export default function Sizes() {
           title="your results"
           utilSlug={utilData.slug}
         >
-          {Object.entries(actionData.files).map(([name, sizes]) => (
-            <SizesResultTable
-              key={name}
-              title={
-                <>
-                  sizes for your file: <code>{name}</code>
-                </>
-              }
-              sizes={sizes}
-            />
-          ))}
-
-          {actionData.textSizes ? (
-            <SizesResultTable
-              title="sizes for your text"
-              sizes={actionData.textSizes}
-            />
-          ) : null}
-
-          {actionData.total ? (
-            <SizesResultTable title="total sizes" sizes={actionData.total} />
-          ) : null}
+          <WCResultTable
+            files={actionData.files}
+            text={actionData.text}
+            total={actionData.total}
+          />
 
           <div className="grid gap-6">
             <button
@@ -386,66 +266,6 @@ export default function Sizes() {
       ) : null}
 
       {isComplete && <ResetButton isLoading={isLoading} onClick={resetForm} />}
-
-      <Divider />
-
-      <ApiRef
-        schema={{
-          endpoints: [
-            {
-              method: 'post',
-              path: '/api/sizes',
-              request: {
-                contentType: ContentType.MULTIPART_FORMDATA,
-                params: [
-                  {
-                    name: 'text',
-                    source: ParamSource.FORMDATA,
-                    description:
-                      'Text for which you want to see the compressed size.',
-                  },
-                  {
-                    name: 'files',
-                    source: ParamSource.FORMDATA,
-                    description:
-                      'Files for which you want to see the compressed size. Files should have unique names.',
-                  },
-                ],
-                note: {
-                  body: (
-                    <>
-                      <code>text</code> and <code>files</code> are both optional
-                      but at least one must be provided. If <code>text</code> is
-                      empty, at least 1 file must be provided.
-                    </>
-                  ),
-                },
-              },
-              response: {
-                contentType: ContentType.APPLICATION_JSON,
-                statuses: [
-                  {
-                    code: 200,
-                    description:
-                      'Successfully compressed & measured file sizes.',
-                    example: (
-                      <code
-                        dangerouslySetInnerHTML={{
-                          __html: highlighted.apiExample,
-                        }}
-                      />
-                    ),
-                  },
-                  {
-                    code: 400,
-                    description: 'Invalid request parameters',
-                  },
-                ],
-              },
-            },
-          ],
-        }}
-      />
     </UtilLayout>
   )
 }

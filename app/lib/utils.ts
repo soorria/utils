@@ -133,3 +133,6 @@ export const useScrollIntoViewOnMount = <T extends Element>() => {
     el?.scrollIntoView(true)
   }, [])
 }
+
+export type PartiallyOptional<T, K extends keyof T> = Omit<T, K> &
+  Partial<Pick<T, K>>

@@ -30,6 +30,11 @@ const _allUtils = [
     description: 'Remove types from some TypeScript code',
   },
   {
+    slug: 'wc',
+    title: 'wc',
+    description: "Like the cli tool but worse because it's a website.",
+  },
+  {
     slug: 'quick-copy',
     title: 'Quick Copy',
     description:

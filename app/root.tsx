@@ -182,7 +182,7 @@ export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
       <main className="space-y-8">
         <h1 className="text-5xl mt-8">something broke somewhere :(</h1>
 
-        <pre>{error.stack || error.message}</pre>
+        <pre className="overflow-x-auto">{error.stack || error.message}</pre>
 
         <Link to="." className="btn btn-ghost btn-block btn-outline">
           Try again ?
