@@ -60,6 +60,11 @@ const Index: React.FC = () => {
     <MainLayout>
       <MainHeading>All Utils</MainHeading>
 
+      <p className="text-2xl">
+        A bunch of micro-apps that are too small for creating a new project to
+        be worth it. Some of them are useful, others less ...
+      </p>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
         {data.utils.map(util => (
           <Link
