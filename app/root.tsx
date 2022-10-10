@@ -42,7 +42,7 @@ export const links: LinksFunction = () => {
 export const meta: MetaFunction = () => {
   const image = ogImage('Utils')
   const description =
-    'Sometimes helpful utils that I use. Has a bunch of color schemes because why not.'
+    'A bunch of micro-apps that are too small for creating a new project to be worth it. Some of them are useful, others less ...'
   const title = DEFAULT_TITLE
 
   return {
