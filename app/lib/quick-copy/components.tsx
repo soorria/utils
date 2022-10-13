@@ -19,6 +19,7 @@ import Dialog, {
 } from '~/components/ui/Dialog'
 import { useEditable } from '~/components/ui/Editable'
 import FormControl from '~/components/ui/forms/FormControl'
+import Input from '~/components/ui/forms/Input'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import Textarea from '~/components/ui/forms/Textarea'
 import SubmitButton from '~/components/ui/SubmitButton'
@@ -314,13 +315,19 @@ export const CreateStringForm: React.FC<{
 export const CopyBar: React.FC<{
   selectedSet: Set<string>
   onClear: () => void
-  getCopyString: () => string
-}> = ({ selectedSet, onClear, getCopyString }) => {
+  getStrings: () => string[]
+}> = ({ selectedSet, onClear, getStrings }) => {
   const clearAfterCopyInput = 'clear-after-copy'
+  const separatorInput = 'separator'
   const [clearAfterCopy, setClearAfterCopy] = useLocalStorage(
     'utils:copy-clear',
     false
   )
+  const separator = useQuickCopyStore(s => s.separator)
+  const [getSeparatedString, setSeparator] = useQuickCopyStore(s => [
+    s.getSeparatedString,
+    s.setSeparator,
+  ])
   const [copy, copied] = useCopy()
   return (
     <>
@@ -335,6 +342,20 @@ export const CopyBar: React.FC<{
             className="toggle toggle-primary"
             checked={clearAfterCopy}
             onChange={e => setClearAfterCopy(e.currentTarget.checked)}
+          />
+        </FormControl>
+      </div>
+      <div>
+        <FormControl variant="INLINE">
+          <FormLabel htmlFor={clearAfterCopyInput} className="flex-1">
+            Separator
+          </FormLabel>
+          <Input
+            id={separatorInput}
+            type="text"
+            className=""
+            defaultValue={separator}
+            onChange={e => setSeparator(e.currentTarget.value)}
           />
         </FormControl>
       </div>
@@ -358,7 +379,7 @@ export const CopyBar: React.FC<{
           className="btn btn-primary"
           disabled={selectedSet.size === 0}
           onClick={async () => {
-            await copy(getCopyString())
+            await copy(getSeparatedString(getStrings()))
             if (clearAfterCopy) onClear()
           }}
         >

@@ -19,6 +19,9 @@ export type Group = {
 export type Store = {
   ungrouped: StringItem[]
   groups: Record<string, Group>
+  separator: string
+  setSeparator: (sep: string) => void
+  getSeparatedString: (strings: string[]) => string
 
   canCreateGroup: (name: string) => boolean
   createGroup: (name: string) => boolean
@@ -28,8 +31,16 @@ export type Store = {
 
   __addStringItem: (item: StringItem, groupSlug: string | null) => boolean
   createString: (text: string, groupSlug: string | null) => boolean
-  updateString: (id: string, groupSlug: string | null, newText: string) => boolean
-  moveString: (id: string, fromGroupSlug: string | null, toGroupSlug: string | null) => boolean
+  updateString: (
+    id: string,
+    groupSlug: string | null,
+    newText: string
+  ) => boolean
+  moveString: (
+    id: string,
+    fromGroupSlug: string | null,
+    toGroupSlug: string | null
+  ) => boolean
   deleteString: (id: string, groupSlug: string | null) => boolean
 }
 
@@ -41,6 +52,17 @@ const createStore = () =>
       (set, get) => ({
         ungrouped: [] as StringItem[],
         groups: {} as Store['groups'],
+        separator: '\\n',
+        getSeparatedString: (strings: string[]) => {
+          return strings.join(
+            get().separator.replace('\\n', '\n').replace('\\t', '\t')
+          )
+        },
+        setSeparator: sep => {
+          set({
+            separator: sep,
+          })
+        },
 
         canCreateGroup: name => {
           name = name.trim()
@@ -49,7 +71,9 @@ const createStore = () =>
         createGroup: name => {
           if (!get().canCreateGroup(name)) return false
           const slug = getSlugForGroupName(name)
-          set(state => ({ groups: { ...state.groups, [slug]: createGroupObject(name, slug) } }))
+          set(state => ({
+            groups: { ...state.groups, [slug]: createGroupObject(name, slug) },
+          }))
           return true
         },
         getGroup: slug => get().groups[slug] ?? null,
@@ -58,7 +82,9 @@ const createStore = () =>
 
           if (!group) return false
 
-          set(state => ({ groups: { ...state.groups, [slug]: { ...group, name: newName } } }))
+          set(state => ({
+            groups: { ...state.groups, [slug]: { ...group, name: newName } },
+          }))
 
           return true
         },
@@ -74,7 +100,10 @@ const createStore = () =>
           if (!text) return false
           return get().__addStringItem(createStringItem(text), groupSlug)
         },
-        __addStringItem: (item: StringItem, groupSlug: string | null): boolean => {
+        __addStringItem: (
+          item: StringItem,
+          groupSlug: string | null
+        ): boolean => {
           if (groupSlug) {
             const group = get().groups[groupSlug]
             if (!group) return false
@@ -90,7 +119,8 @@ const createStore = () =>
           return true
         },
         updateString: (id, groupSlug, newText) => {
-          const mapFn = (s: StringItem): StringItem => (s.id === id ? { ...s, text: newText } : s)
+          const mapFn = (s: StringItem): StringItem =>
+            s.id === id ? { ...s, text: newText } : s
           if (groupSlug) {
             const group = get().groups[groupSlug]
             if (!group) return false
@@ -116,7 +146,10 @@ const createStore = () =>
             ? getGroup(fromGroupSlug)?.strings.find(s => s.id === id)
             : ungrouped.find(s => s.id === id)
           if (!item) return false
-          return deleteString(id, fromGroupSlug) && get().__addStringItem(item, toGroupSlug)
+          return (
+            deleteString(id, fromGroupSlug) &&
+            get().__addStringItem(item, toGroupSlug)
+          )
         },
         deleteString: (id, groupSlug) => {
           const filterFn = (s: StringItem) => s.id !== id
@@ -126,11 +159,16 @@ const createStore = () =>
             set(state => ({
               groups: {
                 ...state.groups,
-                [groupSlug]: { ...group, strings: group.strings.filter(filterFn) },
+                [groupSlug]: {
+                  ...group,
+                  strings: group.strings.filter(filterFn),
+                },
               },
             }))
           } else {
-            set(state => ({ ungrouped: state.ungrouped.filter(s => s.id !== id) }))
+            set(state => ({
+              ungrouped: state.ungrouped.filter(s => s.id !== id),
+            }))
           }
           return true
         },
@@ -143,7 +181,11 @@ const createStore = () =>
   )
 
 const createStringItem = (text: string): StringItem => ({ text, id: cuid() })
-const createGroupObject = (name: string, slug: string): Group => ({ name, slug, strings: [] })
+const createGroupObject = (name: string, slug: string): Group => ({
+  name,
+  slug,
+  strings: [],
+})
 
 export const getSlugForGroupName = (name: string) => slugify(name)
 

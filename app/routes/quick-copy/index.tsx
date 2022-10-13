@@ -6,7 +6,11 @@ import FormLabel from '~/components/ui/forms/FormLabel'
 import BaseSection from '~/components/ui/sections/BaseSection'
 import SubmitButton from '~/components/ui/SubmitButton'
 import { getSlugForGroupName, useQuickCopyStore } from '~/lib/quick-copy'
-import { CopyBar, CreateStringForm, StringItemCard } from '~/lib/quick-copy/components'
+import {
+  CopyBar,
+  CreateStringForm,
+  StringItemCard,
+} from '~/lib/quick-copy/components'
 import Input from '~/components/ui/forms/Input'
 import BaseLink from '~/components/BaseLink'
 import Checkbox from '~/components/ui/forms/Checkbox'
@@ -34,11 +38,14 @@ const QuickCopyIndex: React.FC = () => {
   const [selected, setSelected] = useState<string[]>([])
   const selectedSet = useMemo(() => new Set(selected), [selected])
 
-  const numSelectedInUngrouped = ungrouped.filter(s => selectedSet.has(s.id)).length
+  const numSelectedInUngrouped = ungrouped.filter(s =>
+    selectedSet.has(s.id)
+  ).length
 
   const ungroupedIndeterminate =
     numSelectedInUngrouped > 0 && numSelectedInUngrouped < ungrouped.length
-  const ungroupedChecked = numSelectedInUngrouped > 0 && numSelectedInUngrouped === ungrouped.length
+  const ungroupedChecked =
+    numSelectedInUngrouped > 0 && numSelectedInUngrouped === ungrouped.length
 
   return (
     <>
@@ -50,7 +57,9 @@ const QuickCopyIndex: React.FC = () => {
           title={
             <span className="flex items-center space-x-4">
               <label className="flex items-center">
-                <span className="sr-only">Toggle selected for ungrouped strings</span>
+                <span className="sr-only">
+                  Toggle selected for ungrouped strings
+                </span>
                 <Checkbox
                   className="checkbox checkbox-primary"
                   checked={ungroupedChecked}
@@ -59,7 +68,9 @@ const QuickCopyIndex: React.FC = () => {
                     const ids = ungrouped.map(s => s.id)
                     const groupStringIdSet = new Set(ids)
                     if (ungroupedChecked || ungroupedIndeterminate) {
-                      setSelected(selected => selected.filter(id => !groupStringIdSet.has(id)))
+                      setSelected(selected =>
+                        selected.filter(id => !groupStringIdSet.has(id))
+                      )
                     } else {
                       setSelected(selected => [...selected, ...ids])
                     }
@@ -88,10 +99,14 @@ const QuickCopyIndex: React.FC = () => {
         </BaseSection>
       ) : null}
       {groups.map(g => {
-        const numSelectedInGroup = g.strings.filter(s => selectedSet.has(s.id)).length
+        const numSelectedInGroup = g.strings.filter(s =>
+          selectedSet.has(s.id)
+        ).length
 
-        const indeterminate = numSelectedInGroup > 0 && numSelectedInGroup < g.strings.length
-        const checked = numSelectedInGroup > 0 && numSelectedInGroup === g.strings.length
+        const indeterminate =
+          numSelectedInGroup > 0 && numSelectedInGroup < g.strings.length
+        const checked =
+          numSelectedInGroup > 0 && numSelectedInGroup === g.strings.length
 
         return (
           <BaseSection
@@ -101,7 +116,9 @@ const QuickCopyIndex: React.FC = () => {
             title={
               <span className="flex items-center space-x-4">
                 <label className="flex items-center">
-                  <span className="sr-only">Toggle selected in group {g.name}</span>
+                  <span className="sr-only">
+                    Toggle selected in group {g.name}
+                  </span>
                   <Checkbox
                     disabled={g.strings.length === 0}
                     className="checkbox checkbox-primary"
@@ -109,7 +126,9 @@ const QuickCopyIndex: React.FC = () => {
                       const ids = g.strings.map(s => s.id)
                       const groupStringIdSet = new Set(ids)
                       if (indeterminate || checked) {
-                        setSelected(selected => selected.filter(id => !groupStringIdSet.has(id)))
+                        setSelected(selected =>
+                          selected.filter(id => !groupStringIdSet.has(id))
+                        )
                       } else {
                         setSelected(selected => [...selected, ...ids])
                       }
@@ -167,7 +186,10 @@ const QuickCopyIndex: React.FC = () => {
       >
         <BaseSection
           title={
-            <label htmlFor={IDS.groupNameInput} className="flex items-center space-x-4">
+            <label
+              htmlFor={IDS.groupNameInput}
+              className="flex items-center space-x-4"
+            >
               <PlusIcon className="w-6 h-6" />
               <span>Create a new group</span>
             </label>
@@ -178,8 +200,8 @@ const QuickCopyIndex: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {isUnusableGroupname && (
               <div id={IDS.groupNameError} className="text-sm col-span-full">
-                Group name slug (<code>{getSlugForGroupName(groupName)}</code>) must be unique and
-                contain at least 1 non-whitespace character.
+                Group name slug (<code>{getSlugForGroupName(groupName)}</code>)
+                must be unique and contain at least 1 non-whitespace character.
               </div>
             )}
             <FormLabel className="sr-only" htmlFor={IDS.groupNameInput}>
@@ -200,13 +222,13 @@ const QuickCopyIndex: React.FC = () => {
       </BaseForm>
       <CopyBar
         selectedSet={selectedSet}
-        getCopyString={() =>
+        getStrings={() =>
           [
             ...ungrouped.filter(s => selectedSet.has(s.id)),
-            ...groups.flatMap(g => g.strings.filter(s => selectedSet.has(s.id))),
-          ]
-            .map(s => s.text)
-            .join('\n')
+            ...groups.flatMap(g =>
+              g.strings.filter(s => selectedSet.has(s.id))
+            ),
+          ].map(s => s.text)
         }
         onClear={() => setSelected([])}
       />

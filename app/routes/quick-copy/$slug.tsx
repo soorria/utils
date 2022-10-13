@@ -106,11 +106,8 @@ const QuickCopySingleGroup: React.FC = () => {
       <CreateStringForm groupSlug={slug} textareaId={`create-string-${slug}`} />
 
       <CopyBar
-        getCopyString={() =>
-          group.strings
-            .filter(s => selectedSet.has(s.id))
-            .map(s => s.text)
-            .join('\n')
+        getStrings={() =>
+          group.strings.filter(s => selectedSet.has(s.id)).map(s => s.text)
         }
         onClear={() => setSelected([])}
         selectedSet={selectedSet}
