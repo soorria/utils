@@ -207,6 +207,7 @@ export default function Plaiceholder() {
             name="size"
             className="w-full"
             defaultValue={16}
+            disabled={isLoading}
           />
           <FormLabel variant="ALT" id={ids.sizeInputHelpText}>
             A higher size increases the quality of the placeholder, but also
