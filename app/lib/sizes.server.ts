@@ -41,10 +41,22 @@ const getSizeIfEnabled = (
   level: number
 ): Promise<number | null> => (enabled ? fn(text, level) : Promise.resolve(null))
 
+let i = 0
+
 export const getSizes = async (
   stringOrFile: string | File,
   options: SizesOptions
 ): Promise<Sizes> => {
+  const start = process.hrtime()
+  const key = `sizes ${++i}`
+  console.log(key, start)
+  const logThen =
+    <T>(format: SizeFormats) =>
+    (r: T): T => {
+      console.log(key, format, process.hrtime(start), r)
+      return r
+    }
+
   const text =
     typeof stringOrFile === 'string' ? stringOrFile : await stringOrFile.text()
 
@@ -53,7 +65,7 @@ export const getSizes = async (
       getSizeWithKeyAndOptions(
         'initial',
         getSizeIfEnabled(bytesSize, text, options.initialEnabled, -1)
-      ),
+      ).then(logThen('initial')),
       getSizeWithKeyAndOptions(
         'deflate',
         getSizeIfEnabled(
@@ -62,11 +74,11 @@ export const getSizes = async (
           options.deflateEnabled,
           options.deflateLevel
         )
-      ),
+      ).then(logThen('deflate')),
       getSizeWithKeyAndOptions(
         'gzip',
         getSizeIfEnabled(gzipSize, text, options.gzipEnabled, options.gzipLevel)
-      ),
+      ).then(logThen('gzip')),
       getSizeWithKeyAndOptions(
         'brotli',
         getSizeIfEnabled(
@@ -75,7 +87,7 @@ export const getSizes = async (
           options.brotliEnabled,
           options.brotliLevel
         )
-      ),
+      ).then(logThen('brotli')),
     ])
   ).filter(([_, val]) => val !== null)
 
