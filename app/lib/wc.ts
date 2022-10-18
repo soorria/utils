@@ -20,7 +20,16 @@ export type DoWCResult = {
   files: Array<{ name: string; wc: WC }>
 }
 
-const doSingleWC = (text: string): WC => {
+const doSingleWC = async (fileOrText: File | string): Promise<WC> => {
+  let text: string
+  let bytes: number
+  if (fileOrText instanceof File) {
+    text = await fileOrText.text()
+    bytes = fileOrText.size
+  } else {
+    text = fileOrText
+    bytes = text.length
+  }
   const { words, time, text: readingTimeText } = readingTime(text)
   const lines = text.split('\n').length
 
@@ -28,7 +37,7 @@ const doSingleWC = (text: string): WC => {
     readingTime: readingTimeText,
     words,
     lines,
-    bytes: text.length,
+    bytes,
     chars: charLength(text),
   }
 }
@@ -48,7 +57,7 @@ export const doWC = async ({ text, files }: DoWCInput): Promise<DoWCResult> => {
   }
 
   if (text) {
-    const textResult = doSingleWC(text)
+    const textResult = await doSingleWC(text)
     const { readingTime: _, ...copyWithoutReadingTime } = textResult
     result.total = copyWithoutReadingTime
     result.text = textResult
@@ -57,10 +66,9 @@ export const doWC = async ({ text, files }: DoWCInput): Promise<DoWCResult> => {
   if (files.length) {
     result.files = await Promise.all(
       files.map(async file => {
-        const fileText = await file.text()
         return {
           name: file.name,
-          wc: doSingleWC(fileText),
+          wc: await doSingleWC(file),
         }
       })
     )

@@ -58,7 +58,9 @@ const WCResultTable: React.FC<DoWCResult> = ({ files, total, text }) => {
             <tr className="font-bold">
               <td>total</td>
               {formatOrder.map(name => (
-                <td key={name}>{name !== 'readingTime' ? total[name] : ''}</td>
+                <td key={name} className="text-right">
+                  {name !== 'readingTime' ? total[name] : ''}
+                </td>
               ))}
             </tr>
           </tbody>
