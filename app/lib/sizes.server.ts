@@ -204,6 +204,8 @@ export const getAllSizes = async (
   { text, files = [] }: GetAllSizesInput,
   options: SizesOptions
 ): Promise<GetAllSizesResult> => {
+  const start = process.hrtime()
+  console.log('sizes start', start)
   if (typeof text !== 'string' && files.length === 0) {
     return { files: {}, total: options.totalEnabled ? sumSizes([]) : undefined }
   }
@@ -229,7 +231,9 @@ export const getAllSizes = async (
     })
   }
 
+  console.log('sizes before Promise.all', process.hrtime(start))
   await Promise.all(promises)
+  console.log('sizes after Promise.all', process.hrtime(start))
 
   if (options.totalEnabled) {
     const allSizes = Object.values(result.files)

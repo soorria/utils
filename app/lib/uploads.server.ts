@@ -13,7 +13,7 @@ export const parseMultipartFormData = async (
   request: Request
 ): Promise<FormData | null> => {
   const start = process.hrtime()
-  console.log('start', start)
+  console.log('upload start', start)
   try {
     const formData = await unstable_parseMultipartFormData(
       request,
@@ -23,6 +23,6 @@ export const parseMultipartFormData = async (
   } catch (err) {
     return null
   } finally {
-    console.log('end', process.hrtime(start))
+    console.log('upload end', process.hrtime(start))
   }
 }
