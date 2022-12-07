@@ -1,16 +1,27 @@
-node_modules
 
-.cache
-.vercel
+dist
+.solid
 .output
+.vercel
+.netlify
+netlify
 
-/build/
-/public/build
-/api/index.js
-/api/index.js.map
-/api/_assets/*
-*.js.map
-app/app.css
+# dependencies
+/node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+*.launch
+.settings/
+
+# Temp
+gitignore
+
+# System Files
+.DS_Store
+Thumbs.db
 
 yarn-error.log
 

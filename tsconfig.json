@@ -1,23 +1,18 @@
 {
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2019"],
-    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "jsx": "react-jsx",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "target": "ES2019",
+    "jsxImportSource": "solid-js",
+    "jsx": "preserve",
     "strict": true,
-    "baseUrl": ".",
+    "types": ["vite/client", "unplugin-icons/types/solid"],
+    "baseUrl": "./",
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./src/*"]
     },
-    "importsNotUsedAsValues": "error",
-    "noEmit": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowJs": true,
-    "strictNullChecks": true,
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": true
   }
 }
