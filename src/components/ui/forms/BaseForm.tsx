@@ -11,6 +11,8 @@ interface BaseFormProps extends ComponentProps<'form'> {
   form: Component<any>
 }
 
+export const baseFormClass = 'space-y-6'
+
 const BaseForm: ParentComponent<BaseFormProps> = _props => {
   const [local, props] = splitProps(mergeProps({ baseStyles: true }, _props), [
     'baseStyles',

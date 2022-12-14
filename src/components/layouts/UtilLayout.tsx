@@ -17,12 +17,6 @@ const UtilLayout: ParentComponent<UtilLayoutProps> = _props => {
       <MainHeading>{local.util.title}</MainHeading>
       <UtilDescription>{local.util.description}</UtilDescription>
 
-      <noscript>
-        <div class="h-48 text-xl font-bold grid place-items-center">
-          <p>{local.util.title} requires javascript to be enabled.</p>
-        </div>
-      </noscript>
-
       {local.children}
     </MainLayout>
   )

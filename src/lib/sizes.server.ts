@@ -12,9 +12,10 @@ import {
 } from './sizes'
 import { z } from 'zod'
 import { optionalBooleanOrCheckboxValue as defaultedBooleanOrCheckboxValue } from './zod-utils'
+import { File } from 'undici'
 
 export type SizeFormats = 'initial' | 'gzip' | 'brotli' | 'deflate'
-export type Sizes = Partial<Record<SizeFormats, number>>
+export type SizesResult = Partial<Record<SizeFormats, number>>
 export type SizesOptions = Omit<SizesRequest, 'text' | 'files'>
 
 type SizeFunction = (text: string, level: number) => Promise<number>
@@ -46,7 +47,7 @@ let i = 0
 export const getSizes = async (
   stringOrFile: string | File,
   options: SizesOptions
-): Promise<Sizes> => {
+): Promise<SizesResult> => {
   const start = process.hrtime()
   const key = `sizes ${++i}`
   console.log(key, start)
@@ -91,7 +92,7 @@ export const getSizes = async (
     ])
   ).filter(([_, val]) => val !== null)
 
-  return Object.fromEntries(resultEntries) as Sizes
+  return Object.fromEntries(resultEntries) as SizesResult
 }
 
 const createStringStream = (string: string): Readable => {
@@ -103,7 +104,7 @@ const createStringStream = (string: string): Readable => {
 
 export const getSizesUsingStream = async (
   stringOrFile: string | File
-): Promise<Sizes> => {
+): Promise<SizesResult> => {
   const stream = (
     typeof stringOrFile === 'string'
       ? createStringStream(stringOrFile)
@@ -208,9 +209,9 @@ export type GetAllSizesInput = {
 }
 
 export type GetAllSizesResult = {
-  text?: Sizes
-  total?: Sizes
-  files: Record<string, Sizes>
+  text?: SizesResult
+  total?: SizesResult
+  files: Record<string, SizesResult>
 }
 
 export const getAllSizes = async (
@@ -259,13 +260,13 @@ export const getAllSizes = async (
   return result
 }
 
-const sumSizes = (sizes: Sizes[]): Sizes => {
+const sumSizes = (sizes: SizesResult[]): SizesResult => {
   if (sizes.length === 0) {
     return { brotli: 0, deflate: 0, gzip: 0, initial: 0 }
   }
 
-  const keys = Object.keys(sizes[0]!) as (keyof Sizes)[]
-  const result = Object.fromEntries(keys.map(key => [key, 0])) as Sizes
+  const keys = Object.keys(sizes[0]!) as (keyof SizesResult)[]
+  const result = Object.fromEntries(keys.map(key => [key, 0])) as SizesResult
   for (const measurement of sizes) {
     for (const key of keys) {
       result[key]! += measurement[key] ?? 0

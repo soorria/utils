@@ -21,18 +21,18 @@ export const routeData = () => {
   }
 }
 
-const tagDetailsMap: Record<Tag, { class: string; label: JSXElement }> = {
+const tagDetailsMap: Record<Tag, { class: string; label: () => JSXElement }> = {
   [Tag.API]: {
     class: 'badge-primary',
-    label: '+ API',
+    label: () => '+ API',
   },
   [Tag.NEEDS_JS]: {
     class: 'badge-warning',
-    label: 'NEEDS JS',
+    label: () => 'NEEDS JS',
   },
   [Tag.WIP]: {
     class: 'badge-error',
-    label: (
+    label: () => (
       <>
         <ExclamationTriangleIconSolid class="w-3 h-3 mr-1" /> WIP
       </>

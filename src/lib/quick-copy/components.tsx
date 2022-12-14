@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/outline'
 import autosize from 'autosize'
 import { KeyboardEvent, useEffect, useRef } from 'react'
-import BaseForm from '~/components/ui/BaseForm'
+import BaseForm from '~/components/ui/forms/BaseForm'
 import Dialog, {
   DialogActions,
   DialogBox,

@@ -7,14 +7,17 @@ import {
   FileRoutes,
   Head,
   Html,
+  Link,
   Meta,
   Routes,
   Scripts,
   Title,
 } from 'solid-start'
+import { Toaster } from 'solid-toast'
 import { HeartIconSolid } from './components/ui/icons'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 import './root.css'
+import 'dracula-prism/dist/css/dracula-prism.min.css'
 
 const META = {
   title: DEFAULT_TITLE,
@@ -30,12 +33,23 @@ export default function Root() {
         <Title>SolidStart - With TailwindCSS</Title>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
+
         <script
           async
           defer
           data-domain="utils.soorria.com"
           data-api="https://soorria.com/proxy/api/event"
           src="https://soorria.com/js/potato.js"
+        />
+        <Link rel="preconnect" href="https://fonts.googleapis.com" />
+        <Link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <Link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;700;900&display=swap"
         />
         <Title>{META.title}</Title>
         <Meta name="description" content={META.description} />
@@ -53,7 +67,7 @@ export default function Root() {
         <Meta name="twitter:title" content={META.title} />
         <Meta name="twitter:alt" content={META.title} />
       </Head>
-      <Body>
+      <Body class="h-full flex flex-col">
         <Suspense>
           <ErrorBoundary>
             <div class="max-w-screen-lg w-full mx-auto py-8 px-4 md:px-8 md:py-12 space-y-8 flex flex-col h-full flex-1">
@@ -115,6 +129,27 @@ export default function Root() {
             </footer>
           </ErrorBoundary>
         </Suspense>
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            style: {
+              'background-color': 'hsl(var(--n))',
+              color: 'hsl(var(--nc))',
+            },
+            // success: {
+            //   iconTheme: {
+            //     primary: 'hsl(var(--su))',
+            //     secondary: 'hsl(var(--suc))',
+            //   },
+            // },
+            // error: {
+            //   iconTheme: {
+            //     primary: 'hsl(var(--er))',
+            //     secondary: 'hsl(var(--erc))',
+            //   },
+            // },
+          }}
+        />
         <Scripts />
       </Body>
     </Html>
