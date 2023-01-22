@@ -7,7 +7,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [
     solid({
-      adapter: vercel({ edge: false }),
+      adapter: vercel({ edge: true }),
       ssr: true,
       islands: false,
       islandsRouter: false,
