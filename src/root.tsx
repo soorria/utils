@@ -17,7 +17,7 @@ import { Toaster } from 'solid-toast'
 import { HeartIconSolid } from './components/ui/icons'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 import './root.css'
-// import 'dracula-prism/dist/css/dracula-prism.min.css'
+import 'dracula-prism/dist/css/dracula-prism.min.css'
 
 const META = {
   title: DEFAULT_TITLE,

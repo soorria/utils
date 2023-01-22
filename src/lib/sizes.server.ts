@@ -12,6 +12,7 @@ import {
 } from './sizes'
 import { z } from 'zod'
 import { optionalBooleanOrCheckboxValue as defaultedBooleanOrCheckboxValue } from './zod-utils'
+import { Blob } from 'buffer'
 import { File } from 'undici'
 
 export type SizeFormats = 'initial' | 'gzip' | 'brotli' | 'deflate'
@@ -297,7 +298,7 @@ export const sizesRequestBodySchema = z
       .transform(
         files =>
           files.filter(
-            file => Boolean(file.name) && file.size <= 5_000_000
+            file => Boolean((file as File)?.name) && file.size <= 5_000_000
           ) as unknown as File[]
       ),
     initialEnabled: defaultedBooleanOrCheckboxValue(true),

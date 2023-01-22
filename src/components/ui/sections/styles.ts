@@ -1,7 +1,7 @@
 import { cx } from '~/lib/utils'
 import type { SectionVariant } from './common-types'
 
-const rootMinimal = 'flex flex-col space-y-8'
+const rootMinimal = 'flex flex-col space-y-8 scroll-m-8'
 export const classes = {
   rootMinimal,
   rootBase: cx('p-4 md:p-8 border-2 rounded-box', rootMinimal),

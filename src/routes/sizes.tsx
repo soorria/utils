@@ -34,7 +34,6 @@ import { Component, createMemo, createSignal, For, Show } from 'solid-js'
 import { A, useRouteData } from 'solid-start'
 import { createServerAction$ } from 'solid-start/server'
 import CompressionFormatToggle from '~/components/sizes/CompressionFormatToggle'
-import { File } from 'undici'
 
 type ActionData =
   | {
@@ -45,12 +44,6 @@ type ActionData =
       total?: SizesResult
     }
   | ({ status: 'error' } & SizesRequestErrors)
-
-type LoaderData = {
-  maxSize: number
-  utilData: Util
-  highlighted: { apiExample: string }
-}
 
 export const routeData = () => {
   const utilData = getUtilBySlug('sizes')
