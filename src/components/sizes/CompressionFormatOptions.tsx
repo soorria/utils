@@ -3,31 +3,7 @@ import { CompressionLevelRange, getCompressionRangeDefault } from '~/lib/sizes'
 import { range } from '~/lib/utils'
 import FormControl from '../ui/forms/FormControl'
 import FormLabel from '../ui/forms/FormLabel'
-
-interface CompressionFormatToggleProps {
-  formatName: string
-  id: string
-  name: string
-}
-
-export const CompressionFormatToggle: Component<
-  CompressionFormatToggleProps
-> = props => {
-  return (
-    <FormControl variant="INLINE">
-      <FormLabel class="cursor-pointer flex-1" for={props.id}>
-        include {props.formatName}
-      </FormLabel>
-      <input
-        type="checkbox"
-        class="toggle toggle-primary"
-        attr:checked={true}
-        id={props.id}
-        name={props.name}
-      />
-    </FormControl>
-  )
-}
+import CompressionFormatToggle from './CompressionFormatToggle'
 
 interface CompressionFormatOptionsProps {
   formatName: string

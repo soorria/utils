@@ -1,10 +1,8 @@
-import CompressionFormatOptions, {
-  CompressionFormatToggle,
-} from '~/components/sizes/CompressionFormatOptions'
+import CompressionFormatOptions from '~/components/sizes/CompressionFormatOptions'
 import Divider from '~/components/ui/Divider'
 import FileInput, { FileSizeInfo } from '~/components/ui/forms/FileInput'
 import SizesResultTable from '~/components/sizes/SizesResultTable'
-import BaseForm, { baseFormClass } from '~/components/ui/forms/BaseForm'
+import { baseFormClass } from '~/components/ui/forms/BaseForm'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
 import ResetButton from '~/components/ui/ResetButton'
 import ResultsSection from '~/components/ui/sections/ResultsSection'
@@ -24,13 +22,19 @@ import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import Textarea from '~/components/ui/forms/Textarea'
 import { ApiRef } from '~/components/ApiRef'
-import { ContentType, ParamSource } from '~/components/ApiRef/types'
+import {
+  ApiRefSchema,
+  ContentType,
+  ParamSource,
+} from '~/components/ApiRef/types'
 import { highlight } from '~/lib/prism.server'
 import { humanFileSize } from '~/lib/utils'
 import toast from 'solid-toast'
-import { Component, createSignal, For, Show } from 'solid-js'
+import { Component, createMemo, createSignal, For, Show } from 'solid-js'
 import { A, useRouteData } from 'solid-start'
-import { createServerAction$, json, redirect } from 'solid-start/server'
+import { createServerAction$ } from 'solid-start/server'
+import CompressionFormatToggle from '~/components/sizes/CompressionFormatToggle'
+import { File } from 'undici'
 
 type ActionData =
   | {
@@ -110,15 +114,13 @@ export default function Sizes() {
       })()
       const parseResult = await sizesRequestBodySchema.spa(payload)
 
-      console.log(payload)
-
       if (!parseResult.success) {
         const parseErrors = parseResult.error.flatten()
 
         return {
           status: 'error',
           ...parseErrors,
-        }
+        } as ActionData
       }
 
       const { text = null, files = [], ...options } = parseResult.data
@@ -132,17 +134,17 @@ export default function Sizes() {
       )
 
       return {
-        status: 'success',
+        status: 'success' as const,
         text,
         textSizes: sizes.text,
         files: sizes.files,
         total: sizes.total,
-      }
+      } as ActionData
     },
     { invalidate: r => console.log(r) }
   )
 
-  const [files, setFiles] = createSignal<File[]>([])
+  const [files, setFiles] = createSignal<globalThis.File[]>([])
   let formRef: HTMLFormElement | undefined = undefined
   const [resetFileInputKey, setResetFileInputKey] = createSignal(0)
 
@@ -158,25 +160,18 @@ export default function Sizes() {
     event.preventDefault()
     const data = new FormData(event.currentTarget as HTMLFormElement)
 
-    const existingFiles = new Set(data.getAll('files'))
-
+    data.delete('files')
     files().forEach(file => {
-      if (!existingFiles.has(file)) {
-        data.append('files', file)
-      }
+      data.append('files', file)
     })
 
     action(data)
-    // submit(data, {
-    //   method: 'post',
-    //   encType: 'multipart/form-data',
-    //   replace: true,
-    // })
   }
 
   const resetForm = () => {
     setResetFileInputKey(k => k + 1)
     formRef?.reset()
+    submission.clear()
   }
 
   const downloadResultsAsJson = () => {
@@ -193,6 +188,57 @@ export default function Sizes() {
     download(json, 'sizes.json')
   }
 
+  const apiSchema = createMemo(() => {
+    return {
+      endpoints: [
+        {
+          method: 'post',
+          path: '/api/sizes',
+          request: {
+            contentType: ContentType.MULTIPART_FORMDATA,
+            params: [
+              {
+                name: 'text',
+                source: ParamSource.FORMDATA,
+                description:
+                  'Text for which you want to see the compressed size.',
+              },
+              {
+                name: 'files',
+                source: ParamSource.FORMDATA,
+                description:
+                  'Files for which you want to see the compressed size. Files should have unique names.',
+              },
+            ],
+            note: {
+              body: (
+                <>
+                  <code>text</code> and <code>files</code> are both optional but
+                  at least one must be provided. If <code>text</code> is empty,
+                  at least 1 file must be provided.
+                </>
+              ),
+            },
+          },
+          response: {
+            contentType: ContentType.APPLICATION_JSON,
+            statuses: [
+              {
+                code: 200,
+                description: 'Successfully compressed & measured file sizes.',
+                example: <code innerHTML={highlighted.apiExample} />,
+              },
+              {
+                code: 400,
+                description: 'Invalid request parameters',
+              },
+            ],
+          },
+        },
+      ],
+    } as ApiRefSchema
+  })
+
   return (
     <UtilLayout util={utilData}>
       <action.Form
@@ -204,7 +250,7 @@ export default function Sizes() {
         ref={formRef}
       >
         <FormControl>
-          <FormLabel for={ids.fileInput}>your files</FormLabel>
+          <FormLabel for={ids.fileInput}>Your files</FormLabel>
           <FileInput
             // TODO: reload component when key changes
             // key={resetFileInputKey}
@@ -213,7 +259,7 @@ export default function Sizes() {
             itemsName="files to measure"
             aria-describedby={ids.fileInputHelpText}
             disabled={isLoading()}
-            onFiles={files => setFiles(files)}
+            onFiles={setFiles}
             onError={() =>
               toast.error(
                 <div class="space-y-2">
@@ -229,30 +275,30 @@ export default function Sizes() {
             }
             multiple
             maxSize={maxSize}
-          />
+          ></FileInput>
           <FileSizeInfo id={ids.fileInputHelpText} maxSize={maxSize} />
         </FormControl>
 
         <Divider>and / or</Divider>
 
         <FormControl>
-          <FormLabel for={ids.textarea}>your text</FormLabel>
+          <FormLabel for={ids.textarea}>Your text</FormLabel>
           <Textarea
             id={ids.textarea}
             name="text"
             minHeight="16rem"
-            placeholder="your text here"
+            placeholder="Your text here"
             disabled={isLoading()}
           />
         </FormControl>
 
         <details class="space-y-8 bg-base-300 p-4 rounded-btn focus-within:outline-primary outline-offset-2">
           <summary class="cursor-pointer -m-4 p-4 focus-outline rounded-btn">
-            <h2 class="inline-block ml-1">compression options</h2>
+            <h2 class="inline-block ml-1">Compression options</h2>
           </summary>
 
           <CompressionFormatOptions
-            formatName="deflate"
+            formatName="Deflate"
             idBase="deflate-options"
             levelName="deflateLevel"
             toggleName="deflateEnabled"
@@ -262,7 +308,7 @@ export default function Sizes() {
           <hr class="border-base-100" />
 
           <CompressionFormatOptions
-            formatName="gzip"
+            formatName="Gzip"
             idBase="gzip-options"
             levelName="gzipLevel"
             toggleName="gzipEnabled"
@@ -272,7 +318,7 @@ export default function Sizes() {
           <hr class="border-base-100" />
 
           <CompressionFormatOptions
-            formatName="brotli"
+            formatName="Brotli"
             idBase="brotli-options"
             levelName="brotliLevel"
             toggleName="brotliEnabled"
@@ -282,7 +328,7 @@ export default function Sizes() {
           <hr class="border-base-100" />
 
           <CompressionFormatToggle
-            formatName="initial size"
+            formatName="Initial size"
             id="initial-enabled"
             name="initialEnabled"
           />
@@ -290,20 +336,19 @@ export default function Sizes() {
           <hr class="border-base-100" />
 
           <CompressionFormatToggle
-            formatName="total"
+            formatName="Total"
             id="total-enabled"
             name="totalEnabled"
           />
         </details>
 
         <SubmitButton isSubmitting={isLoading()}>see sizes!</SubmitButton>
+        <ResetButton
+          isSubmitting={isLoading()}
+          onClick={resetForm}
+          resetHref="."
+        />
       </action.Form>
-      <ResetButton
-        isSubmitting={isLoading()}
-        onClick={resetForm}
-        resetHref="."
-      />
-
       <Show
         when={
           submission.result?.status === 'error' && submission.result.formErrors
@@ -320,7 +365,6 @@ export default function Sizes() {
           </ErrorSection>
         )}
       </Show>
-
       <Show
         when={submission.result?.status === 'success' && submission.result}
         keyed
@@ -362,7 +406,6 @@ export default function Sizes() {
           </ResultsSection>
         )}
       </Show>
-
       <Show when={isComplete()}>
         <ResetButton
           isSubmitting={isLoading()}
@@ -370,60 +413,8 @@ export default function Sizes() {
           resetHref="."
         />
       </Show>
-
       <Divider />
-
-      <ApiRef
-        schema={{
-          endpoints: [
-            {
-              method: 'post',
-              path: '/api/sizes',
-              request: {
-                contentType: ContentType.MULTIPART_FORMDATA,
-                params: [
-                  {
-                    name: 'text',
-                    source: ParamSource.FORMDATA,
-                    description:
-                      'Text for which you want to see the compressed size.',
-                  },
-                  {
-                    name: 'files',
-                    source: ParamSource.FORMDATA,
-                    description:
-                      'Files for which you want to see the compressed size. Files should have unique names.',
-                  },
-                ],
-                note: {
-                  body: (
-                    <>
-                      <code>text</code> and <code>files</code> are both optional
-                      but at least one must be provided. If <code>text</code> is
-                      empty, at least 1 file must be provided.
-                    </>
-                  ),
-                },
-              },
-              response: {
-                contentType: ContentType.APPLICATION_JSON,
-                statuses: [
-                  {
-                    code: 200,
-                    description:
-                      'Successfully compressed & measured file sizes.',
-                    example: <code innerHTML={highlighted.apiExample} />,
-                  },
-                  {
-                    code: 400,
-                    description: 'Invalid request parameters',
-                  },
-                ],
-              },
-            },
-          ],
-        }}
-      />
+      <ApiRef schema={apiSchema()}></ApiRef>
     </UtilLayout>
   )
 }

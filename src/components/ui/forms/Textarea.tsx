@@ -8,8 +8,8 @@ interface TextareaProps extends Omit<ComponentProps<'textarea'>, 'style'> {
   error?: boolean
 }
 
-const Textarea: VoidComponent<TextareaProps> = _props => {
-  const [local, props] = splitProps(_props, [
+const Textarea: VoidComponent<TextareaProps> = props => {
+  const [local, delegated] = splitProps(props, [
     'class',
     'style',
     'minHeight',
@@ -30,7 +30,7 @@ const Textarea: VoidComponent<TextareaProps> = _props => {
       }}
       aria-invalid={local.error}
       style={{ 'min-height': local.minHeight }}
-      {...props}
+      {...delegated}
     />
   )
 }

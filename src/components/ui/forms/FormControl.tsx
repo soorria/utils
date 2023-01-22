@@ -1,4 +1,9 @@
-import { ComponentProps, mergeProps, ParentComponent } from 'solid-js'
+import {
+  ComponentProps,
+  mergeProps,
+  ParentComponent,
+  splitProps,
+} from 'solid-js'
 import { cx } from '~/lib/utils'
 
 interface FormControlProps extends ComponentProps<'div'> {
@@ -12,14 +17,18 @@ const variantToClassname: Partial<
   INLINE: 'flex-row items-center',
 }
 
-const FormControl: ParentComponent<FormControlProps> = _props => {
-  const props = mergeProps({ variant: 'DEFAULT' as const }, _props)
+const FormControl: ParentComponent<FormControlProps> = props => {
+  const [local, delegated] = splitProps(props, ['variant', 'class', 'children'])
   return (
     <div
-      class={cx('form-control', variantToClassname[props.variant], props.class)}
-      {...props}
+      {...delegated}
+      class={cx(
+        'form-control',
+        variantToClassname[local.variant ?? 'DEFAULT'],
+        local.class
+      )}
     >
-      {props.children}
+      {local.children}
     </div>
   )
 }

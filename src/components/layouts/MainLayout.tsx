@@ -7,10 +7,10 @@ export const MainHeading: ParentComponent = props => {
 
 export type MainLayoutProps = ComponentProps<'main'>
 
-const MainLayout: ParentComponent<MainLayoutProps> = _props => {
-  const [local, props] = splitProps(_props, ['class'])
+const MainLayout: ParentComponent<MainLayoutProps> = props => {
+  const [local, delegated] = splitProps(props, ['class'])
 
-  return <main class={cx('space-y-8 flex-1', local.class)} {...props} />
+  return <main class={cx('space-y-8 flex-1', local.class)} {...delegated} />
 }
 
 export default MainLayout

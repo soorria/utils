@@ -17,7 +17,7 @@ const ResetButton: ParentComponent<ResetButtonProps> = props => {
       }}
       onClick={props.onClick}
     >
-      {props.children}
+      {props.children ?? 'Reset'}
     </A>
   )
 }

@@ -62,7 +62,7 @@ const Index: VoidComponent = () => {
   return (
     <MainLayout>
       <CdnCacheYear />
-      <MainHeading>All Utils</MainHeading>
+      <MainHeading>All utils</MainHeading>
 
       <p class="text-2xl">
         A bunch of micro-apps that are too small for creating a new project to
@@ -80,7 +80,7 @@ const Index: VoidComponent = () => {
                 {util.title}
               </span>
 
-              <span class="min-h-12">{util.description}</span>
+              <span class="min-h-12 flex-1">{util.description}</span>
 
               <Show when={util.tags?.length}>
                 <div class="!-mt-0 -ml-4">

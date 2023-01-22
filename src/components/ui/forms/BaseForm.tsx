@@ -14,12 +14,12 @@ interface BaseFormProps extends ComponentProps<'form'> {
 export const baseFormClass = 'space-y-6'
 
 const BaseForm: ParentComponent<BaseFormProps> = _props => {
-  const [local, props] = splitProps(mergeProps({ baseStyles: true }, _props), [
-    'baseStyles',
-    'form',
-  ])
+  const [local, delegated] = splitProps(
+    mergeProps({ baseStyles: true }, _props),
+    ['baseStyles', 'form']
+  )
 
-  return <form {...props}></form>
+  return <form {...delegated}></form>
 }
 
 export default BaseForm

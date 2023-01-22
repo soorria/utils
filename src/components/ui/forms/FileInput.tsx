@@ -1,5 +1,5 @@
-import { Component, ComponentProps, createSignal, For, Show } from 'solid-js'
-// import { useDropzone } from 'react-dropzone'
+import { Component, ComponentProps, For, Show } from 'solid-js'
+import { createDropzone, FileRejection } from '@soorria/solid-dropzone'
 import { cx, humanFileSize } from '~/lib/utils'
 import { ExclamationTriangleIconSolid } from '../icons'
 import FormLabel from './FormLabel'
@@ -8,52 +8,54 @@ const FileInput: Component<
   ComponentProps<'input'> & {
     value?: File[]
     onFiles?: (files: File[]) => any
-    onError?: (files: File[]) => any
+    onError?: (files: FileRejection[]) => any
     id: string
     itemsName: string
     maxSize?: number
   }
 > = props => {
-  // const onDrop = ((accepted, rejected) => {
-  //   props.onFiles?.(accepted)
-  //   if (rejected.length) {
-  //     props.onError?.(rejected)
-  //   }
-  // }, [])
+  const dropzone = createDropzone({
+    noKeyboard: false,
+    noClick: true,
+    onDrop: (accepted, rejected) => {
+      props.onFiles?.(accepted)
+      if (rejected.length) {
+        console.log('rejected files', rejected, accepted)
+        props.onError?.(rejected)
+      }
+    },
+    get disabled() {
+      return props.disabled
+    },
+    get multiple() {
+      return props.multiple
+    },
+    get maxSize() {
+      return props.maxSize
+    },
+    get accept() {
+      return props.accept
+    },
+  })
 
-  // const { getInputProps, getRootProps, isDragActive, acceptedFiles } =
-  //   useDropzone({
-  //     noKeyboard: false,
-  //     noClick: true,
-  //     onDrop,
-  //     disabled: props.disabled,
-  //     multiple: props.multiple,
-  //     maxSize,
-  //     accept: props.accept,
-  //   })
-
-  // const isDragging = isDragActive
-
-  const [acceptedFiles, setAcceptedFiles] = createSignal<File[]>([])
-  const hasFiles = () => acceptedFiles().length > 0
-
+  const isDragging = () => dropzone.isDragActive
+  const hasFiles = () => dropzone.acceptedFiles.length > 0
+  const acceptedFiles = () => dropzone.acceptedFiles
   const totalSize = () =>
-    acceptedFiles()
+    dropzone.acceptedFiles
       .map(file => file.size)
       .reduce((acc, curr) => acc + curr, 0)
 
-  // const totalSize = acceptedFiles
-  //   .map(file => file.size)
-  //   .reduce((acc, curr) => acc + curr, 0)
-
   return (
     <div
-      class={cx(
-        'relative border-2 rounded-btn min-h-[8rem] p-4 text-lg overflow-hidden cursor-default',
-        'focus-within-outline',
-        // isDragging && 'bg-base-200',
-        props.disabled ? 'bg-base-200 border-base-200' : 'border-primary'
-      )}
+      {...dropzone.getRootProps({
+        class: cx(
+          'relative border-2 rounded-btn min-h-[8rem] p-4 text-lg overflow-hidden cursor-default',
+          'focus-within-outline',
+          isDragging() && 'bg-base-200',
+          props.disabled ? 'bg-base-200 border-base-200' : 'border-primary'
+        ),
+      })}
     >
       <Show
         when={hasFiles()}
@@ -137,27 +139,25 @@ const FileInput: Component<
       </Show>
 
       <input
-        // {...getInputProps({
-        //   name: 'file',
-        //   type: 'file',
-        //   class:
-        //     'sr-only no-js:not-sr-only input input-primary border-none focus:outline-none block',
-        //   ...props,
-        // })}
-        name="file"
-        type="file"
-        class="sr-only no-js:not-sr-only input input-primary border-none focus:outline-none block"
-        {...props}
+        {...dropzone.getInputProps({
+          name: props.name ?? 'file',
+          id: props.id,
+          type: 'file',
+          class:
+            'sr-only no-js:not-sr-only input input-primary border-none focus:outline-none block',
+          // ...props,
+        })}
       />
 
-      {/* <span
-        class={cx(
-          'place-items-center bg-base-200 absolute inset-0 transition-opacity pointer-events-none grid col-span-full z-50',
-          isDragging ? 'opacity-100' : 'opacity-0'
-        )}
+      <span
+        class="place-items-center bg-base-200 absolute inset-0 transition-opacity pointer-events-none grid col-span-full z-50"
+        classList={{
+          'opacity-0': !isDragging(),
+          'opacity-100': isDragging(),
+        }}
       >
         drop files to measure
-      </span> */}
+      </span>
 
       {/* Janky workaround for when ther's no js so that you can still see if you've selected any files */}
       <noscript>

@@ -1,4 +1,12 @@
-import { JSXElement, Show, VoidComponent, For, mergeProps } from 'solid-js'
+import {
+  JSXElement,
+  Show,
+  VoidComponent,
+  For,
+  mergeProps,
+  createMemo,
+  children,
+} from 'solid-js'
 import { cx } from '~/lib/utils'
 import BaseSection from '../ui/sections/BaseSection'
 import type { ApiRefSchema, ContentType } from './types'
@@ -15,17 +23,19 @@ interface ApiRefProps {
 
 export const ApiRef: VoidComponent<ApiRefProps> = _props => {
   const props = mergeProps({ id: 'api' }, _props)
+
   return (
     <BaseSection
       title={
         <>
           {props.schema.title || 'Api Reference'}
-          <a
+          {/* FIXME: this gives me hydration warnings */}
+          {/* <a
             href={`#${props.id}`}
             class="heading-anchor"
             aria-hidden="true"
             tabIndex={-1}
-          />
+          /> */}
         </>
       }
       variant="MINIMAL"

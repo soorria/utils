@@ -87,8 +87,8 @@ body {
 @screen sm {
   /* Chrome */
   ::-webkit-scrollbar {
-    width: 16px;
-    height: 16px;
+    width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {

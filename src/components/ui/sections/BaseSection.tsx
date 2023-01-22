@@ -20,15 +20,15 @@ const BaseSection: ParentComponent<
     ComponentProps<'div'>,
     'title'
   >
-> = _props => {
-  const [local, props] = splitProps(
-    mergeProps({ variant: defaultSectionVariant }, _props),
+> = props => {
+  const [local, delegated] = splitProps(
+    mergeProps({ variant: defaultSectionVariant }, props),
     ['variant', 'class', 'title', 'children']
   )
   return (
     <div
       class={cx(getRootClassForVariant(local.variant), local.class)}
-      {...props}
+      {...delegated}
     >
       <Show when={local.title}>
         <h2 class={cx(classes.title, 'text-primary')}>{local.title}</h2>

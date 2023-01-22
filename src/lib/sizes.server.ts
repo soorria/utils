@@ -292,9 +292,14 @@ export const sizesRequestBodySchema = z
   .object({
     text: z.string(),
     files: z
-      .instanceof(File, { message: 'files should only contain Files' })
+      .instanceof(Blob)
       .array()
-      .transform(files => files.filter(file => Boolean(file.name))),
+      .transform(
+        files =>
+          files.filter(
+            file => Boolean(file.name) && file.size <= 5_000_000
+          ) as unknown as File[]
+      ),
     initialEnabled: defaultedBooleanOrCheckboxValue(true),
     totalEnabled: defaultedBooleanOrCheckboxValue(true),
     brotliEnabled: defaultedBooleanOrCheckboxValue(true),
