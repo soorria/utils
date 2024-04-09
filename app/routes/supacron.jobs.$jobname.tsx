@@ -19,7 +19,7 @@ import Dialog, {
   DialogHeading,
   useDialog,
 } from '~/components/ui/Dialog'
-import { ClientOnly } from 'remix-utils'
+import { ClientOnly } from 'remix-utils/client-only'
 import SubmitButton from '~/components/ui/SubmitButton'
 import BaseForm from '~/components/ui/BaseForm'
 import { getUtilBySlug } from '~/lib/all-utils.server'

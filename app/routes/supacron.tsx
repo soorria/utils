@@ -1,12 +1,11 @@
 import {
-  ActionFunction,
   ActionFunctionArgs,
   json,
   LoaderFunction,
   redirect,
 } from '@remix-run/node'
 import { Form, Outlet, useLoaderData } from '@remix-run/react'
-import { ClientOnly } from 'remix-utils'
+import { ClientOnly } from 'remix-utils/client-only'
 import Dialog, {
   DialogActions,
   DialogBox,

@@ -20,7 +20,7 @@ import {
   SizesRequestErrors,
 } from '~/lib/sizes'
 import { sizesRequestBodySchema } from '~/lib/sizes.server'
-import { getAllSizes, Sizes } from '~/lib/sizes.server'
+import { getAllSizes, type Sizes } from '~/lib/sizes.server'
 import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
 import { commonMetaFactory } from '~/lib/all-utils'
 import Link from '~/components/BaseLink'

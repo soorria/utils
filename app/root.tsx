@@ -1,7 +1,7 @@
 import { LinksFunction } from '@remix-run/node'
 import Link from '~/components/BaseLink'
 import type { MetaFunction } from '@remix-run/node'
-import { ClientOnly } from 'remix-utils'
+import { ClientOnly } from 'remix-utils/client-only'
 import appStyles from './app.css'
 import { Toaster } from 'react-hot-toast'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'

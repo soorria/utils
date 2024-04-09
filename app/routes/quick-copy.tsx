@@ -2,7 +2,7 @@ import { HeadersFunction, json, LoaderFunction } from '@remix-run/node'
 import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import { commonMetaFactory } from '~/lib/all-utils'
 import { getUtilBySlug, Util } from '~/lib/all-utils.server'
-import { ClientOnly } from 'remix-utils'
+import { ClientOnly } from 'remix-utils/client-only'
 import { QuickCopyProvider } from '~/lib/quick-copy'
 import { Outlet, useLoaderData, useParams } from '@remix-run/react'
 

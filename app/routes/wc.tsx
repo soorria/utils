@@ -119,7 +119,7 @@ const ids = {
   deflateLevel: 'deflate-level',
 }
 
-export default function Sizes() {
+export default function WordCount() {
   const { maxSize, utilData } = useLoaderData<typeof loader>()
   const submit = useSubmit()
   const transition = useNavigation()

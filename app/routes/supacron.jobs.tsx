@@ -9,7 +9,7 @@ import {
   withClient,
 } from '~/lib/supacron'
 import { cx, getCookieHeader } from '~/lib/utils'
-import type { SupacronOutletData } from '../supacron'
+import type { SupacronOutletData } from './supacron'
 import Bleed from '~/components/ui/Bleed'
 import {
   useLocation,

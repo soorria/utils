@@ -11,7 +11,7 @@ import overrideStyles from './codemirror.css'
 import type { LinkDescriptor } from '@remix-run/node'
 import { TextareaHTMLAttributes, useEffect, useRef } from 'react'
 import Textarea from './Textarea'
-import { useHydrated } from 'remix-utils'
+import { useHydrated } from 'remix-utils/use-hydrated'
 import { cx } from '~/lib/utils'
 
 if (typeof window !== 'undefined') {

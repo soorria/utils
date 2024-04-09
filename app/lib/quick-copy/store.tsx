@@ -1,4 +1,4 @@
-import cuid from 'cuid'
+import { createId as cuid } from '@paralleldrive/cuid2'
 import type { Provider, ReactNode } from 'react'
 import slugify from 'slugify'
 import create from 'zustand'

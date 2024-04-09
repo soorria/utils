@@ -4,8 +4,8 @@ import FormLabel from '~/components/ui/forms/FormLabel'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
 import SubmitButton from '~/components/ui/SubmitButton'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
-import type { SupacronOutletData, ActionData } from '../supacron'
-import { action } from '../supacron'
+import type { SupacronOutletData, ActionData } from './supacron'
+import { action } from './supacron'
 import {
   useActionData,
   useNavigation,
