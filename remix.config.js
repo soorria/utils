@@ -22,4 +22,5 @@ module.exports = {
     '@zag-js/remove-scroll',
     '@zag-js/types',
   ],
+  serverModuleFormat: 'esm',
 }
