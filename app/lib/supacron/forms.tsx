@@ -32,7 +32,7 @@ const IDS = {
   commandError: 'command-error',
 }
 
-export const CronJobForm: React.FC<CronJobFormProps> = ({
+export const CronJobForm = ({
   defaultValues,
   errors,
   isSubmitting,
@@ -40,7 +40,7 @@ export const CronJobForm: React.FC<CronJobFormProps> = ({
   cancelText,
   fields,
   cancelHref,
-}) => {
+}: CronJobFormProps) => {
   return (
     <BaseForm replace={false} method="post" className="space-y-6">
       {fields.name && (
@@ -58,7 +58,9 @@ export const CronJobForm: React.FC<CronJobFormProps> = ({
             placeholder="do the thing all the time"
           />
           {errors?.name ? (
-            <FormErrorMessage id={IDS.nameError}>{errors.name}</FormErrorMessage>
+            <FormErrorMessage id={IDS.nameError}>
+              {errors.name}
+            </FormErrorMessage>
           ) : null}
           <FormLabel htmlFor={IDS.nameInput} variant="ALT">
             This needs to be unique across all jobs in the database.
@@ -81,7 +83,9 @@ export const CronJobForm: React.FC<CronJobFormProps> = ({
             placeholder="0 * * * *"
           />
           {errors?.schedule ? (
-            <FormErrorMessage id={IDS.scheduleError}>{errors.schedule}</FormErrorMessage>
+            <FormErrorMessage id={IDS.scheduleError}>
+              {errors.schedule}
+            </FormErrorMessage>
           ) : null}
           <FormLabel htmlFor={IDS.scheduleInput} variant="ALT">
             Should have 5 expressions (no seconds expression). Check out{' '}
@@ -104,7 +108,9 @@ export const CronJobForm: React.FC<CronJobFormProps> = ({
             options={{ mode: 'sql' }}
           />
           {errors?.command ? (
-            <FormErrorMessage id={IDS.commandError}>{errors.command}</FormErrorMessage>
+            <FormErrorMessage id={IDS.commandError}>
+              {errors.command}
+            </FormErrorMessage>
           ) : null}
         </FormControl>
       )}

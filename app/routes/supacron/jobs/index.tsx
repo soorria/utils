@@ -1,6 +1,6 @@
-import { Link } from 'remix'
+import { Link } from '@remix-run/react'
 
-const JobsIndexPlaceholder: React.FC = () => {
+const JobsIndexPlaceholder = () => {
   return (
     <>
       <div className="sticky top-4 hidden md:block">
@@ -11,7 +11,10 @@ const JobsIndexPlaceholder: React.FC = () => {
         >
           <div>
             Select or{' '}
-            <Link to="new" className="link rounded-btn focus:ring-offset-base-300">
+            <Link
+              to="new"
+              className="link rounded-btn focus:ring-offset-base-300"
+            >
               Create
             </Link>{' '}
             a job to see its details here

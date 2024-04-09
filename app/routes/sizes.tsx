@@ -1,14 +1,5 @@
 import { FormEventHandler, useRef, useState } from 'react'
-import {
-  ActionFunction,
-  useActionData,
-  LoaderFunction,
-  useLoaderData,
-  useTransition,
-  json,
-  useSubmit,
-  ErrorBoundaryComponent,
-} from 'remix'
+import { ActionFunction, LoaderFunction, json } from '@remix-run/node'
 import CompressionFormatOptions, {
   CompressionFormatToggle,
 } from '~/components/CompressionFormatOptions'
@@ -43,6 +34,14 @@ import { highlight } from '~/lib/prism.server'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
 import { humanFileSize } from '~/lib/utils'
 import toast from 'react-hot-toast'
+import {
+  useActionData,
+  useLoaderData,
+  useNavigation,
+  useRouteError,
+  useSubmit,
+} from '@remix-run/react'
+import { ErrorBoundaryComponent } from '@remix-run/react/dist/routeModules'
 
 export const meta = commonMetaFactory<LoaderData>()
 export const headers = passthroughCachingHeaderFactory()
@@ -174,16 +173,16 @@ const ids = {
 export default function Sizes() {
   const { maxSize, utilData, highlighted } = useLoaderData<LoaderData>()
   const submit = useSubmit()
-  const transition = useTransition()
+  const transition = useNavigation()
   const actionData = useActionData<ActionData>()
   const [files, setFiles] = useState<File[]>([])
   const formRef = useRef<HTMLFormElement>(null)
   const [resetFileInputKey, setResetFileInputKey] = useState(0)
 
-  const isSuccess = !transition.submission && actionData?.status === 'success'
-  const isError = !transition.submission && actionData?.status === 'error'
+  const isSuccess = !transition.formData && actionData?.status === 'success'
+  const isError = !transition.formData && actionData?.status === 'error'
   const isComplete = isError || isSuccess
-  const isLoading = Boolean(transition.submission)
+  const isLoading = Boolean(transition.formData)
 
   // need this since we can't set the value of file inputs with js
   const handleSubmit: FormEventHandler<HTMLFormElement> = event => {
@@ -450,7 +449,8 @@ export default function Sizes() {
   )
 }
 
-export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
+export const ErrorBoundary: ErrorBoundaryComponent = () => {
+  const error = useRouteError()
   console.error(error)
 
   return (

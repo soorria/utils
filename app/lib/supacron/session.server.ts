@@ -1,4 +1,4 @@
-import { createCookieSessionStorage, createCookie } from 'remix'
+import { createCookieSessionStorage, createCookie } from '@remix-run/node'
 import { isProd } from '~/constants.server'
 import { slug } from './details.server'
 

@@ -1,6 +1,7 @@
 import { FormEventHandler, useCallback, useRef, useState } from 'react'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
-import { json, LoaderFunction, useLoaderData } from 'remix'
+import { json, LoaderFunction } from '@remix-run/node'
+import { useLoaderData } from '@remix-run/react'
 import BaseForm from '~/components/ui/BaseForm'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'

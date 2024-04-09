@@ -1,16 +1,10 @@
-import {
-  HeadersFunction,
-  json,
-  LoaderFunction,
-  Outlet,
-  useLoaderData,
-  useParams,
-} from 'remix'
+import { HeadersFunction, json, LoaderFunction } from '@remix-run/node'
 import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import { commonMetaFactory } from '~/lib/all-utils'
 import { getUtilBySlug, Util } from '~/lib/all-utils.server'
 import { ClientOnly } from 'remix-utils'
 import { QuickCopyProvider } from '~/lib/quick-copy'
+import { Outlet, useLoaderData, useParams } from '@remix-run/react'
 
 export const meta = commonMetaFactory()
 
@@ -30,7 +24,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json<LoaderData>({ utilData })
 }
 
-const QuickCopy: React.FC = () => {
+const QuickCopy = () => {
   return (
     <>
       <Outlet />

@@ -1,5 +1,5 @@
 import { forwardRef } from 'react'
-import { Form, FormProps } from 'remix'
+import { Form, FormProps } from '@remix-run/react'
 import { cx } from '~/lib/utils'
 
 interface BaseFormProps extends FormProps {

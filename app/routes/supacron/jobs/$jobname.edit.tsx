@@ -5,10 +5,8 @@ import {
   LinksFunction,
   LoaderFunction,
   redirect,
-  useActionData,
-  useLoaderData,
-  useTransition,
-} from 'remix'
+} from '@remix-run/node'
+import { useActionData, useLoaderData, useNavigation } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 
 import BaseLink from '~/components/BaseLink'
@@ -84,7 +82,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const session = await sbConnStringSession.getSession(getCookieHeader(request))
   const config = await requireConfigFromSession(session)
 
-  const job = await withClient(config, client => getCronJobByName(client, { name: jobname }))
+  const job = await withClient(config, client =>
+    getCronJobByName(client, { name: jobname })
+  )
 
   if (!job) {
     throw json({ jobname }, 404)
@@ -95,12 +95,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   return json<LoaderData>({ job, user: config.user })
 }
 
-const JobDetails: React.FC = () => {
+const JobDetails = () => {
   const { job, user } = useLoaderData<LoaderData>()
-  const transition = useTransition()
+  const transition = useNavigation()
   const actionData = useActionData<ActionData>()
 
-  const isSubmitting = Boolean(transition.submission)
+  const isSubmitting = Boolean(transition.formData)
 
   const { data: submittedData, fieldErrors } = actionData || {}
   const data = { ...job, submittedData }
@@ -126,9 +126,10 @@ const JobDetails: React.FC = () => {
               <ExclamationIcon className="w-6 h-6 flex-grow-1 block" />
             </div>
             <p className="flex-shrink">
-              This cron job was created by the <code>{job.username}</code> user, but you're
-              connected as the <code>{user}</code> user. Updating this cron job will delete the
-              existing job and create a new one to replace it.
+              This cron job was created by the <code>{job.username}</code> user,
+              but you're connected as the <code>{user}</code> user. Updating
+              this cron job will delete the existing job and create a new one to
+              replace it.
             </p>
           </div>
         )}

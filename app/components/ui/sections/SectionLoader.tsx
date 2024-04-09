@@ -1,12 +1,17 @@
 import { cx } from '~/lib/utils'
 import type { SectionVariant } from './common-types'
 import { classes, getRootClassForVariant } from './styles'
+import { ReactNode } from 'react'
 
 interface SectionLoaderProps {
   variant?: SectionVariant
+  children: ReactNode
 }
 
-const SectionLoader: React.FC<SectionLoaderProps> = ({ variant = 'DEFAULT', children }) => {
+const SectionLoader = ({
+  variant = 'DEFAULT',
+  children,
+}: SectionLoaderProps) => {
   return (
     <div className={cx(getRootClassForVariant(variant), 'border-neutral')}>
       <h2 className={cx(classes.title, 'skeleton w-64 h-[1.2em]')} />

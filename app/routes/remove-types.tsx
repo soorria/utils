@@ -1,11 +1,4 @@
-import {
-  json,
-  LinksFunction,
-  LoaderFunction,
-  useLoaderData,
-  useSearchParams,
-  useTransition,
-} from 'remix'
+import { json, LinksFunction, LoaderFunction } from '@remix-run/node'
 import BaseForm from '~/components/ui/BaseForm'
 import ResetButton from '~/components/ui/ResetButton'
 import SubmitButton from '~/components/ui/SubmitButton'
@@ -28,8 +21,11 @@ import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
-import CodeMirrorTextarea, { codeMirrorLinks } from '~/components/ui/forms/CodeMirrorTextarea'
+import CodeMirrorTextarea, {
+  codeMirrorLinks,
+} from '~/components/ui/forms/CodeMirrorTextarea'
 import { highlight } from '~/lib/prism.server'
+import { useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
 
 if (typeof window !== 'undefined') {
   require('codemirror/mode/javascript/javascript')
@@ -74,7 +70,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   const result = await removeTypes(ts, options)
 
   const highlightedJs =
-    result.status === 'success' ? highlight(result.js, options.isTsx ? 'jsx' : 'js') : null
+    result.status === 'success'
+      ? highlight(result.js, options.isTsx ? 'jsx' : 'js')
+      : null
 
   return json<LoaderData>(
     { utilData, result, options, highlightedJs },
@@ -96,9 +94,10 @@ const copiedToast = () => {
   toast.success('Copied JS to clipboard', { id: 'js-copied' })
 }
 
-const RemoveTypes: React.FC = () => {
-  const { utilData, result, options, highlightedJs } = useLoaderData<LoaderData>()
-  const transition = useTransition()
+const RemoveTypes = () => {
+  const { utilData, result, options, highlightedJs } =
+    useLoaderData<LoaderData>()
+  const transition = useNavigation()
   const [params] = useSearchParams()
   const [isTsx, setIsTsx] = useState(options?.isTsx)
 
@@ -110,7 +109,8 @@ const RemoveTypes: React.FC = () => {
   const isIdle =
     !didSubmit &&
     (transition.state === 'idle' ||
-      (transition.state === 'loading' && transition.location.pathname !== utilData.path))
+      (transition.state === 'loading' &&
+        transition.location.pathname !== utilData.path))
   const isSubmitting = transition.state === 'submitting'
   const isSuccess = !isSubmitting && didSubmit && result.status === 'success'
   const isError = !isSubmitting && didSubmit && result.status === 'error'
@@ -138,7 +138,9 @@ const RemoveTypes: React.FC = () => {
                 spellCheck="false"
                 disabled={isSubmitting}
                 options={{
-                  mode: isTsx ? 'text/typescript-jsx' : 'application/typescript',
+                  mode: isTsx
+                    ? 'text/typescript-jsx'
+                    : 'application/typescript',
                 }}
                 id={IDS.ts}
                 name="ts"
@@ -163,7 +165,10 @@ const RemoveTypes: React.FC = () => {
             </FormControl>
 
             <FormControl variant="INLINE">
-              <FormLabel className="cursor-pointer flex-1" htmlFor={IDS.copyWhenDone}>
+              <FormLabel
+                className="cursor-pointer flex-1"
+                htmlFor={IDS.copyWhenDone}
+              >
                 copy to clipboard when done
               </FormLabel>
               <input
@@ -192,13 +197,19 @@ const RemoveTypes: React.FC = () => {
             </SectionLoader>
           )}
           {isSuccess && (
-            <ResultsSection utilSlug={utilData.slug} title="JavaScript" variant="MINIMAL">
+            <ResultsSection
+              utilSlug={utilData.slug}
+              title="JavaScript"
+              variant="MINIMAL"
+            >
               <FormControl>
                 <p className="label">
                   <span className="label-text">de-typed code</span>
                 </p>
                 <pre className="font-mono leading-tight textarea textarea-primary rounded-btn w-full min-h-[16rem] overflow-x-auto">
-                  <code dangerouslySetInnerHTML={{ __html: highlightedJs || '' }} />
+                  <code
+                    dangerouslySetInnerHTML={{ __html: highlightedJs || '' }}
+                  />
                 </pre>
               </FormControl>
 
@@ -224,7 +235,8 @@ const RemoveTypes: React.FC = () => {
                     ))}
                   </ul>
                   <p className="text-sm">
-                    Try re-submitting after toggling <code>'does this code have tsx?'</code>
+                    Try re-submitting after toggling{' '}
+                    <code>'does this code have tsx?'</code>
                   </p>
                 </div>
               ) : null}
@@ -235,7 +247,8 @@ const RemoveTypes: React.FC = () => {
                     {result.errors.babel.stack || result.errors.babel.message}
                   </p>
                   <p className="text-sm">
-                    Try re-submitting after toggling <code>'does this code have tsx?'</code>
+                    Try re-submitting after toggling{' '}
+                    <code>'does this code have tsx?'</code>
                   </p>
                 </div>
               ) : null}

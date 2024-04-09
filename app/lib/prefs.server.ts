@@ -1,7 +1,7 @@
 // @ts-expect-error doesn't have types
 import themes from 'daisyui/src/colors/themes'
-import type { Session } from 'remix'
-import { createCookieSessionStorage } from 'remix'
+import type { Session } from '@remix-run/node'
+import { createCookieSessionStorage } from '@remix-run/node'
 import { isProd } from '~/constants.server'
 import { randomItem } from './utils'
 

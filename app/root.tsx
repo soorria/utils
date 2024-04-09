@@ -1,15 +1,6 @@
-import {
-  ErrorBoundaryComponent,
-  Links,
-  LinksFunction,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from 'remix'
+import { LinksFunction } from '@remix-run/node'
 import Link from '~/components/BaseLink'
-import type { MetaFunction } from 'remix'
+import type { MetaFunction } from '@remix-run/node'
 import { ClientOnly } from 'remix-utils'
 import appStyles from './app.css'
 import { Toaster } from 'react-hot-toast'
@@ -17,6 +8,18 @@ import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
 import PageLoadingIndicator from './components/PageLoadingIndicator'
 import { PRISM_CSS_HREF } from './lib/prism'
 import { HeartIcon } from '@heroicons/react/outline'
+import { metaV1 } from '@remix-run/v1-meta'
+import { ReactNode } from 'react'
+import {
+  Links,
+  LiveReload,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useRouteError,
+} from '@remix-run/react'
+import { ErrorBoundaryComponent } from '@remix-run/react/dist/routeModules'
 
 export const links: LinksFunction = () => {
   return [
@@ -39,13 +42,13 @@ export const links: LinksFunction = () => {
   ]
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = args => {
   const image = ogImage('Utils')
   const description =
     'A bunch of micro-apps that are too small for creating a new project to be worth it. Some of them are useful, others less ...'
   const title = DEFAULT_TITLE
 
-  return {
+  return metaV1(args, {
     title,
     description,
     image,
@@ -61,10 +64,10 @@ export const meta: MetaFunction = () => {
     'twitter:site': '@soorriously',
     'twitter:title': title,
     'twitter:alt': title,
-  }
+  })
 }
 
-const Layout: React.FC = ({ children }) => {
+const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en" data-theme="dracula">
       <head>
@@ -165,7 +168,7 @@ const Layout: React.FC = ({ children }) => {
   )
 }
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <Layout>
       <Outlet />
@@ -175,14 +178,17 @@ const App: React.FC = () => {
 
 export default App
 
-export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
+export const ErrorBoundary: ErrorBoundaryComponent = () => {
+  const error = useRouteError()
   console.error(error)
   return (
     <Layout>
       <main className="space-y-8">
         <h1 className="text-5xl mt-8">something broke somewhere :(</h1>
 
-        <pre className="overflow-x-auto">{error.stack || error.message}</pre>
+        {error instanceof Error && (
+          <pre className="overflow-x-auto">{error.stack || error.message}</pre>
+        )}
 
         <Link to="." className="btn btn-ghost btn-block btn-outline">
           Try again ?

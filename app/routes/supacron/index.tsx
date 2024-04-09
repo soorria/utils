@@ -1,4 +1,3 @@
-import { useActionData, useOutletContext, useTransition } from 'remix'
 import BaseForm from '~/components/ui/BaseForm'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
@@ -7,6 +6,11 @@ import SubmitButton from '~/components/ui/SubmitButton'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
 import type { SupacronOutletData, ActionData } from '../supacron'
 import { action } from '../supacron'
+import {
+  useActionData,
+  useNavigation,
+  useOutletContext,
+} from '@remix-run/react'
 
 export const headers = passthroughCachingHeaderFactory()
 
@@ -18,13 +22,16 @@ const IDS = {
 export { action }
 
 const SupaCronAuth = () => {
-  const transition = useTransition()
+  const transition = useNavigation()
   const { utilData } = useOutletContext<SupacronOutletData>()
   const actionData = useActionData<ActionData>()
 
   const submitting = transition.state === 'submitting'
 
-  const errors = [actionData?.connectionErrors || [], actionData?.formErrors || []].flat()
+  const errors = [
+    actionData?.connectionErrors || [],
+    actionData?.formErrors || [],
+  ].flat()
   const isError = !submitting && errors.length > 0
   const isConnectionError = Boolean(actionData?.connectionErrors?.length)
 
@@ -32,7 +39,9 @@ const SupaCronAuth = () => {
     <>
       {isError ? (
         <ErrorSection
-          title={isConnectionError ? 'Failed to connect to database' : undefined}
+          title={
+            isConnectionError ? 'Failed to connect to database' : undefined
+          }
           utilSlug={utilData.slug}
         >
           <div aria-live="assertive" className="space-y-6" id={IDS.formError}>
@@ -46,7 +55,9 @@ const SupaCronAuth = () => {
       ) : null}
       <BaseForm replace={false} method="post">
         <FormControl>
-          <FormLabel htmlFor={IDS.connectionString}>Database Connection String</FormLabel>
+          <FormLabel htmlFor={IDS.connectionString}>
+            Database Connection String
+          </FormLabel>
           <input
             id={IDS.connectionString}
             name="connectionString"

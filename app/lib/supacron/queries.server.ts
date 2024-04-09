@@ -1,12 +1,15 @@
 import type { Client, QueryConfig } from 'pg'
 import type { CronJob, CronJobRunDetails } from './types'
 
-type QueryFunction<Result, Arg = never> = (
+type QueryFunction<Result, Arg = false> = (
   client: Client,
-  ...args: Arg extends never ? [] : [Arg]
+  ...args: Arg extends false ? [] : [Arg]
 ) => Promise<Result>
 
-export const checkPgCronExtension: QueryFunction<boolean, never> = async client => {
+export const checkPgCronExtension: QueryFunction<
+  boolean,
+  false
+> = async client => {
   const QUERY: QueryConfig<never[]> = {
     name: 'check-pg-cron',
     text: `
@@ -16,11 +19,17 @@ export const checkPgCronExtension: QueryFunction<boolean, never> = async client 
     `,
   }
   const result = await client.query(QUERY)
-  return result.rowCount >= 1
+  return (result.rowCount ?? 0) >= 1
 }
 
-export type AllCronJobsResult = Pick<CronJob, 'jobid' | 'jobname' | 'schedule' | 'active'>[]
-export const getAllCronJobs: QueryFunction<AllCronJobsResult, never> = async client => {
+export type AllCronJobsResult = Pick<
+  CronJob,
+  'jobid' | 'jobname' | 'schedule' | 'active'
+>[]
+export const getAllCronJobs: QueryFunction<
+  AllCronJobsResult,
+  false
+> = async client => {
   const QUERY: QueryConfig = {
     name: 'get-cron-jobs',
     text: `
@@ -32,10 +41,10 @@ export const getAllCronJobs: QueryFunction<AllCronJobsResult, never> = async cli
   return result.rows
 }
 
-export const getCronJobByName: QueryFunction<CronJob | null, { name: string }> = async (
-  client,
-  { name }
-) => {
+export const getCronJobByName: QueryFunction<
+  CronJob | null,
+  { name: string }
+> = async (client, { name }) => {
   const QUERY: QueryConfig<[string]> = {
     name: 'get-job-by-name',
     text: `
@@ -49,10 +58,10 @@ export const getCronJobByName: QueryFunction<CronJob | null, { name: string }> =
   return result.rows[0] || null
 }
 
-export const getCronJobById: QueryFunction<CronJob | null, { id: string }> = async (
-  client,
-  { id }
-) => {
+export const getCronJobById: QueryFunction<
+  CronJob | null,
+  { id: string }
+> = async (client, { id }) => {
   const QUERY: QueryConfig<[string]> = {
     name: 'get-job-by-id',
     text: `
@@ -116,7 +125,10 @@ export const updateCronJob: QueryFunction<
   await client.query(QUERY)
 }
 
-export const deleteCronJobById: QueryFunction<void, { id: string }> = async (client, { id }) => {
+export const deleteCronJobById: QueryFunction<void, { id: string }> = async (
+  client,
+  { id }
+) => {
   if (!Number.isSafeInteger(parseInt(id))) {
     return
   }
@@ -134,10 +146,10 @@ export const deleteCronJobById: QueryFunction<void, { id: string }> = async (cli
   }
 }
 
-export const deleteCronJobByName: QueryFunction<void, { name: string }> = async (
-  client,
-  { name }
-) => {
+export const deleteCronJobByName: QueryFunction<
+  void,
+  { name: string }
+> = async (client, { name }) => {
   const job = await getCronJobByName(client, { name })
   if (!job) {
     return

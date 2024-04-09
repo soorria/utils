@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { HeadersFunction, useNavigate, useParams } from 'remix'
+import { HeadersFunction } from '@remix-run/node'
 import BaseLink from '~/components/BaseLink'
 import Dialog, {
   DialogActions,
@@ -16,6 +16,7 @@ import {
   StringItemCard,
   useQuickCopyStore,
 } from '~/lib/quick-copy'
+import { useNavigate, useParams } from '@remix-run/react'
 
 export const headers: HeadersFunction = () => {
   return {
@@ -23,7 +24,7 @@ export const headers: HeadersFunction = () => {
   }
 }
 
-const QuickCopySingleGroup: React.FC = () => {
+const QuickCopySingleGroup = () => {
   const { slug } = useParams<{ slug: string }>()
   const [deleteGroup] = useQuickCopyStore(s => [s.deleteGroup])
   const group = useQuickCopyStore(

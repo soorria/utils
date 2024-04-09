@@ -1,7 +1,7 @@
 {
   "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2019"],
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
@@ -13,11 +13,11 @@
     "paths": {
       "~/*": ["./app/*"]
     },
-    "importsNotUsedAsValues": "error",
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true
   }
 }

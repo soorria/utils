@@ -1,18 +1,20 @@
-import { Link, LinkProps } from 'remix'
+import { Link, LinkProps } from '@remix-run/react'
+import { ReactNode } from 'react'
 import { cx } from '~/lib/utils'
 
 interface ResetButtonProps {
   onClick?: LinkProps['onClick']
   isLoading?: boolean
   resetHref?: string
+  children?: ReactNode
 }
 
-const ResetButton: React.FC<ResetButtonProps> = ({
+const ResetButton = ({
   onClick,
   isLoading,
   resetHref = '.',
   children = 'start over',
-}) => {
+}: ResetButtonProps) => {
   return (
     <Link
       to={resetHref}

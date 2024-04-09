@@ -1,4 +1,5 @@
-import { ActionFunction, json, LinksFunction, redirect, useActionData, useTransition } from 'remix'
+import { ActionFunction, json, LinksFunction, redirect } from '@remix-run/node'
+import { useActionData, useNavigate, useNavigation } from '@remix-run/react'
 import BaseLink from '~/components/BaseLink'
 import { codeMirrorLinks } from '~/components/ui/forms/CodeMirrorTextarea'
 import BaseSection from '~/components/ui/sections/BaseSection'
@@ -48,18 +49,20 @@ export const action: ActionFunction = async ({ request }) => {
   return redirect(`${getUtilBySlug('supacron').path}/jobs/${jobname}`)
 }
 
-const CreateNewCronJob: React.FC = () => {
+const CreateNewCronJob = () => {
   const actionData = useActionData<ActionData>()
-  const transition = useTransition()
+  const transition = useNavigation()
   const { data, fieldErrors } = actionData || {}
 
   const errorMap = Object.fromEntries(
-    Object.entries(fieldErrors || ({} as Exclude<typeof fieldErrors, undefined>)).map(
-      ([field, errors]) => [field, errors?.[0] || null]
-    )
-  ) as Partial<Record<keyof Exclude<typeof fieldErrors, undefined>, string | null>>
+    Object.entries(
+      fieldErrors || ({} as Exclude<typeof fieldErrors, undefined>)
+    ).map(([field, errors]) => [field, errors?.[0] || null])
+  ) as Partial<
+    Record<keyof Exclude<typeof fieldErrors, undefined>, string | null>
+  >
 
-  const isSubmitting = Boolean(transition.submission)
+  const isSubmitting = Boolean(transition.formData)
 
   return (
     <>

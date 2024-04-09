@@ -1,7 +1,7 @@
-import type { SVGProps } from 'react'
+import type { ComponentType, SVGProps } from 'react'
 
 type IconProps = {
   className?: string
 } & SVGProps<SVGSVGElement>
 
-export type IconComponent = React.FC<IconProps>
+export type IconComponent = ComponentType<IconProps>

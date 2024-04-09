@@ -14,7 +14,7 @@ import {
 import Input from '~/components/ui/forms/Input'
 import BaseLink from '~/components/BaseLink'
 import Checkbox from '~/components/ui/forms/Checkbox'
-import type { HeadersFunction } from 'remix'
+import type { HeadersFunction } from '@remix-run/node'
 
 export const headers: HeadersFunction = () => {
   return {
@@ -29,7 +29,7 @@ const IDS = {
   clearAfterCopyInput: 'clear-after-copy-input',
 }
 
-const QuickCopyIndex: React.FC = () => {
+const QuickCopyIndex = () => {
   const { ungrouped, createGroup, canCreateGroup } = useQuickCopyStore()
   const groups = useQuickCopyStore(s => Object.values(s.groups))
   const [groupName, setGroupName] = useState('')

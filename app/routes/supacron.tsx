@@ -1,4 +1,11 @@
-import { ActionFunction, Form, json, LoaderFunction, Outlet, redirect, useLoaderData } from 'remix'
+import {
+  ActionFunction,
+  ActionFunctionArgs,
+  json,
+  LoaderFunction,
+  redirect,
+} from '@remix-run/node'
+import { Form, Outlet, useLoaderData } from '@remix-run/react'
 import { ClientOnly } from 'remix-utils'
 import Dialog, {
   DialogActions,
@@ -30,7 +37,7 @@ export type ActionData = {
   connectionErrors?: string[]
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formdata = await request.formData()
 
   const action = getActionFromFormData(formdata)
@@ -155,7 +162,8 @@ const SupaCron = () => {
                   <DialogBox>
                     <DialogHeading>Disconnect from database</DialogHeading>
                     <DialogDescription>
-                      Are you sure you want to disconnect this browser from your database?
+                      Are you sure you want to disconnect this browser from your
+                      database?
                     </DialogDescription>
                     <DialogActions>
                       <DialogCloseAction>Cancel</DialogCloseAction>

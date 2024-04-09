@@ -1,4 +1,4 @@
-import { ActionFunction, json } from 'remix'
+import { ActionFunction, json } from '@remix-run/node'
 import { parse as parseContentType, ParsedMediaType } from 'content-type'
 import { parseMultipartFormData } from '~/lib/uploads.server'
 import { getAllSizes, sizesRequestBodySchema } from '~/lib/sizes.server'
@@ -32,7 +32,9 @@ export const action: ActionFunction = async ({ request }) => {
     if (!formData) {
       return json(
         {
-          formErrors: ['Could not read request body. Maybe files are too large?'],
+          formErrors: [
+            'Could not read request body. Maybe files are too large?',
+          ],
         },
         400
       )

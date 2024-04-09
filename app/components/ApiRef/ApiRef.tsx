@@ -13,7 +13,7 @@ interface ApiRefProps {
   schema: ApiRefSchema
 }
 
-export const ApiRef: React.FC<ApiRefProps> = ({ id = 'api', schema }) => {
+export const ApiRef = ({ id = 'api', schema }: ApiRefProps) => {
   return (
     <BaseSection
       title={
@@ -119,10 +119,13 @@ const wrapExample = (ex: ReactNode) => {
   return null
 }
 
-const RequestResponseHeader: React.FC<{
+const RequestResponseHeader = ({
+  title,
+  contentType,
+}: {
   title: string
   contentType?: ContentType
-}> = ({ title, contentType }) => (
+}) => (
   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end">
     <h4 className="text-lg">{title}</h4>
     {typeof contentType !== 'undefined' && (
@@ -133,10 +136,7 @@ const RequestResponseHeader: React.FC<{
   </div>
 )
 
-const Table: React.FC<{ head: ReactNode; body: ReactNode }> = ({
-  head,
-  body,
-}) => (
+const Table = ({ head, body }: { head: ReactNode; body: ReactNode }) => (
   <div className="overflow-x-auto">
     <table className="table w-full">
       <thead>{head}</thead>

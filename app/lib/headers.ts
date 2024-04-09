@@ -1,4 +1,4 @@
-import type { HeadersFunction } from 'remix'
+import type { HeadersFunction } from '@remix-run/node'
 
 export const passthroughCachingHeaderFactory =
   (): HeadersFunction =>

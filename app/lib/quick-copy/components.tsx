@@ -34,12 +34,17 @@ const classes = {
   icon: 'w-6 h-6 mx-auto',
 }
 
-export const StringItemCard: React.FC<{
+export const StringItemCard = ({
+  item,
+  groupSlug,
+  selected,
+  onSelectedChange,
+}: {
   item: StringItem
   groupSlug: string | null
   selected: boolean
   onSelectedChange: (selected: boolean) => void
-}> = ({ item, groupSlug, selected, onSelectedChange }) => {
+}) => {
   const [copy, copied] = useCopy()
   const [deleteString, moveString, updateString] = useQuickCopyStore(s => [
     s.deleteString,
@@ -92,6 +97,7 @@ export const StringItemCard: React.FC<{
       htmlFor={inputId}
       className="flex flex-col cursor-pointer rounded-btn focus-within-outline focus-outline p-4 sm:px-6 bg-base-200 hocus-within:bg-base-300 hover:shadow-xl"
       style={{
+        // @ts-expect-error react types outta date
         '--tooltip-offset': '110%',
       }}
     >
@@ -264,10 +270,13 @@ export const StringItemCard: React.FC<{
   )
 }
 
-export const CreateStringForm: React.FC<{
+export const CreateStringForm = ({
+  groupSlug,
+  textareaId,
+}: {
   groupSlug: string | null
   textareaId: string
-}> = ({ groupSlug, textareaId }) => {
+}) => {
   const createString = useQuickCopyStore(s => s.createString)
   const textarea = useRef<HTMLTextAreaElement>(null)
 
@@ -312,11 +321,15 @@ export const CreateStringForm: React.FC<{
   )
 }
 
-export const CopyBar: React.FC<{
+export const CopyBar = ({
+  selectedSet,
+  onClear,
+  getStrings,
+}: {
   selectedSet: Set<string>
   onClear: () => void
   getStrings: () => string[]
-}> = ({ selectedSet, onClear, getStrings }) => {
+}) => {
   const clearAfterCopyInput = 'clear-after-copy'
   const separatorInput = 'separator'
   const [clearAfterCopy, setClearAfterCopy] = useLocalStorage(

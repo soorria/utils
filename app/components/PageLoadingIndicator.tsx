@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useTransition } from 'remix'
+import { useNavigation } from '@remix-run/react'
 import { clamp, useCssVar } from '~/lib/utils'
 
 const PROGRESS_VAR = '--progress'
@@ -8,8 +8,8 @@ const PROGRESS_DURATION = 200
 const PROGRESS_DURATION_MS = `${PROGRESS_DURATION}ms`
 const SHOW_VAR = '--loading'
 
-const PageLoadingIndicator: React.FC = () => {
-  const transition = useTransition()
+const PageLoadingIndicator = () => {
+  const transition = useNavigation()
 
   const progress = useCssVar({ name: PROGRESS_VAR })
   const progressDuration = useCssVar({ name: PROGRESS_DURATION_VAR })
@@ -28,11 +28,11 @@ const PageLoadingIndicator: React.FC = () => {
       }
     }
 
-    if (
-      transition.type === 'normalLoad' &&
-      transition.location.pathname === location.pathname
-    )
-      return
+    // if (
+    //   transition.type === 'normalLoad' &&
+    //   transition.location.pathname === location.pathname
+    // )
+    //   return
 
     const setWithoutTransition = (val: string): Promise<void> => {
       return new Promise(resolve => {

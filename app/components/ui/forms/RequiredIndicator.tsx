@@ -1,3 +1,3 @@
-const RequiredIndicator: React.FC = () => <span className="text-error">*</span>
+const RequiredIndicator = () => <span className="text-error">*</span>
 
 export default RequiredIndicator

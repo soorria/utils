@@ -1,14 +1,16 @@
 import type { ClientConfig } from 'pg'
 import { Client } from 'pg'
 import { parse } from 'pg-connection-string'
-import { redirect, Session } from 'remix'
+import { redirect, Session } from '@remix-run/node'
 import { z } from 'zod'
 import { slug } from './details.server'
 import { sbConnStringSession } from './session.server'
 
 const connectionConfigInputSchema = z.object({
   host: z.string({
-    errorMap: () => ({ message: 'Host could not be parsed from connection string.' }),
+    errorMap: () => ({
+      message: 'Host could not be parsed from connection string.',
+    }),
   }),
   database: z.string({
     errorMap: () => ({
@@ -41,7 +43,9 @@ const connectionConfigSessionSchema = connectionConfigInputSchema
 
 export type ConnectionConfig = z.infer<typeof connectionConfigInputSchema>
 
-export type ConnectionStringErrors = z.inferFlattenedErrors<typeof connectionConfigInputSchema>
+export type ConnectionStringErrors = z.inferFlattenedErrors<
+  typeof connectionConfigInputSchema
+>
 
 export const parseConnectionString = (connectionString: string) => {
   return connectionConfigInputSchema.safeParse(parse(connectionString))
@@ -66,7 +70,10 @@ export const withClient = async <Result>(
   }
 }
 
-export const setConfigToSession = (session: Session, config: ConnectionConfig) => {
+export const setConfigToSession = (
+  session: Session,
+  config: ConnectionConfig
+) => {
   session.set('config', config)
 }
 

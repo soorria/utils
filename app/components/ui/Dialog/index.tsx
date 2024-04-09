@@ -5,6 +5,7 @@ import {
   createContext,
   forwardRef,
   HTMLAttributes,
+  ReactNode,
   useContext,
 } from 'react'
 import invariant from 'tiny-invariant'
@@ -14,6 +15,7 @@ export * from './hooks'
 
 interface DialogProps {
   api: DialogApi
+  children: ReactNode
 }
 
 const DialogContext = createContext<DialogApi | null>(null)
@@ -23,7 +25,7 @@ const useDialogContext = () => {
   return ctx
 }
 
-const Dialog: React.FC<DialogProps> = ({ api, children }) => {
+const Dialog = ({ api, children }: DialogProps) => {
   return (
     <Portal>
       <Transition show={api.isOpen}>

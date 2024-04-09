@@ -1,5 +1,4 @@
-import type { ReactNode } from 'react'
-import { capitalise, cx, PartiallyOptional } from '~/lib/utils'
+import { capitalise } from '~/lib/utils'
 import type { DoWCResult, WC } from '~/lib/wc'
 
 const formatOrder: Array<keyof WC> = [
@@ -17,7 +16,7 @@ const getFormattedName = (name: keyof WC) => {
   return formattedNames[name] ?? capitalise(name)
 }
 
-const WCResultTable: React.FC<DoWCResult> = ({ files, total, text }) => {
+const WCResultTable = ({ files, total, text }: DoWCResult) => {
   return (
     <section>
       <div className="overflow-x-auto">

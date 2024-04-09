@@ -1,5 +1,6 @@
-import type { MetaFunction, HtmlMetaDescriptor } from 'remix'
+import type { MetaFunction } from '@remix-run/node'
 import type { Util } from './all-utils.server'
+import { V1_MetaDescriptor, metaV1 } from '@remix-run/v1-meta'
 
 export enum Tag {
   API = 'API',
@@ -19,18 +20,18 @@ export const ogImage = (title: string = '') =>
   })}`
 
 export const commonMetaFactory =
-  <LoaderData extends { utilData: Util }>(overrides?: HtmlMetaDescriptor) =>
-  ({
-    data,
-  }: Omit<Parameters<MetaFunction>[0], 'data'> & {
-    data: LoaderData
-  }): HtmlMetaDescriptor => {
-    const title = TITLE_FORMAT.replace(PLACEHOLDER, data.utilData.title)
-    const { description, path } = data.utilData
+  <LoaderData extends { utilData: Util }>(overrides?: V1_MetaDescriptor) =>
+  (
+    args: Omit<Parameters<MetaFunction>[0], 'data'> & {
+      data: LoaderData
+    }
+  ) => {
+    const title = TITLE_FORMAT.replace(PLACEHOLDER, args.data.utilData.title)
+    const { description, path } = args.data.utilData
 
-    const image = ogImage(data.utilData.title)
+    const image = ogImage(args.data.utilData.title)
 
-    return {
+    return metaV1(args, {
       title,
       description,
       image,
@@ -47,5 +48,5 @@ export const commonMetaFactory =
       'twitter:title': title,
       'twitter:alt': title,
       ...overrides,
-    }
+    })
   }

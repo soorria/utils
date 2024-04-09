@@ -8,7 +8,7 @@ import codeMirrorStyles from 'codemirror/lib/codemirror.css'
 import draculaThemeStyles from 'codemirror/theme/dracula.css'
 import scrollbarStyles from 'codemirror/addon/scroll/simplescrollbars.css'
 import overrideStyles from './codemirror.css'
-import type { LinkDescriptor } from 'remix'
+import type { LinkDescriptor } from '@remix-run/node'
 import { TextareaHTMLAttributes, useEffect, useRef } from 'react'
 import Textarea from './Textarea'
 import { useHydrated } from 'remix-utils'
@@ -30,16 +30,19 @@ export const codeMirrorLinks: LinkDescriptor[] = [
   href: url,
 }))
 
-type CodeMirrorTextareaProps = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'name'> & {
+type CodeMirrorTextareaProps = Omit<
+  TextareaHTMLAttributes<HTMLTextAreaElement>,
+  'name'
+> & {
   name: string
   options: IUnControlledCodeMirror['options']
 }
 
-const CodeMirrorTextarea: React.FC<CodeMirrorTextareaProps> = ({
+const CodeMirrorTextarea = ({
   options,
   className,
   ...delegated
-}) => {
+}: CodeMirrorTextareaProps) => {
   const textarea = useRef<HTMLTextAreaElement>(null)
   const editor = useRef<UnControlled>(null)
   const hydrated = useHydrated()

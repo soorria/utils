@@ -1,5 +1,5 @@
 import cuid from 'cuid'
-import type { Provider } from 'react'
+import type { Provider, ReactNode } from 'react'
 import slugify from 'slugify'
 import create from 'zustand'
 import createContext from 'zustand/context'
@@ -195,7 +195,7 @@ const {
   useStoreApi: useQuickCopyStoreApi,
 } = createContext<ReturnType<typeof createStore>>()
 
-export const QuickCopyProvider: React.FC = props => {
+export const QuickCopyProvider = (props: { children: ReactNode }) => {
   return <Provider createStore={createStore}>{props.children}</Provider>
 }
 export { useQuickCopyStore, useQuickCopyStoreApi }

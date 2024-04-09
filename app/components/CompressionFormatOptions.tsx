@@ -10,17 +10,23 @@ interface CompressionFormatToggleProps {
   name: string
 }
 
-export const CompressionFormatToggle: React.FC<CompressionFormatToggleProps> = ({
+export const CompressionFormatToggle = ({
   id,
   formatName,
   name,
-}) => {
+}: CompressionFormatToggleProps) => {
   return (
     <FormControl variant="INLINE">
       <FormLabel className="cursor-pointer flex-1" htmlFor={id}>
         include {formatName}
       </FormLabel>
-      <input type="checkbox" className="toggle toggle-primary" defaultChecked id={id} name={name} />
+      <input
+        type="checkbox"
+        className="toggle toggle-primary"
+        defaultChecked
+        id={id}
+        name={name}
+      />
     </FormControl>
   )
 }
@@ -33,13 +39,13 @@ interface CompressionFormatOptionsProps {
   levelName: string
 }
 
-const CompressionFormatOptions: React.FC<CompressionFormatOptionsProps> = ({
+const CompressionFormatOptions = ({
   idBase,
   formatName,
   levelName,
   levelRange,
   toggleName,
-}) => {
+}: CompressionFormatOptionsProps) => {
   const toggleId = idBase + '-enabled'
   const levelId = idBase + '-level'
   const label = `${formatName} compression level`
@@ -48,7 +54,11 @@ const CompressionFormatOptions: React.FC<CompressionFormatOptionsProps> = ({
 
   return (
     <div className="space-y-4">
-      <CompressionFormatToggle id={toggleId} name={toggleName} formatName={formatName} />
+      <CompressionFormatToggle
+        id={toggleId}
+        name={toggleName}
+        formatName={formatName}
+      />
 
       <FormControl>
         <FormLabel htmlFor={levelId}>{label}</FormLabel>

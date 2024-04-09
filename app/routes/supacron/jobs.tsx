@@ -1,14 +1,5 @@
 import { useMemo } from 'react'
-import {
-  Link,
-  LoaderFunction,
-  json,
-  useLoaderData,
-  Outlet,
-  useParams,
-  useLocation,
-  useOutletContext,
-} from 'remix'
+import { LoaderFunction, json } from '@remix-run/node'
 import { XCircleIcon, CheckCircleIcon, PlusIcon } from '@heroicons/react/solid'
 import {
   AllCronJobsResult,
@@ -20,6 +11,14 @@ import {
 import { cx, getCookieHeader } from '~/lib/utils'
 import type { SupacronOutletData } from '../supacron'
 import Bleed from '~/components/ui/Bleed'
+import {
+  useLocation,
+  useParams,
+  useOutletContext,
+  Link,
+  Outlet,
+  useLoaderData,
+} from '@remix-run/react'
 
 type LoaderData = {
   jobs: AllCronJobsResult
@@ -37,7 +36,7 @@ export type SupacronJobsOutletData = {
   jobsByName: Record<string, AllCronJobsResult[number]>
 }
 
-const SupacronJobs: React.FC = () => {
+const SupacronJobs = () => {
   const { jobs } = useLoaderData<LoaderData>()
   const location = useLocation()
   const params = useParams<{ jobname: string }>()
@@ -57,7 +56,13 @@ const SupacronJobs: React.FC = () => {
 
   return (
     <Bleed className="grid gap-8 grid-cols-1 md:grid-cols-2/3 lg:grid-cols-3 mb-24 xl:pb-0">
-      <div className={cx(hideLeftSidebarOnSmallScreens && 'hidden', 'md:block', 'space-y-6')}>
+      <div
+        className={cx(
+          hideLeftSidebarOnSmallScreens && 'hidden',
+          'md:block',
+          'space-y-6'
+        )}
+      >
         <div className="bg-base-100 flex justify-between items-end">
           <h2 className="text-3xl text-primary">Cron Jobs</h2>
         </div>
@@ -95,7 +100,9 @@ const SupacronJobs: React.FC = () => {
                     )}
                   >
                     <Icon className="w-4 h-4 fill-current" />
-                    <span className="font-display">{job.active ? 'ACTIVE' : 'INACTIVE'}</span>
+                    <span className="font-display">
+                      {job.active ? 'ACTIVE' : 'INACTIVE'}
+                    </span>
                   </span>
                 </span>
               </Link>

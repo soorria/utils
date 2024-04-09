@@ -1,13 +1,4 @@
-import {
-  json,
-  LoaderFunction,
-  useParams,
-  useLoaderData,
-  Form,
-  ActionFunction,
-  useTransition,
-  redirect,
-} from 'remix'
+import { json, LoaderFunction, ActionFunction, redirect } from '@remix-run/node'
 import dedent from 'dedent'
 import { highlight } from '~/lib/prism.server'
 import {
@@ -35,6 +26,7 @@ import { getUtilBySlug } from '~/lib/all-utils.server'
 import BaseLink from '~/components/BaseLink'
 import Divider from '~/components/Divider'
 import BaseSection from '~/components/ui/sections/BaseSection'
+import { Form, useLoaderData, useNavigation, useParams } from '@remix-run/react'
 
 type LoaderData = {
   job: CronJob
@@ -50,13 +42,17 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const [formData, config] = await Promise.all([
     request.formData(),
-    sbConnStringSession.getSession(getCookieHeader(request)).then(requireConfigFromSession),
+    sbConnStringSession
+      .getSession(getCookieHeader(request))
+      .then(requireConfigFromSession),
   ])
 
   const action = getActionFromFormData(formData)
 
   if (action === 'delete') {
-    await withClient(config, client => deleteCronJobByName(client, { name: jobname }))
+    await withClient(config, client =>
+      deleteCronJobByName(client, { name: jobname })
+    )
     return redirect(`${getUtilBySlug('supacron').path}/jobs`)
   }
 
@@ -73,7 +69,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const session = await sbConnStringSession.getSession(getCookieHeader(request))
   const config = await requireConfigFromSession(session)
 
-  const job = await withClient(config, client => getCronJobByName(client, { name: jobname }))
+  const job = await withClient(config, client =>
+    getCronJobByName(client, { name: jobname })
+  )
 
   if (!job) {
     throw json({ jobname }, 404)
@@ -84,13 +82,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   return json<LoaderData>({ job, highlightedCommand })
 }
 
-const JobDetails: React.FC = () => {
+const JobDetails = () => {
   const { job, highlightedCommand } = useLoaderData<LoaderData>()
-  const transition = useTransition()
+  const transition = useNavigation()
   const dialog = useDialog({ id: 'job-delete' })
 
   const isDeleting =
-    transition.submission && getActionFromFormData(transition.submission.formData) === 'delete'
+    transition.formData &&
+    getActionFromFormData(transition.formData) === 'delete'
   const deleteTriggerText = isDeleting ? 'Deleting' : 'Delete Job'
 
   return (
@@ -99,7 +98,10 @@ const JobDetails: React.FC = () => {
         &larr; Back to all jobs
       </BaseLink>
       <BaseSection
-        className={cx('sticky top-4 transition-opacity', isDeleting && 'opacity-80')}
+        className={cx(
+          'sticky top-4 transition-opacity',
+          isDeleting && 'opacity-80'
+        )}
         variant="MINIMAL"
         title={
           <>
@@ -203,7 +205,7 @@ const JobDetails: React.FC = () => {
 
 export default JobDetails
 
-export const CatchBoundary: React.FC = () => {
+export const CatchBoundary = () => {
   const { jobname } = useParams<{ jobname: string }>()
   return <div>Job with name '{jobname}' not found</div>
 }

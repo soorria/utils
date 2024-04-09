@@ -7,11 +7,7 @@ export interface UtilLayoutProps extends MainLayoutProps {
   util: Util
 }
 
-const UtilLayout: React.FC<UtilLayoutProps> = ({
-  util,
-  children,
-  ...props
-}) => {
+const UtilLayout = ({ util, children, ...props }: UtilLayoutProps) => {
   return (
     <MainLayout {...props}>
       <MainHeading>{util.title}</MainHeading>

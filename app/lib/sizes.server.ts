@@ -1,6 +1,5 @@
 import zlib from 'zlib'
 import { promisify } from 'util'
-import { Readable, PassThrough } from 'stream'
 
 import { getResolvedPromiseValueOrDefault } from './utils'
 import {
@@ -18,8 +17,7 @@ export type Sizes = Partial<Record<SizeFormats, number>>
 export type SizesOptions = Omit<SizesRequest, 'text' | 'files'>
 
 type SizeFunction = (text: string, level: number) => Promise<number>
-
-type StreamToMeasure = Readable | NodeJS.ReadableStream
+type StreamToMeasure = ReadableStream<Uint8Array>
 type SizeFromStream = (stream: StreamToMeasure) => Promise<number>
 
 const getSizeWithKeyAndOptions = <Format extends string>(
@@ -94,11 +92,13 @@ export const getSizes = async (
   return Object.fromEntries(resultEntries) as Sizes
 }
 
-const createStringStream = (string: string): Readable => {
-  const stream = new Readable()
-  stream.push(string)
-  stream.push(null)
-  return stream
+const stringToReadableStream = (string: string): ReadableStream<Uint8Array> => {
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode(string))
+      controller.close()
+    },
+  })
 }
 
 export const getSizesUsingStream = async (
@@ -106,7 +106,7 @@ export const getSizesUsingStream = async (
 ): Promise<Sizes> => {
   const stream =
     typeof stringOrFile === 'string'
-      ? createStringStream(stringOrFile)
+      ? stringToReadableStream(stringOrFile)
       : stringOrFile.stream()
 
   const [initial, gzip, brotli, deflate] = (
@@ -126,23 +126,37 @@ export const getSizesUsingStream = async (
   }
 }
 
+const readableStreamToAsyncIterable = async function* (
+  stream: ReadableStream<Uint8Array>
+) {
+  const reader = stream.getReader()
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) {
+        break
+      }
+
+      yield value
+    }
+  } finally {
+    reader.releaseLock()
+  }
+}
+
 const bytesSize: SizeFunction = async text => {
   return new TextEncoder().encode(text).length
 }
 
 const bytesSizeFromStream: SizeFromStream = async stream => {
-  const bytes = new PassThrough()
   let size = 0
 
-  return new Promise(resolve => {
-    bytes
-      .on('data', buf => {
-        size += (buf as Buffer).length
-      })
-      .on('error', () => resolve(-1))
-      .on('end', () => resolve(size))
-    stream.pipe(bytes)
-  })
+  for await (const chunk of readableStreamToAsyncIterable(stream)) {
+    size += chunk.byteLength
+  }
+
+  return size
 }
 
 const deflate = promisify(zlib.deflate)
@@ -151,19 +165,19 @@ const deflateSize: SizeFunction = async (text, level) => {
   return compressed.length
 }
 
-const deflateSizeFromStream: SizeFromStream = stream => {
+const deflateSizeFromStream: SizeFromStream = async stream => {
   const deflate = zlib.createDeflate()
   let size = 0
 
-  return new Promise(resolve => {
-    deflate
-      .on('data', buf => {
-        size += (buf as Buffer).length
-      })
-      .on('error', () => resolve(-1))
-      .on('end', () => resolve(size))
-    stream.pipe(deflate)
+  deflate.on('data', buf => {
+    size += (buf as Buffer).length
   })
+
+  for await (const chunk of readableStreamToAsyncIterable(stream)) {
+    deflate.write(chunk)
+  }
+
+  return size
 }
 
 const gzip = promisify(zlib.gzip)
@@ -172,19 +186,19 @@ const gzipSize: SizeFunction = async (text, level) => {
   return compressed.length
 }
 
-const gzipSizeFromStream: SizeFromStream = stream => {
+const gzipSizeFromStream: SizeFromStream = async stream => {
   const gzip = zlib.createGzip({ level: 9 })
   let size = 0
 
-  return new Promise(resolve => {
-    gzip
-      .on('data', buf => {
-        size += (buf as Buffer).length
-      })
-      .on('error', () => resolve(-1))
-      .on('end', () => resolve(size))
-    stream.pipe(gzip)
+  gzip.on('data', buf => {
+    size += (buf as Buffer).length
   })
+
+  for await (const chunk of readableStreamToAsyncIterable(stream)) {
+    gzip.write(chunk)
+  }
+
+  return size
 }
 
 const brotli = promisify(zlib.brotliCompress)

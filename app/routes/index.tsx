@@ -1,4 +1,4 @@
-import { json, useLoaderData } from 'remix'
+import { json } from '@remix-run/node'
 import { ExclamationIcon } from '@heroicons/react/solid'
 import MainHeading from '~/components/ui/MainHeading'
 import { allUtils, Util } from '~/lib/all-utils.server'
@@ -8,6 +8,7 @@ import MainLayout from '~/components/ui/layouts/MainLayout'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
 import { cx } from '~/lib/utils'
 import type { ReactNode } from 'react'
+import { useLoaderData } from '@remix-run/react'
 
 type LoaderData = {
   utils: Util[]
@@ -46,14 +47,14 @@ const tagDetailsMap: Record<Tag, { className: string; label: ReactNode }> = {
     ),
   },
 }
-const TagBadge: React.FC<{ tag: Tag }> = props => {
+const TagBadge = (props: { tag: Tag }) => {
   const { className, label } = tagDetailsMap[props.tag]
   return (
     <span className={cx('badge font-mono font-bold', className)}>{label}</span>
   )
 }
 
-const Index: React.FC = () => {
+const Index = () => {
   const data = useLoaderData<LoaderData>()
 
   return (

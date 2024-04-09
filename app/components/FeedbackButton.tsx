@@ -1,13 +1,14 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { cx } from '~/lib/utils'
 
-export const AQRM_SCRIPT_SRC = 'https://aqrm.soorria.com/aqrm.js?s=utils.soorria.com'
+export const AQRM_SCRIPT_SRC =
+  'https://aqrm.soorria.com/aqrm.js?s=utils.soorria.com'
 
 export const MODAL_ROOT_ID = 'aqrm-modal-root'
 
-export const FeedbackButtonModalRoot: React.FC = memo(() => <div id={MODAL_ROOT_ID} />)
+export const FeedbackButtonModalRoot = memo(() => <div id={MODAL_ROOT_ID} />)
 
-const FeedbackButton: React.FC = () => {
+const FeedbackButton = () => {
   const [enabled, setEnabled] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
 

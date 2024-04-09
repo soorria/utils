@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export const useLocalStorage = <T>(
   key: string,
@@ -21,9 +21,9 @@ export const useLocalStorage = <T>(
     localStorage.setItem(key, JSON.stringify(state))
   }, [state, key])
 
-  const clearState = () => {
+  const clearState = useCallback(() => {
     setState(initialValue)
-  }
+  }, [])
 
   return [state, setState, clearState]
 }

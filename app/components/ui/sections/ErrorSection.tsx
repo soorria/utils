@@ -1,18 +1,20 @@
 import { cx, useScrollIntoViewOnMount } from '~/lib/utils'
 import type { SectionVariant } from './common-types'
 import { classes, getRootClassForVariant } from './styles'
+import { ReactNode } from 'react'
 
-const ErrorSection: React.FC<{
-  title?: string
-  utilSlug: string
-  variant?: SectionVariant
-  scrollOnMount?: boolean
-}> = ({
+const ErrorSection = ({
   title = 'something went wrong :(',
   utilSlug,
   children,
   variant = 'DEFAULT',
   scrollOnMount,
+}: {
+  title?: string
+  utilSlug: string
+  variant?: SectionVariant
+  scrollOnMount?: boolean
+  children: ReactNode
 }) => {
   const ref = useScrollIntoViewOnMount()
   return (

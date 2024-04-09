@@ -21,9 +21,12 @@ const getFormatOrder = (a: string, b: string): number => {
   return 0
 }
 
-const SizeAndSavings: React.FC<{ size: number; initial?: number }> = ({
+const SizeAndSavings = ({
   size,
   initial,
+}: {
+  size: number
+  initial?: number
 }) => {
   const savings = size >= 0 && initial ? 1 - size / initial : null
 
@@ -52,9 +55,12 @@ const SizeAndSavings: React.FC<{ size: number; initial?: number }> = ({
   )
 }
 
-const SizesResultTable: React.FC<{ title: ReactNode; sizes: Sizes }> = ({
+const SizesResultTable = ({
   title,
   sizes,
+}: {
+  title: ReactNode
+  sizes: Sizes
 }) => {
   return (
     <section>

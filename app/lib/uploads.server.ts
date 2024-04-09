@@ -1,7 +1,7 @@
 import {
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
-} from 'remix'
+} from '@remix-run/node'
 
 export const MAX_FILE_SIZE = 5_000_000
 

@@ -1,14 +1,5 @@
-import { FormEventHandler, useRef, useState } from 'react'
-import {
-  useActionData,
-  useLoaderData,
-  useTransition,
-  json,
-  useSubmit,
-  ErrorBoundaryComponent,
-  LoaderArgs,
-  ActionArgs,
-} from 'remix'
+import { FormEventHandler, ReactNode, useRef, useState } from 'react'
+import { ActionFunctionArgs, LoaderFunctionArgs, json } from '@remix-run/node'
 import FileInput, { FileSizeInfo } from '~/components/FileInput'
 import BaseForm from '~/components/ui/BaseForm'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
@@ -34,6 +25,14 @@ import toast from 'react-hot-toast'
 import { cx, humanFileSize } from '~/lib/utils'
 import { useCopy } from '~/lib/use-copy'
 import Input from '~/components/ui/forms/Input'
+import {
+  useActionData,
+  useLoaderData,
+  useNavigation,
+  useRouteError,
+  useSubmit,
+} from '@remix-run/react'
+import { ErrorBoundaryComponent } from '@remix-run/react/dist/routeModules'
 
 export const meta = commonMetaFactory()
 export const headers = passthroughCachingHeaderFactory()
@@ -45,7 +44,7 @@ type ActionData =
     }
   | ({ status: 'error' } & PlaiceholderRequestErrors)
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const typedJson = json<ActionData>
   const formData = await parseMultipartFormData(request)
 
@@ -100,7 +99,7 @@ export const action = async ({ request }: ActionArgs) => {
   }
 }
 
-export const loader = async ({}: LoaderArgs) => {
+export const loader = async ({}: LoaderFunctionArgs) => {
   const utilData = getUtilBySlug('plaiceholder')
 
   return json(
@@ -120,16 +119,16 @@ const ids = {
 export default function Plaiceholder() {
   const { maxSize, utilData } = useLoaderData<typeof loader>()
   const submit = useSubmit()
-  const transition = useTransition()
+  const transition = useNavigation()
   const actionData = useActionData<typeof action>()
   const [files, setFiles] = useState<File[]>([])
   const formRef = useRef<HTMLFormElement>(null)
   const [resetFileInputKey, setResetFileInputKey] = useState(0)
 
-  const isSuccess = !transition.submission && actionData?.status === 'success'
-  const isError = !transition.submission && actionData?.status === 'error'
+  const isSuccess = !transition.formData && actionData?.status === 'success'
+  const isError = !transition.formData && actionData?.status === 'error'
   const isComplete = isSuccess || isError
-  const isLoading = Boolean(transition.submission)
+  const isLoading = Boolean(transition.formData)
 
   // need this since we can't set the value of file inputs with js
   const handleSubmit: FormEventHandler<HTMLFormElement> = event => {
@@ -251,7 +250,8 @@ export default function Plaiceholder() {
   )
 }
 
-export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
+export const ErrorBoundary: ErrorBoundaryComponent = () => {
+  const error = useRouteError()
   console.error(error)
 
   return (
@@ -269,9 +269,12 @@ export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
   )
 }
 
-const PlaiceholderOptionCopyButton: React.FC<{ text: string }> = ({
+const PlaiceholderOptionCopyButton = ({
   text,
   children,
+}: {
+  text: string
+  children: ReactNode
 }) => {
   const [copy, copied] = useCopy()
 
@@ -285,10 +288,13 @@ const PlaiceholderOptionCopyButton: React.FC<{ text: string }> = ({
   )
 }
 
-const PlaiceholderResultCard: React.FC<{
+const PlaiceholderResultCard = ({
+  placeholders,
+  fileName,
+}: {
   placeholders: PlaiceholderResultOptions
   fileName: string
-}> = ({ placeholders, fileName }) => {
+}) => {
   const { base64, css, img } = placeholders
 
   return (

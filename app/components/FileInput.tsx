@@ -18,15 +18,19 @@ const useStableFunction = <TFunc extends (...args: any[]) => any>(
 
 const noop = () => {}
 
-const FileInput: React.FC<
-  InputHTMLAttributes<HTMLInputElement> & {
-    onFiles?: (files: File[]) => any
-    onError?: (files: File[]) => any
-    id: string
-    itemsName: string
-    maxSize?: number
-  }
-> = ({ onFiles = noop, onError = noop, itemsName, maxSize, ...props }) => {
+const FileInput = ({
+  onFiles = noop,
+  onError = noop,
+  itemsName,
+  maxSize,
+  ...props
+}: InputHTMLAttributes<HTMLInputElement> & {
+  onFiles?: (files: File[]) => any
+  onError?: (files: File[]) => any
+  id: string
+  itemsName: string
+  maxSize?: number
+}) => {
   const onFilesStable = useStableFunction(onFiles)
   const onErrorStable = useStableFunction(onError)
 
@@ -167,9 +171,12 @@ const FileInput: React.FC<
 
 export default FileInput
 
-export const FileSizeInfo: React.FC<{ id: string; maxSize: number }> = ({
+export const FileSizeInfo = ({
   id,
   maxSize,
+}: {
+  id: string
+  maxSize: number
 }) => {
   return (
     <FormLabel variant="ALT" id={id}>
