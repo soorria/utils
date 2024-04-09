@@ -2,7 +2,6 @@
  * @type {import('@remix-run/dev').AppConfig}
  */
 module.exports = {
-  serverBuildTarget: 'vercel',
   ignoredRouteFiles: ['.*'],
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
@@ -21,6 +20,7 @@ module.exports = {
     '@zag-js/editable',
     '@zag-js/remove-scroll',
     '@zag-js/types',
+    'remix-utils',
   ],
   serverModuleFormat: 'esm',
 }
