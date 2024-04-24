@@ -1,24 +1,18 @@
-import { ActionFunction, json, LinksFunction, redirect } from '@remix-run/node'
-import { useActionData, useNavigate, useNavigation } from '@remix-run/react'
+import { ActionFunction, json, redirect } from '@remix-run/node'
+import { useActionData, useNavigation } from '@remix-run/react'
 import BaseLink from '~/components/BaseLink'
-import { codeMirrorLinks } from '~/components/ui/forms/CodeMirrorTextarea'
 import BaseSection from '~/components/ui/sections/BaseSection'
 import { getUtilBySlug } from '~/lib/all-utils.server'
+import { CronJobForm } from '~/lib/supacron/forms'
+import { requireConfigFromSession, withClient } from '~/lib/supacron/pg.server'
+import { createCronJob } from '~/lib/supacron/queries.server'
+import { sbConnStringSession } from '~/lib/supacron/session.server'
 import {
-  createCronJob,
+  CreateCronJobSchemaErrors,
   CreateCronJobSchema,
   createCronJobSchema,
-  CreateCronJobSchemaErrors,
-  requireConfigFromSession,
-  sbConnStringSession,
-  withClient,
-  CronJobForm,
-} from '~/lib/supacron'
+} from '~/lib/supacron/validation.server'
 import { getCookieHeader } from '~/lib/utils'
-
-export const links: LinksFunction = () => {
-  return [...codeMirrorLinks]
-}
 
 type ActionData = Partial<CreateCronJobSchemaErrors> & {
   data: Record<keyof CreateCronJobSchema, unknown>

@@ -1,14 +1,6 @@
 import { json, LoaderFunction, ActionFunction, redirect } from '@remix-run/node'
 import dedent from 'dedent'
 import { highlight } from '~/lib/prism.server'
-import {
-  getCronJobByName,
-  requireConfigFromSession,
-  sbConnStringSession,
-  withClient,
-  CronJob,
-  deleteCronJobByName,
-} from '~/lib/supacron'
 import { cx, getCookieHeader } from '~/lib/utils'
 import { ActionMethodInput, getActionFromFormData } from '~/lib/action-utils'
 import Dialog, {
@@ -27,6 +19,10 @@ import BaseLink from '~/components/BaseLink'
 import Divider from '~/components/Divider'
 import BaseSection from '~/components/ui/sections/BaseSection'
 import { Form, useLoaderData, useNavigation, useParams } from '@remix-run/react'
+import { requireConfigFromSession, withClient } from '~/lib/supacron/pg.server'
+import { deleteCronJobByName, getCronJobByName } from '~/lib/supacron/queries.server'
+import { sbConnStringSession } from '~/lib/supacron/session.server'
+import { CronJob } from '~/lib/supacron/types'
 
 type LoaderData = {
   job: CronJob

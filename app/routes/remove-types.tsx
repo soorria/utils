@@ -21,19 +21,13 @@ import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
-import CodeMirrorTextarea, {
-  codeMirrorLinks,
-} from '~/components/ui/forms/CodeMirrorTextarea'
+import CodeMirrorTextarea  from '~/components/ui/forms/CodeMirrorTextarea'
 import { highlight } from '~/lib/prism.server'
 import { useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
 
 if (typeof window !== 'undefined') {
   require('codemirror/mode/javascript/javascript')
   require('codemirror/mode/jsx/jsx')
-}
-
-export const links: LinksFunction = () => {
-  return [...codeMirrorLinks]
 }
 
 export const meta = commonMetaFactory<LoaderData>()

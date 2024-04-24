@@ -1,6 +1,6 @@
 import invariant from 'tiny-invariant'
 import { Tag } from './all-utils'
-import { details as supacronDetails } from './supacron'
+import * as supacronDetails from './supacron/details.server'
 
 export type Util = {
   path: string
@@ -60,7 +60,7 @@ export const allUtils: Util[] = _allUtils.map(u => ({
   path: (u as Util).path || `/${u.slug}`,
 }))
 
-type UtilSlug = typeof _allUtils[number]['slug']
+type UtilSlug = (typeof _allUtils)[number]['slug']
 
 const utilBySlug = Object.fromEntries(
   allUtils.map(util => [util.slug, util])

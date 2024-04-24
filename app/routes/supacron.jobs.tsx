@@ -5,13 +5,6 @@ import {
   CheckCircleIcon,
   PlusIcon,
 } from '@heroicons/react/24/solid'
-import {
-  AllCronJobsResult,
-  getAllCronJobs,
-  requireConfigFromSession,
-  sbConnStringSession,
-  withClient,
-} from '~/lib/supacron'
 import { cx, getCookieHeader } from '~/lib/utils'
 import type { SupacronOutletData } from './supacron'
 import Bleed from '~/components/ui/Bleed'
@@ -23,6 +16,9 @@ import {
   Outlet,
   useLoaderData,
 } from '@remix-run/react'
+import { requireConfigFromSession, withClient } from '~/lib/supacron/pg.server'
+import { AllCronJobsResult, getAllCronJobs } from '~/lib/supacron/queries.server'
+import { sbConnStringSession } from '~/lib/supacron/session.server'
 
 type LoaderData = {
   jobs: AllCronJobsResult

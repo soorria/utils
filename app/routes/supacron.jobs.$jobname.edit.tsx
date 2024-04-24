@@ -2,7 +2,6 @@ import { ExclamationCircleIcon as ExclamationIcon } from '@heroicons/react/24/so
 import {
   ActionFunction,
   json,
-  LinksFunction,
   LoaderFunction,
   redirect,
 } from '@remix-run/node'
@@ -10,26 +9,15 @@ import { useActionData, useLoaderData, useNavigation } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 
 import BaseLink from '~/components/BaseLink'
-import { codeMirrorLinks } from '~/components/ui/forms/CodeMirrorTextarea'
 import BaseSection from '~/components/ui/sections/BaseSection'
 import { getUtilBySlug } from '~/lib/all-utils.server'
-import {
-  CronJob,
-  CronJobForm,
-  getCronJobByName,
-  requireConfigFromSession,
-  sbConnStringSession,
-  updateCronJob,
-  updateCronJobSchema,
-  UpdateCronJobSchema,
-  UpdateCronJobSchemaErrors,
-  withClient,
-} from '~/lib/supacron'
+import { CronJobForm } from '~/lib/supacron/forms'
+import { requireConfigFromSession, withClient } from '~/lib/supacron/pg.server'
+import { updateCronJob, getCronJobByName } from '~/lib/supacron/queries.server'
+import { sbConnStringSession } from '~/lib/supacron/session.server'
+import { CronJob } from '~/lib/supacron/types'
+import { UpdateCronJobSchemaErrors, UpdateCronJobSchema, updateCronJobSchema } from '~/lib/supacron/validation.server'
 import { cx, getCookieHeader, getErrorMap } from '~/lib/utils'
-
-export const links: LinksFunction = () => {
-  return [...codeMirrorLinks]
-}
 
 type LoaderData = {
   job: CronJob
