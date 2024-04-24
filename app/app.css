@@ -1,0 +1,219 @@
+@tailwind base;
+@tailwind components;
+
+h1,
+h2,
+h3,
+h4 {
+  @apply font-display font-bold;
+}
+
+h1 {
+  @apply text-primary;
+}
+
+.btn.loading::before {
+  @apply animate-spin;
+}
+
+.textarea,
+.input,
+.btn {
+  @apply border-2;
+}
+
+.bg-rainbow {
+  background-image: linear-gradient(
+    -75deg,
+    theme('colors.pink'),
+    theme('colors.red'),
+    theme('colors.orange'),
+    theme('colors.yellow'),
+    theme('colors.green'),
+    theme('colors.cyan'),
+    theme('colors.purple'),
+    theme('colors.pink'),
+    theme('colors.red'),
+    theme('colors.orange'),
+    theme('colors.yellow'),
+    theme('colors.green'),
+    theme('colors.cyan'),
+    theme('colors.purple'),
+    theme('colors.pink'),
+    theme('colors.red')
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes bgslide {
+  from {
+    background-position: left;
+  }
+  to {
+    background-position: right;
+  }
+}
+
+.bg-rainbow-animate {
+  animation: bgslide linear infinite 3s;
+}
+
+.label {
+  user-select: text;
+  @apply px-0;
+}
+
+[data-theme='dracula'] .btn-ghost:focus-visible {
+  @apply outline-primary;
+}
+
+html,
+body {
+  scroll-behavior: smooth;
+}
+
+.btn:not(.no-ring),
+.link,
+.textarea-primary,
+.input-primary,
+.focus-outline {
+  @apply focus:ring-2 ring-primary ring-offset-2 ring-offset-base-100 transition-shadow focus:outline-none;
+}
+
+.focus-within-outline {
+  @apply focus-within:ring-2 ring-primary ring-offset-2 ring-offset-base-100 transition-shadow focus-within:outline-none;
+}
+
+@screen sm {
+  /* Chrome */
+  ::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-base-200 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-primary;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-color: theme('colors.primary') theme('colors.primary');
+  }
+
+  /* Chrome */
+  pre::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Firefox */
+  pre {
+    scrollbar-width: 'thin';
+  }
+}
+
+/* [data-aqrm-root] {
+  --aqrm-bg: theme('colors.base-200');
+  --aqrm-fg: theme('colors.base-content');
+  --aqrm-primary: theme('colors.primary');
+  --aqrm-primary-dark: theme('colors.primary-focus');
+  --aqrm-primary-contrast: theme('colors.primary-content');
+  --aqrm-base: theme('colors.accent');
+  --aqrm-base-dark: theme('colors.accent-focus');
+  --aqrm-base-darker: theme('colors.accent-focus');
+  --aqrm-issue-1: theme('colors.error');
+  --aqrm-issue-2: theme('colors.error-content');
+  --aqrm-idea-1: theme('colors.warning');
+  --aqrm-idea-2: theme('colors.warning-content');
+  --aqrm-other-1: theme('colors.info');
+  --aqrm-success-1: theme('colors.success');
+  --aqrm-success-2: theme('colors.success-content');
+} */
+
+.aqrm-w {
+  @apply !font-display;
+}
+
+.link {
+  @apply rounded-btn;
+}
+
+.label-text {
+  @apply text-xl;
+}
+.label-text-alt {
+  @apply text-base;
+}
+
+.table th:first-child {
+  position: static;
+}
+
+:root {
+  --bleed-padding: 1rem;
+  --bleed-buffer: calc(var(--bleed-padding) * 2);
+}
+
+@screen md {
+  :root {
+    --bleed-padding: 2rem;
+  }
+}
+
+.skeleton {
+  @apply bg-neutral animate-pulse rounded-btn;
+}
+
+/*
+ * Heading anchors
+ */
+.heading-anchor {
+  @apply absolute no-underline opacity-0 transition-opacity;
+
+  margin-left: 0.5em;
+  padding-right: -1em;
+  cursor: pointer;
+}
+
+.heading-anchor:hover,
+*:hover > .heading-anchor {
+  @apply opacity-100;
+}
+
+.heading-anchor:after {
+  @apply font-normal text-neutral transition-colors duration-100;
+  content: '#';
+}
+
+*:hover > .heading-anchor:hover:after {
+  @apply text-current;
+}
+
+.max-h-dialog-box {
+  max-height: 90svh;
+  max-height: 90vh;
+}
+
+@tailwind utilities;
+
+.tooltip:before {
+  content: attr(aria-label);
+}
+.tooltip-fade-up:before {
+  transform: translateX(-50%) translateY(0%);
+  text-transform: none;
+}
+.tooltip:after {
+  display: none;
+}
+
+.tooltip-fade-up.tooltip-open:before,
+.tooltip-fade-up.tooltip-open:after,
+.tooltip-fade-up:hover:before,
+.tooltip-fade-up:hover:after {
+  transform: translateX(-50%) translateY(-20%);
+}
