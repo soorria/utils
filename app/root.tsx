@@ -1,11 +1,9 @@
 import { LinksFunction } from '@remix-run/node'
 import Link from '~/components/BaseLink'
 import type { MetaFunction } from '@remix-run/node'
-import { ClientOnly } from 'remix-utils/client-only'
 import './app.css'
 import { Toaster } from 'react-hot-toast'
 import { BASE_URL, DEFAULT_TITLE, ogImage } from './lib/all-utils'
-import PageLoadingIndicator from './components/PageLoadingIndicator'
 import { PRISM_CSS_HREF } from './lib/prism'
 import { HeartIcon } from '@heroicons/react/24/outline'
 import { metaV1 } from '@remix-run/v1-meta'
@@ -82,8 +80,8 @@ const Layout = ({ children }: { children: ReactNode }) => {
         <Meta />
         <Links />
       </head>
-      <body className="min-h-screen flex flex-col bg-black">
-        <ClientOnly>{() => <PageLoadingIndicator />}</ClientOnly>
+      <body className="min-h-screen flex flex-col">
+        {/* <ClientOnly>{() => <PageLoadingIndicator />}</ClientOnly> */}
         <div className="max-w-screen-lg w-full mx-auto py-8 px-4 md:px-8 md:py-12 space-y-8 flex flex-col h-full flex-1">
           <header>
             <nav className="flex items-center space-x-2">
