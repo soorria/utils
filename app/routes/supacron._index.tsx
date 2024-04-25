@@ -4,7 +4,7 @@ import FormLabel from '~/components/ui/forms/FormLabel'
 import ErrorSection from '~/components/ui/sections/ErrorSection'
 import SubmitButton from '~/components/ui/SubmitButton'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
-import type { SupacronOutletData, ActionData } from './supacron'
+import type { SupacronOutletData } from './supacron'
 import { action } from './supacron'
 import {
   useActionData,
@@ -24,14 +24,11 @@ export { action }
 const SupaCronAuth = () => {
   const transition = useNavigation()
   const { utilData } = useOutletContext<SupacronOutletData>()
-  const actionData = useActionData<ActionData>()
+  const actionData = useActionData<typeof action>()
 
   const submitting = transition.state === 'submitting'
 
-  const errors = [
-    actionData?.connectionErrors || [],
-    actionData?.formErrors || [],
-  ].flat()
+  const errors = actionData?.connectionErrors || []
   const isError = !submitting && errors.length > 0
   const isConnectionError = Boolean(actionData?.connectionErrors?.length)
 

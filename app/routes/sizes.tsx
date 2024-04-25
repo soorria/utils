@@ -1,5 +1,5 @@
 import { FormEventHandler, useRef, useState } from 'react'
-import { ActionFunction, LoaderFunction, json } from '@remix-run/node'
+import { ActionFunctionArgs, json } from '@remix-run/node'
 import CompressionFormatOptions, {
   CompressionFormatToggle,
 } from '~/components/CompressionFormatOptions'
@@ -56,7 +56,7 @@ type ActionData =
     }
   | ({ status: 'error' } & SizesRequestErrors)
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await parseMultipartFormData(request)
 
   if (!formData) {
@@ -109,7 +109,7 @@ export const action: ActionFunction = async ({ request }) => {
     textSizes: sizes.text,
     files: sizes.files,
     total: sizes.total,
-  }
+  } as ActionData
 }
 
 type LoaderData = {
@@ -118,7 +118,7 @@ type LoaderData = {
   highlighted: { apiExample: string }
 }
 
-export const loader: LoaderFunction = async () => {
+export const loader = async () => {
   const utilData = getUtilBySlug('sizes')
   const apiExample = highlight(
     JSON.stringify(
@@ -150,7 +150,7 @@ export const loader: LoaderFunction = async () => {
     'json'
   )
 
-  return json<LoaderData>(
+  return json(
     {
       maxSize: MAX_FILE_SIZE,
       utilData,
@@ -171,10 +171,10 @@ const ids = {
 }
 
 export default function Sizes() {
-  const { maxSize, utilData, highlighted } = useLoaderData<LoaderData>()
+  const { maxSize, utilData, highlighted } = useLoaderData<typeof loader>()
   const submit = useSubmit()
   const transition = useNavigation()
-  const actionData = useActionData<ActionData>()
+  const actionData = useActionData<typeof action>()
   const [files, setFiles] = useState<File[]>([])
   const formRef = useRef<HTMLFormElement>(null)
   const [resetFileInputKey, setResetFileInputKey] = useState(0)
@@ -331,7 +331,7 @@ export default function Sizes() {
       </BaseForm>
       <ResetButton isLoading={isLoading} onClick={resetForm} />
 
-      {isError ? (
+      {actionData?.status === 'error' ? (
         <ErrorSection utilSlug={utilData.slug}>
           <div aria-live="assertive" className="space-y-6" id={ids.formError}>
             <ul className="list-disc pl-8 space-y-3">

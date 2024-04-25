@@ -1,6 +1,6 @@
 import { FormEventHandler, useCallback, useRef, useState } from 'react'
 import { ArrowTopRightOnSquareIcon as ExternalLinkIcon } from '@heroicons/react/24/outline'
-import { json, LoaderFunction } from '@remix-run/node'
+import { json, LoaderFunctionArgs } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import BaseForm from '~/components/ui/BaseForm'
 import FormControl from '~/components/ui/forms/FormControl'
@@ -10,7 +10,7 @@ import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import ResultsSection from '~/components/ui/sections/ResultsSection'
 import SubmitButton from '~/components/ui/SubmitButton'
 import { commonMetaFactory } from '~/lib/all-utils'
-import { getUtilBySlug, Util } from '~/lib/all-utils.server'
+import { getUtilBySlug } from '~/lib/all-utils.server'
 import { getMaybeLinksFromTextParam } from '~/lib/link-lines'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
 import ResetButton from '~/components/ui/ResetButton'
@@ -18,18 +18,13 @@ import ResetButton from '~/components/ui/ResetButton'
 export const meta = commonMetaFactory()
 export const headers = passthroughCachingHeaderFactory()
 
-type LoaderData = {
-  utilData: Util
-  links: string[] | null
-}
-
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const utilData = getUtilBySlug('link-lines')
 
   const url = new URL(request.url)
   const text = url.searchParams.get('text')
 
-  return json<LoaderData>(
+  return json(
     { utilData, links: getMaybeLinksFromTextParam(text) },
     {
       headers: {
@@ -45,7 +40,7 @@ const IDS = {
 }
 
 const SupaCron = () => {
-  const { utilData, links: initialLinks } = useLoaderData<LoaderData>()
+  const { utilData, links: initialLinks } = useLoaderData<typeof loader>()
   const form = useRef<HTMLFormElement>(null)
 
   const { links, onHydratedSubmit } = useSplitLinks(initialLinks)

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { LoaderFunction, json } from '@remix-run/node'
+import { LoaderFunctionArgs, json } from '@remix-run/node'
 import {
   XCircleIcon,
   CheckCircleIcon,
@@ -17,19 +17,18 @@ import {
   useLoaderData,
 } from '@remix-run/react'
 import { requireConfigFromSession, withClient } from '~/lib/supacron/pg.server'
-import { AllCronJobsResult, getAllCronJobs } from '~/lib/supacron/queries.server'
+import {
+  AllCronJobsResult,
+  getAllCronJobs,
+} from '~/lib/supacron/queries.server'
 import { sbConnStringSession } from '~/lib/supacron/session.server'
 
-type LoaderData = {
-  jobs: AllCronJobsResult
-}
-
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const session = await sbConnStringSession.getSession(getCookieHeader(request))
   const config = await requireConfigFromSession(session)
 
   const jobs = await withClient(config, getAllCronJobs)
-  return json<LoaderData>({ jobs })
+  return json({ jobs })
 }
 
 export type SupacronJobsOutletData = {
@@ -37,7 +36,7 @@ export type SupacronJobsOutletData = {
 }
 
 const SupacronJobs = () => {
-  const { jobs } = useLoaderData<LoaderData>()
+  const { jobs } = useLoaderData<typeof loader>()
   const location = useLocation()
   const params = useParams<{ jobname: string }>()
   const { utilData } = useOutletContext<SupacronOutletData>()

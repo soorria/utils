@@ -1,8 +1,8 @@
 import { ExclamationCircleIcon as ExclamationIcon } from '@heroicons/react/24/solid'
 import {
-  ActionFunction,
+  ActionFunctionArgs,
   json,
-  LoaderFunction,
+  LoaderFunctionArgs,
   redirect,
 } from '@remix-run/node'
 import { useActionData, useLoaderData, useNavigation } from '@remix-run/react'
@@ -15,20 +15,10 @@ import { CronJobForm } from '~/lib/supacron/forms'
 import { requireConfigFromSession, withClient } from '~/lib/supacron/pg.server'
 import { updateCronJob, getCronJobByName } from '~/lib/supacron/queries.server'
 import { sbConnStringSession } from '~/lib/supacron/session.server'
-import { CronJob } from '~/lib/supacron/types'
-import { UpdateCronJobSchemaErrors, UpdateCronJobSchema, updateCronJobSchema } from '~/lib/supacron/validation.server'
+import { updateCronJobSchema } from '~/lib/supacron/validation.server'
 import { cx, getCookieHeader, getErrorMap } from '~/lib/utils'
 
-type LoaderData = {
-  job: CronJob
-  user: string
-}
-
-type ActionData = Partial<UpdateCronJobSchemaErrors> & {
-  data: Record<keyof UpdateCronJobSchema, unknown>
-}
-
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const { jobname } = params
   invariant(jobname)
 
@@ -39,9 +29,9 @@ export const action: ActionFunction = async ({ request, params }) => {
   const parseResult = await updateCronJobSchema.spa(data)
 
   if (!parseResult.success) {
-    return json<ActionData>({
+    return json({
       ...parseResult.error.flatten(),
-      data: data as any,
+      data: data,
     })
   }
 
@@ -60,7 +50,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   return redirect(`${getUtilBySlug('supacron').path}/jobs/${jobname}`)
 }
 
-export const loader: LoaderFunction = async ({ params, request }) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const { jobname } = params
 
   if (typeof jobname !== 'string') {
@@ -78,15 +68,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     throw json({ jobname }, 404)
   }
 
-  job.command = job.command
-
-  return json<LoaderData>({ job, user: config.user })
+  return json({ job, user: config.user })
 }
 
 const JobDetails = () => {
-  const { job, user } = useLoaderData<LoaderData>()
+  const { job, user } = useLoaderData<typeof loader>()
   const transition = useNavigation()
-  const actionData = useActionData<ActionData>()
+  const actionData = useActionData<typeof action>()
 
   const isSubmitting = Boolean(transition.formData)
 

@@ -13,13 +13,36 @@ export const checkPgCronExtension: QueryFunction<
   const QUERY: QueryConfig<never[]> = {
     name: 'check-pg-cron',
     text: `
-      select name, comment, default_version, installed_version
+      select *
       from pg_available_extensions
       where name = 'pg_cron';
     `,
   }
   const result = await client.query(QUERY)
-  return (result.rowCount ?? 0) >= 1
+
+  return !!result.rows[0]?.installed_version
+}
+
+export const enablePgCronExtension: QueryFunction<
+  void,
+  false
+> = async client => {
+  const QUERY: QueryConfig<never[]> = {
+    name: 'enable-pg-cron',
+    text: `create extension if not exists pg_cron;`,
+  }
+  await client.query(QUERY)
+}
+
+export const disablePgCronExtension: QueryFunction<
+  void,
+  false
+> = async client => {
+  const QUERY: QueryConfig<never[]> = {
+    name: 'disable-pg-cron',
+    text: `drop extension if exists pg_cron;`,
+  }
+  await client.query(QUERY)
 }
 
 export type AllCronJobsResult = Pick<
@@ -93,7 +116,7 @@ export const getCronJobRunDetailsByJobId: QueryFunction<
 }
 
 export const createCronJob: QueryFunction<
-  any,
+  void,
   { name: string; schedule: string; command: string }
 > = async (client, { name, schedule, command }) => {
   const QUERY: QueryConfig<[string, string, string]> = {

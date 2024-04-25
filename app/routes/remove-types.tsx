@@ -1,4 +1,4 @@
-import { json, LinksFunction, LoaderFunction } from '@remix-run/node'
+import { json, LoaderFunctionArgs } from '@remix-run/node'
 import BaseForm from '~/components/ui/BaseForm'
 import ResetButton from '~/components/ui/ResetButton'
 import SubmitButton from '~/components/ui/SubmitButton'
@@ -21,7 +21,7 @@ import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import FormControl from '~/components/ui/forms/FormControl'
 import FormLabel from '~/components/ui/forms/FormLabel'
 import { passthroughCachingHeaderFactory } from '~/lib/headers'
-import CodeMirrorTextarea  from '~/components/ui/forms/CodeMirrorTextarea'
+import CodeMirrorTextarea from '~/components/ui/forms/CodeMirrorTextarea'
 import { highlight } from '~/lib/prism.server'
 import { useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
 
@@ -41,7 +41,7 @@ type LoaderData = {
 
 export const headers = passthroughCachingHeaderFactory()
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const successHeaders: HeadersInit = {
     'Cache-Control': 'public, s-maxage=31536000',
   }
@@ -90,7 +90,7 @@ const copiedToast = () => {
 
 const RemoveTypes = () => {
   const { utilData, result, options, highlightedJs } =
-    useLoaderData<LoaderData>()
+    useLoaderData<typeof loader>()
   const transition = useNavigation()
   const [params] = useSearchParams()
   const [isTsx, setIsTsx] = useState(options?.isTsx)
@@ -117,7 +117,7 @@ const RemoveTypes = () => {
     if (result.status === 'success' && didSubmit && shouldCopy) {
       copy(result.js).then(() => copiedToast())
     }
-  }, [result, didSubmit, shouldCopy])
+  }, [result, didSubmit, shouldCopy, copy])
 
   useEffect(() => {
     copyResult()
@@ -232,7 +232,7 @@ const RemoveTypes = () => {
                   </ul>
                   <p className="text-sm">
                     Try re-submitting after toggling{' '}
-                    <code>'does this code have tsx?'</code>
+                    <code>&apos;does this code have tsx?&apos;</code>
                   </p>
                 </div>
               ) : null}
@@ -244,7 +244,7 @@ const RemoveTypes = () => {
                   </p>
                   <p className="text-sm">
                     Try re-submitting after toggling{' '}
-                    <code>'does this code have tsx?'</code>
+                    <code>&apos;does this code have tsx?&apos;</code>
                   </p>
                 </div>
               ) : null}

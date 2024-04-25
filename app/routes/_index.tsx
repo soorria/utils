@@ -1,7 +1,7 @@
 import { json } from '@remix-run/node'
 import { ExclamationCircleIcon as ExclamationIcon } from '@heroicons/react/24/solid'
 import MainHeading from '~/components/ui/MainHeading'
-import { Util, allUtils } from '~/lib/all-utils.server'
+import { allUtils } from '~/lib/all-utils.server'
 import { Tag } from '~/lib/all-utils'
 import Link from '~/components/BaseLink'
 import MainLayout from '~/components/ui/layouts/MainLayout'
@@ -51,7 +51,7 @@ const TagBadge = (props: { tag: Tag }) => {
 }
 
 const Index = () => {
-  const data: { utils: Util[] } = useLoaderData<typeof loader>()
+  const data = useLoaderData<typeof loader>()
 
   return (
     <MainLayout>

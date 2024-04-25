@@ -1,8 +1,9 @@
 import {
   ActionFunctionArgs,
   json,
-  LoaderFunction,
+  LoaderFunctionArgs,
   redirect,
+  SerializeFrom,
 } from '@remix-run/node'
 import { Form, Outlet, useLoaderData } from '@remix-run/react'
 import { ClientOnly } from 'remix-utils/client-only'
@@ -17,8 +18,13 @@ import Dialog, {
 import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import { ActionMethodInput, getActionFromFormData } from '~/lib/action-utils'
 import { commonMetaFactory } from '~/lib/all-utils'
-import { getUtilBySlug, Util } from '~/lib/all-utils.server'
-import { getConfigFromSession, parseConnectionString, setConfigToSession, withClient } from '~/lib/supacron/pg.server'
+import { getUtilBySlug } from '~/lib/all-utils.server'
+import {
+  getConfigFromSession,
+  parseConnectionString,
+  setConfigToSession,
+  withClient,
+} from '~/lib/supacron/pg.server'
 import { checkPgCronExtension } from '~/lib/supacron/queries.server'
 import { sbConnStringSession } from '~/lib/supacron/session.server'
 import { cx, getCookieHeader } from '~/lib/utils'
@@ -26,7 +32,7 @@ import { cx, getCookieHeader } from '~/lib/utils'
 export const meta = commonMetaFactory()
 
 export type ActionData = {
-  connectionString: string
+  connectionString?: string
   formErrors?: string[]
   connectionErrors?: string[]
 }
@@ -49,7 +55,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const connectionString = formdata.get('connectionString')
 
   if (typeof connectionString !== 'string') {
-    return json({})
+    return json<ActionData>({})
   }
 
   const parseResult = parseConnectionString(connectionString)
@@ -65,11 +71,19 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const connectionConfig = parseResult.data
 
   try {
-    await withClient(connectionConfig, async client => {
-      await checkPgCronExtension(client)
+    const installedOk = await withClient(connectionConfig, async client => {
+      return await checkPgCronExtension(client)
     })
+
+    if (!installedOk) {
+      return {
+        connectionErrors: [
+          'Your database does not have the pg_cron extension installed or enabled',
+        ],
+      } as ActionData
+    }
   } catch (err) {
-    return json<ActionData>(
+    return json(
       {
         connectionErrors: [
           err instanceof Error
@@ -84,21 +98,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   setConfigToSession(session, connectionConfig)
 
-  return redirect(`${getUtilBySlug('supacron').slug}/jobs`, {
+  return redirect(`/${getUtilBySlug('supacron').slug}/jobs`, {
     headers: {
       'Set-Cookie': await sbConnStringSession.commitSession(session),
     },
   })
 }
 
-type LoaderData = {
-  utilData: Util
-  authed: boolean
-  database?: string
-  flashError?: string | null
-}
-
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const utilData = getUtilBySlug('supacron')
 
   const session = await sbConnStringSession.getSession(getCookieHeader(request))
@@ -114,13 +121,14 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect(`${utilData.path}/jobs`)
   }
 
-  return json<LoaderData>({ utilData, authed, database })
+  return json({ utilData, authed, database })
 }
 
+type LoaderData = SerializeFrom<typeof loader>
 export type SupacronOutletData = Omit<LoaderData, 'flashError'>
 
 const SupaCron = () => {
-  const { utilData, authed, database } = useLoaderData<LoaderData>()
+  const { utilData, authed, database } = useLoaderData<typeof loader>()
   const dialog = useDialog({ id: 'disconnect-db' })
 
   const outletData: SupacronOutletData = { utilData, authed, database }

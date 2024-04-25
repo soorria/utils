@@ -1,7 +1,7 @@
 import { HeadersFunction, json } from '@remix-run/node'
 import UtilLayout from '~/components/ui/layouts/UtilLayout'
 import { commonMetaFactory } from '~/lib/all-utils'
-import { getUtilBySlug, Util } from '~/lib/all-utils.server'
+import { getUtilBySlug } from '~/lib/all-utils.server'
 import { ClientOnly } from 'remix-utils/client-only'
 import { QuickCopyProvider } from '~/lib/quick-copy'
 import { Outlet, useLoaderData } from '@remix-run/react'
@@ -14,14 +14,10 @@ export const headers: HeadersFunction = () => {
   }
 }
 
-type LoaderData = {
-  utilData: Util
-}
-
 export const loader = async () => {
   const utilData = getUtilBySlug('quick-copy')
 
-  return json<LoaderData>({ utilData })
+  return json({ utilData })
 }
 
 const QuickCopy = () => {
@@ -33,7 +29,7 @@ const QuickCopy = () => {
 }
 
 const QuickCopyRoute = () => {
-  const { utilData } = useLoaderData<LoaderData>()
+  const { utilData } = useLoaderData<typeof loader>()
 
   return (
     <UtilLayout className="flex flex-col" util={utilData}>

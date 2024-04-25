@@ -1,4 +1,4 @@
-import { ActionFunction, json, redirect } from '@remix-run/node'
+import { ActionFunctionArgs, json, redirect } from '@remix-run/node'
 import { useActionData, useNavigation } from '@remix-run/react'
 import BaseLink from '~/components/BaseLink'
 import BaseSection from '~/components/ui/sections/BaseSection'
@@ -15,10 +15,10 @@ import {
 import { getCookieHeader } from '~/lib/utils'
 
 type ActionData = Partial<CreateCronJobSchemaErrors> & {
-  data: Record<keyof CreateCronJobSchema, unknown>
+  data: Record<keyof CreateCronJobSchema, string>
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formdata = await request.formData()
 
   const data = Object.fromEntries(formdata)
@@ -28,7 +28,7 @@ export const action: ActionFunction = async ({ request }) => {
   if (!parseResult.success) {
     return json<ActionData>({
       ...parseResult.error.flatten(),
-      data: data as any,
+      data: data as ActionData['data'],
     })
   }
 
@@ -44,7 +44,7 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 const CreateNewCronJob = () => {
-  const actionData = useActionData<ActionData>()
+  const actionData = useActionData<typeof action>()
   const transition = useNavigation()
   const { data, fieldErrors } = actionData || {}
 

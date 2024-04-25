@@ -1,5 +1,5 @@
 import { FormEventHandler, useRef, useState } from 'react'
-import { ActionFunction, json } from '@remix-run/node'
+import { ActionFunctionArgs, json } from '@remix-run/node'
 import Divider from '~/components/Divider'
 import FileInput, { FileSizeInfo } from '~/components/FileInput'
 import BaseForm from '~/components/ui/BaseForm'
@@ -9,7 +9,6 @@ import ResultsSection from '~/components/ui/sections/ResultsSection'
 import SubmitButton from '~/components/ui/SubmitButton'
 import { getUtilBySlug } from '~/lib/all-utils.server'
 import { download } from '~/lib/download.client'
-import { Sizes } from '~/lib/sizes.server'
 import { MAX_FILE_SIZE, parseMultipartFormData } from '~/lib/uploads.server'
 import { commonMetaFactory } from '~/lib/all-utils'
 import Link from '~/components/BaseLink'
@@ -31,7 +30,6 @@ import {
   useSubmit,
   useLoaderData,
   useActionData,
-  useNavigate,
   useNavigation,
   useRouteError,
 } from '@remix-run/react'
@@ -44,7 +42,7 @@ type ActionData =
   | ({ status: 'success'; inputText: string } & DoWCResult)
   | ({ status: 'error' } & WCRequestErrors)
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await parseMultipartFormData(request)
 
   if (!formData) {
@@ -63,7 +61,7 @@ export const action: ActionFunction = async ({ request }) => {
   const payload: unknown = (() => {
     const inputFiles = formData.getAll('files')
     formData.delete('files')
-    const _payload: any = Object.fromEntries(formData)
+    const _payload: Record<string, unknown> = Object.fromEntries(formData)
     _payload.files = inputFiles
     return _payload
   })()
@@ -77,12 +75,12 @@ export const action: ActionFunction = async ({ request }) => {
       {
         status: 'error',
         ...parseErrors,
-      },
+      } as ActionData,
       400
     )
   }
 
-  const { text, files = [], ...options } = parseResult.data
+  const { text, files = [] } = parseResult.data
 
   const wcs = await doWC({
     text,
@@ -95,7 +93,7 @@ export const action: ActionFunction = async ({ request }) => {
     text: wcs.text,
     files: wcs.files,
     total: wcs.total,
-  }
+  } as ActionData
 }
 
 export const loader = async () => {
@@ -123,7 +121,7 @@ export default function WordCount() {
   const { maxSize, utilData } = useLoaderData<typeof loader>()
   const submit = useSubmit()
   const transition = useNavigation()
-  const actionData = useActionData<ActionData>()
+  const actionData = useActionData<typeof action>()
   const [files, setFiles] = useState<File[]>([])
   const formRef = useRef<HTMLFormElement>(null)
   const [resetFileInputKey, setResetFileInputKey] = useState(0)
